@@ -33,6 +33,9 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.shilapi.xcertplay.airplay.CarPlayClusterDisplay
+import com.shilapi.xcertplay.vehicle.CarBridgeSettings
+import com.shilapi.xcertplay.vehicle.VehicleProfile
+import com.shilapi.xcertplay.vehicle.MediaMode
 import com.shilapi.xcertplay.hud.BydAdbAccess
 import com.shilapi.xcertplay.hud.BydOutputSettings
 import com.shilapi.xcertplay.host.R
@@ -237,6 +240,38 @@ class DiPlayActivity : ComponentActivity() {
         content.addView(body)
     }
 
+    private fun carBridgeSettings(content: LinearLayout) {
+        section(content, "车机与媒体接入") { card ->
+            val profiles = VehicleProfile.entries
+            val modes = MediaMode.entries
+            choice(card, "车机适配", profiles.map { it.label }, profiles.indexOf(CarBridgeSettings.profile(this))) {
+                CarBridgeSettings.prefs(this).edit().putString("vehicle", profiles[it].name).apply()
+                CarPlayMediaKeys.settingsChanged(); render()
+            }
+            choice(card, "媒体接入方式", modes.map { it.label }, modes.indexOf(CarBridgeSettings.mode(this)), reconnects = false) {
+                CarBridgeSettings.prefs(this).edit().putString("mode", modes[it].name).apply()
+                CarPlayMediaKeys.settingsChanged(); render()
+            }
+            card.addView(label(CarPlayMediaKeys.status, 16, MUTED))
+            card.addView(label("自动模式跟随配套 MediaBridge 的忽略名单。强制直连会协商排除桥接；强制桥接仍需取消忽略 CarBridge。", 14, MUTED))
+            card.addView(button("刷新接入状态", false) { CarPlayMediaKeys.settingsChanged(); render() }, matchButton(10, 56))
+            toggle(card, "旧版手动直连已配置", "仅用于旧版 MediaBridge：确认已将 CarBridge 加入忽略名单，或停止旧版桥接服务。", CarBridgeSettings.legacyDirectAcknowledged(this)) {
+                CarBridgeSettings.prefs(this).edit().putBoolean("legacy_direct_confirmed", it).apply()
+                CarPlayMediaKeys.settingsChanged()
+            }
+            toggle(card, "直连在线封面与歌词", "向资源服务发送歌名、歌手和时长以查找资源；关闭后仍可使用原生封面与缓存。桥接模式使用 MediaBridge 自己的资源设置。", CarBridgeSettings.onlineResources(this)) {
+                CarBridgeSettings.prefs(this).edit().putBoolean("online_resources", it).apply()
+                CarPlayMediaKeys.settingsChanged()
+            }
+            card.addView(button("恢复车型默认返回图标与名称", false) {
+                AirPlayPersistence.resetOemToVehicleDefault(this)
+                toast("已恢复车型默认，重新连接 iPhone 后生效")
+            }, matchButton(10, 56))
+            card.addView(button("播放 / 恢复 CarPlay 音乐", false) { CarPlayMediaKeys.command(com.shilapi.xcertplay.airplay.CarPlayMediaButton.PLAY) }, matchButton(10, 56))
+            card.addView(button("暂停 CarPlay 音乐", false) { CarPlayMediaKeys.command(com.shilapi.xcertplay.airplay.CarPlayMediaButton.PAUSE) }, matchButton(10, 56))
+        }
+    }
+
     private fun settings(content: LinearLayout) {
         content.addView(label(getString(R.string.your_drive_your_way), 34, TEXT, true))
         content.addView(label(getString(R.string.apply_reconnects_carplay_for_size_resolution_music_buffer), 17, MUTED).apply { setPadding(0, dp(8), 0, dp(24)) })
@@ -274,8 +309,9 @@ class DiPlayActivity : ComponentActivity() {
                 AirPlayPersistence.saveHideTopBar(this, it); AirPlayPersistence.saveHideBottomBar(this, it)
             }
         }
+        carBridgeSettings(content)
         section(content, getString(R.string.audio_routing)) { card ->
-            toggle(card, getString(R.string.contrib_audio_home_toggle_audio_focus), getString(R.string.contrib_audio_home_toggle_audio_focus_desc), AirPlayPersistence.loadAudioFocusEnabled(this)) { AirPlayPersistence.saveAudioFocusEnabled(this, it) }
+            toggle(card, "音乐互斥", "后一次主动播放优先。其他音乐接管时暂停 CarPlay；关闭后可能同时播放。", AirPlayPersistence.loadAudioFocusEnabled(this)) { AirPlayPersistence.saveAudioFocusEnabled(this, it); CarPlayMediaKeys.settingsChanged() }
             if (resources.getBoolean(R.bool.config_advanced_audio_channel_mapping)) {
                 toggle(card, getString(R.string.advanced_audio_channel_mapping),
                     getString(R.string.use_usage_content_type_routing_instead_of_stream_type),
@@ -981,7 +1017,11 @@ class DiPlayActivity : ComponentActivity() {
         Thread({
             val result = runCatching {
                 val report = buildString {
-                    appendLine("DiPlay ${version()} · private beta diagnostic report")
+                    appendLine("CarBridge ${version()} · diagnostic report")
+                    appendLine("Media route: ${CarPlayMediaKeys.status}")
+                    appendLine("Vehicle: ${CarBridgeSettings.profile(appContext)}; mode: ${CarBridgeSettings.mode(appContext)}")
+                    appendLine("Music exclusive: ${CarBridgeSettings.exclusive(appContext)}; audible: ${CarPlayMediaKeys.isAudible}")
+                    appendLine("NowPlaying: ${CarPlayMediaKeys.snapshot?.let { "connection=${it.connectionId} track=${it.trackGeneration} revision=${it.revision} playback=${it.playback} artwork=${it.artworkSource}" }}")
                     appendLine("Android ${Build.VERSION.RELEASE} / API ${Build.VERSION.SDK_INT}")
                     appendLine("Head unit: ${Build.MANUFACTURER} ${Build.MODEL}")
                     appendLine("Connection: ${if (AirPlayPersistence.loadWirelessEnabled(appContext)) "wireless" else "USB"}")
@@ -996,6 +1036,8 @@ class DiPlayActivity : ComponentActivity() {
                     appendLine("--- Last display negotiation (timestamps distinguish it from current settings) ---")
                     appendLine(DisplayDiagnosticSnapshot.report(appContext))
                     appendLine()
+                    appendLine("--- CarBridge media / route events ---")
+                    appendLine(CarBridgeDiagnostics.report())
                     for (name in SessionLogFile.REPORT_NAMES) {
                         val file = File(appContext.filesDir, "logs/$name")
                         if (file.isFile) {

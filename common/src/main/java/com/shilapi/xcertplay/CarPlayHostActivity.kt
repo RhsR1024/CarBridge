@@ -729,7 +729,7 @@ class CarPlayHostActivity : ComponentActivity() {
 
     // The steering-wheel voice key reaches the focused window; while CarPlay is on screen it opens Siri.
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        if (!CarPlayMediaButton.opensSiri(event.keyCode)) return super.dispatchKeyEvent(event)
+        if (!com.shilapi.xcertplay.vehicle.CarBridgeSettings.isByd(this) || !CarPlayMediaButton.opensSiri(event.keyCode)) return super.dispatchKeyEvent(event)
         if (event.action == KeyEvent.ACTION_UP) {
             val sent = controller?.requestSiri() == true
             appendLog("Siri: voice key ${event.keyCode} sent=$sent")
@@ -2826,7 +2826,7 @@ class CarPlayHostActivity : ComponentActivity() {
 
     private fun defaultAirPlayIconBytes(): ByteArray =
         // Shown in CarPlay's app list as the "back to the car" button.
-        resources.openRawResource(R.raw.ic_car_home).use { it.readBytes() }
+        AirPlayPersistence.defaultOemIconBytes(this)
 
     private fun updateAirPlayIconPreview() {
         val preview = iconPreviewView ?: return
@@ -2838,10 +2838,11 @@ class CarPlayHostActivity : ComponentActivity() {
                 AirPlayPersistence.clearCustomAirPlayIcon(this)
             }
         }
-        val bitmap = customBitmap ?: BitmapFactory.decodeResource(resources, R.raw.placeholder_icon)
+        val bytes = defaultAirPlayIconBytes()
+        val bitmap = customBitmap ?: BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
         preview.setImageBitmap(bitmap)
         iconStatusView?.text =
-            if (customBitmap != null) getString(R.string.custom_1_1_icon) else getString(R.string.default_placeholder_icon)
+            if (customBitmap != null) getString(R.string.custom_1_1_icon) else "${AirPlayPersistence.defaultOemLabel(this)} · 车型默认图标"
     }
 
     private fun currentActivitySize(): DisplaySize? {
@@ -2971,6 +2972,7 @@ class CarPlayHostActivity : ComponentActivity() {
                 diagnosticLog?.append(formattedLogLine(message, System.currentTimeMillis()))
             },
             onMediaAudioChanged = CarPlayMediaKeys::onMediaAudioChanged,
+            musicOutputGate = com.shilapi.xcertplay.playback.MusicOutputGate(),
         )
     }
 
@@ -3176,7 +3178,7 @@ class CarPlayHostActivity : ComponentActivity() {
             },
         )
         controller = next
-        CarPlayMediaKeys.attach(this, next)
+        CarPlayMediaKeys.attach(this, next, checkNotNull(renderer.musicOutputGate))
         if (airPlayConfig.videoInCar) CarPlayVideo.attach(this, next)
         CarPlayBackgroundSession.store(next, renderer, size.width, size.height, this) { completion ->
             runOnUiThread {

@@ -22,8 +22,10 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "xcertplay"
+rootProject.name = "CarBridge"
 include(":common")
 include(":mobile")
 include(":automotive")
 include(":shared")
+
+include(":ecarx")

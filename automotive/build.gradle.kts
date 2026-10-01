@@ -10,11 +10,11 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.shilapi.xcertplay"
+        applicationId = "io.github.rhsr1024.carbridge.automotive"
         minSdk = 28
         targetSdk = 37
-        versionCode = 1201
-        versionName = "1.2.1"
+        versionCode = 100
+        versionName = "0.1.0"
 
     }
 

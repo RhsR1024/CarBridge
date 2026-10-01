@@ -80,7 +80,7 @@ object AirPlayPersistence {
 
     const val DEFAULT_MANUFACTURER = "DiPlay"
     const val DEFAULT_MODEL = "DiPlay"
-    const val DEFAULT_OEM_LABEL = "BYD"
+    const val DEFAULT_OEM_LABEL = "Geely"
     const val DEFAULT_MFI_I2C_PATH = "/dev/i2c-1"
 
     fun loadDisplayScaleTenths(context: Context): Int {
@@ -148,7 +148,7 @@ object AirPlayPersistence {
 
     fun loadAudioFocusEnabled(context: Context): Boolean =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getBoolean(KEY_AUDIO_FOCUS_ENABLED, false)
+            .getBoolean(KEY_AUDIO_FOCUS_ENABLED, true)
 
     fun saveAudioFocusEnabled(context: Context, enabled: Boolean) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
@@ -370,11 +370,25 @@ object AirPlayPersistence {
             .apply()
     }
 
+    fun defaultOemLabel(context: Context): String = when (com.shilapi.xcertplay.vehicle.CarBridgeSettings.profile(context)) {
+        com.shilapi.xcertplay.vehicle.VehicleProfile.BYD -> "BYD"
+        com.shilapi.xcertplay.vehicle.VehicleProfile.GEELY -> "Geely"
+        else -> "CarBridge"
+    }
+    fun resetOemToVehicleDefault(context: Context) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().remove(KEY_OEM_LABEL).apply()
+        clearCustomAirPlayIcon(context)
+    }
+    fun defaultOemIconBytes(context: Context): ByteArray = context.resources.openRawResource(
+        if (com.shilapi.xcertplay.vehicle.CarBridgeSettings.profile(context) == com.shilapi.xcertplay.vehicle.VehicleProfile.GEELY)
+            com.shilapi.xcertplay.host.R.raw.geely_car_home
+        else com.shilapi.xcertplay.host.R.raw.ic_car_home
+    ).use { it.readBytes() }
     fun loadOemLabel(context: Context): String =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .getString(KEY_OEM_LABEL, DEFAULT_OEM_LABEL)
+            .getString(KEY_OEM_LABEL, defaultOemLabel(context))
             // iOS hides the car icon without a label.
-            .orEmpty().ifBlank { DEFAULT_OEM_LABEL }
+            .orEmpty().ifBlank { defaultOemLabel(context) }
 
     fun saveOemLabel(context: Context, oemLabel: String) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
@@ -451,7 +465,7 @@ object AirPlayPersistence {
     }
 
     fun loadClusterMapEnabled(context: Context): Boolean =
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_CLUSTER_MAP, false)
+        com.shilapi.xcertplay.vehicle.CarBridgeSettings.isByd(context) && context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_CLUSTER_MAP, false)
 
     fun saveClusterMapEnabled(context: Context, enabled: Boolean) {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putBoolean(KEY_CLUSTER_MAP, enabled).apply()

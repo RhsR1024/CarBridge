@@ -10,7 +10,16 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- Optional, owner-enabled Usage Access for the verified DiLink 5.1 cluster profile. -->
     <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" tools:ignore="ProtectedPermissions" />
+    <queries>
+        <package android:name="com.mediabridge.app" />
+        <package android:name="com.mediabridge.app.dev" />
+        <package android:name="ecarx.xsf.mediacenter" />
+        <package android:name="com.ecarx.sdk.openapi" />
+        <package android:name="com.ecarx.mediacenter" />
+    </queries>
     <application>
+        <provider android:name="com.shilapi.xcertplay.media.CarBridgeArtworkProvider"
+            android:authorities="${applicationId}.artwork" android:exported="false" android:grantUriPermissions="true" />
         <activity android:name="com.shilapi.xcertplay.DiPlayActivity"
             android:exported="true" android:launchMode="singleTop"
             android:configChanges="density|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"

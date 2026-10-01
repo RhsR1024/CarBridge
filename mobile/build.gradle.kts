@@ -14,11 +14,11 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.shihab.diplay"
+        applicationId = "io.github.rhsr1024.carbridge"
         minSdk = 28
         targetSdk = 37
-        versionCode = 27
-        versionName = "0.2.8"
+        versionCode = 100
+        versionName = "0.1.0"
 
     }
 
@@ -39,8 +39,8 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix = ".hudtest"
-            versionNameSuffix = "-hud-test"
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
         }
         release {
             optimization {
