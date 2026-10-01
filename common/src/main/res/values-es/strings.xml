@@ -60,6 +60,8 @@
     <string name="status_attaching_ncm">Conectando la red NCM/AirPlay</string>
     <string name="status_failed">Error: %1$s</string>
     <string name="msg_car_hotspot_off">El punto de acceso del coche «%1$s» está apagado. Actívalo en la configuración del coche antes de conectarte.</string>
+    <string name="msg_car_hotspot_off_unnamed">El punto de acceso del coche está apagado. Actívalo en la configuración del coche antes de conectarte.</string>
+    <string name="msg_car_hotspot_connect_unnamed">CarBridge se conecta a través del punto de acceso del coche. Actívalo en la configuración del coche y luego conéctate.</string>
     <string name="home_public_preview">VISTA PREVIA PÚBLICA  ·\u0020\u0020</string>
     <string name="choose_iphone_prefix">Elegir iPhone ·\u0020</string>
     <string name="audio_saved_value">Guardado: %1$d</string>

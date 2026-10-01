@@ -43,7 +43,6 @@ internal class CarBridgeRouteManager(
     private var direct: EcarxMediaRoute? = null
     private var releasePending = false
     private var releaseUncertain = false
-    private var legacy = false
     private var snapshot = NowPlayingSnapshot("")
     private var audible = false
     private var activeIntent = ""
@@ -59,14 +58,14 @@ internal class CarBridgeRouteManager(
         override fun onServiceConnected(name: ComponentName, binder: IBinder) {
             if (closed) return
             if (!trusted(context, name.packageName, peerUid)) { fail("配套应用签名不受信任"); return }
-            peer = Messenger(binder); server = ""; policyRevision = -1; legacy = false
+            peer = Messenger(binder); server = ""; policyRevision = -1
             lastResponse = SystemClock.elapsedRealtime()
             val hello = message().apply { putString("package", context.packageName) }
             send(HELLO, hello)
         }
         override fun onServiceDisconnected(name: ComponentName) { peer = null; fail("MediaBridge 连接中断，等待重新协商") }
         override fun onBindingDied(name: ComponentName) { peer = null; fail("MediaBridge 正在重启"); unbind(); main.postDelayed({ bind() }, 1000) }
-        override fun onNullBinding(name: ComponentName) { legacyMode() }
+        override fun onNullBinding(name: ComponentName) { incompatiblePeer() }
     }
     private val ticker = object : Runnable {
         override fun run() {
@@ -89,7 +88,7 @@ internal class CarBridgeRouteManager(
         peerUid = context.packageManager.getApplicationInfo(peerPackage, 0).uid
         if (!trusted(context, peerPackage, peerUid)) { fail("请安装受信任的配套 MediaBridge"); return }
         val intent = Intent().setComponent(ComponentName(peerPackage, SERVICE))
-        if (context.packageManager.resolveService(intent, 0) == null) { legacyMode(); return }
+        if (context.packageManager.resolveService(intent, 0) == null) { incompatiblePeer(); return }
         bound = runCatching { context.bindService(intent, connection, Context.BIND_AUTO_CREATE) }.getOrDefault(false)
         if (!bound) fail("MediaBridge 协作服务不可用")
     }
@@ -185,7 +184,7 @@ internal class CarBridgeRouteManager(
         val expected = epoch
         direct = EcarxMediaRoute(context,
             ready = { ok -> if (!closed && epoch == expected) {
-                if (ok) ready("DIRECT", "ECARX 直连已就绪") else fail("ECARX 服务不可用")
+                if (ok) ready("DIRECT", "ECARX 直连已就绪") else fail("ECARX 服务不可用；手机请使用 MediaBridge 手机调试模式，或选择通用 Android")
             } },
             command = { index, id -> if (route == "DIRECT" && epoch == expected) onCommand(index, id) },
             yield = { reason -> if (epoch == expected) { activeIntent = ""; onYield(reason) } })
@@ -200,15 +199,7 @@ internal class CarBridgeRouteManager(
         if (CarBridgeSettings.mode(context) == MediaMode.BRIDGE) { fail("请安装并启用 MediaBridge"); return }
         epoch++; target = "DIRECT"; openDirect()
     }
-    private fun legacyMode() {
-        legacy = true
-        when (CarBridgeSettings.mode(context)) {
-            MediaMode.AUTO -> fail("旧版 MediaBridge 需要手动选择模式，或安装配套新版")
-            MediaMode.BRIDGE -> ready("BRIDGE", "手动桥接：请在旧版 MediaBridge 取消忽略 CarBridge")
-            MediaMode.DIRECT -> if (CarBridgeSettings.legacyDirectAcknowledged(context)) standalone()
-                else fail("请先在旧版 MediaBridge 忽略 CarBridge，再确认手动直连")
-        }
-    }
+    private fun incompatiblePeer() = fail("请同时更新 CarBridge 和 MediaBridge 至配套版本", retry = false)
     fun update(value: NowPlayingSnapshot) {
         if (snapshot.connectionId != value.connectionId) {
             activeIntent = ""; playCallback?.invoke(false); playCallback = null
@@ -231,8 +222,7 @@ internal class CarBridgeRouteManager(
                 else direct?.requestPlay(intentId) { ok -> if (!closed && epoch == expected && activeIntent == intentId) {
                     playCallback = null; callback(ok)
                 } }
-            "BRIDGE" -> if (legacy) { playCallback = null; callback(true) }
-                else send(PLAY, message().apply { putString("intent", intentId); putLong("intentRevision", intentId.substringAfterLast(':').toLongOrNull() ?: -1); putLong("snapshot", value.revision) })
+            "BRIDGE" -> send(PLAY, message().apply { putString("intent", intentId); putLong("intentRevision", intentId.substringAfterLast(':').toLongOrNull() ?: -1); putLong("snapshot", value.revision) })
             else -> { playCallback = null; callback(false) }
         }
         main.postDelayed({ if (!closed && epoch == expected && activeIntent == intentId && playCallback != null) {
@@ -240,18 +230,18 @@ internal class CarBridgeRouteManager(
         } }, 5000)
     }
     fun suspendPlayback() {
-        if (route == "BRIDGE" && !legacy && activeIntent.isNotEmpty()) send(PAUSE, message().apply { putString("intent", activeIntent) })
+        if (route == "BRIDGE" && activeIntent.isNotEmpty()) send(PAUSE, message().apply { putString("intent", activeIntent) })
         activeIntent = ""; playCallback = null; direct?.pause()
     }
     fun acceptMediaController(caller: String?): Boolean =
-        !mediaBridge(caller) || route == "BRIDGE" && legacy
+        !mediaBridge(caller)
     fun refreshSettings() {
         suspendPlayback(); onYield("媒体设置已改变")
         route = ""; negotiating = false
         if (peer != null && server.isNotEmpty()) choose()
-        else releaseDirect { if (it) { if (legacy) legacyMode() else if (peerPackage.isEmpty()) standalone() else bind() } }
+        else releaseDirect { if (it) bind() }
     }
-    private fun fail(reason: String) {
+    private fun fail(reason: String, retry: Boolean = true) {
         val wasActive = route.isNotEmpty() || negotiating
         if (peer != null && server.isNotEmpty()) io.github.rhsr1024.interop.BridgeProtocol.send(peer, receiver, CLOSE, message())
         peer = null; server = ""; unbind()
@@ -259,7 +249,7 @@ internal class CarBridgeRouteManager(
         if (wasActive) onYield(reason)
         if (direct != null && !releasePending) releaseDirect { }
         CarBridgeDiagnostics.record("Route", "$reason instance=$instance epoch=$epoch")
-        if (!closed && peerPackage.isNotEmpty() && !legacy) main.postDelayed({ if (!closed && !bound && !releasePending && !releaseUncertain) bind() }, 2000)
+        if (retry && !closed && peerPackage.isNotEmpty()) main.postDelayed({ if (!closed && !bound && !releasePending && !releaseUncertain) bind() }, 2000)
     }
     private fun unbind() { if (bound) runCatching { context.unbindService(connection) }; bound = false }
     fun close() {

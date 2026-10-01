@@ -29,6 +29,13 @@ class CarBridgeArtworkProvider : ContentProvider() {
 
     companion object {
         private fun directory(context: Context) = File(context.cacheDir, "carbridge-artwork").apply { mkdirs() }
+        fun grantReadAccess(context: Context, value: String?) {
+            val uri = value?.let(Uri::parse) ?: return
+            if (uri.scheme != "content" || uri.authority != context.packageName + ".artwork") return
+            for (pkg in listOf("com.mediabridge.app", "com.mediabridge.app.dev", "ecarx.xsf.mediacenter", "com.ecarx.sdk.openapi", "com.ecarx.mediacenter")) {
+                runCatching { context.grantUriPermission(pkg, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
+            }
+        }
         fun save(context: Context, bytes: ByteArray): Uri? {
             if (bytes.isEmpty() || bytes.size > 4 * 1024 * 1024) return null
             val png = bytes.size >= 8 && bytes.copyOfRange(0, 8).contentEquals(byteArrayOf(0x89.toByte(), 0x50, 0x4e, 0x47, 13, 10, 26, 10))
@@ -56,9 +63,7 @@ class CarBridgeArtworkProvider : ContentProvider() {
                 file.setLastModified(System.currentTimeMillis())
                 val uri = Uri.Builder().scheme("content").authority(context.packageName + ".artwork")
                     .appendPath("artwork").appendPath(name).build()
-                for (pkg in listOf("com.mediabridge.app", "com.mediabridge.app.dev", "ecarx.xsf.mediacenter", "com.ecarx.sdk.openapi", "com.ecarx.mediacenter")) {
-                    runCatching { context.grantUriPermission(pkg, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION) }
-                }
+                grantReadAccess(context, uri.toString())
                 dir.listFiles()?.filter { it.extension == "png" }?.sortedByDescending { it.lastModified() }?.drop(24)?.forEach {
                     val expired = uri.buildUpon().path("/artwork/${it.name}").build()
                     context.revokeUriPermission(expired, Intent.FLAG_GRANT_READ_URI_PERMISSION)

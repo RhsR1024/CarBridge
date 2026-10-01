@@ -78,6 +78,7 @@ internal class CarBridgeMediaRuntime(
         route = CarBridgeRouteManager(context,
             onReady = { ready -> onMain {
                 if (!ready) pendingGrant = null
+                if (ready) CarBridgeArtworkProvider.grantReadAccess(context, snapshot.artworkUri)
                 policy.route(ready)
                 syncOutput()
                 if (ready && policy.wantsPlayback && !policy.vehicleGranted) requestPlayback()

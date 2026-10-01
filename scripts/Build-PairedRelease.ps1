@@ -2,7 +2,7 @@ param(
     [string]$Tooling = 'D:\CarSoft\MediaBridgeApp\tooling',
     [string]$MediaBridgeRoot = 'D:\CarSoft\MediaBridgeApp\MediaBridge-src',
     [string]$AuthenticationAssets = $env:DIPLAY_AUTH_ASSETS_DIR,
-    [string]$OutputDirectory = 'D:\WorkSpace\CarPlay\deliverables\CarBridge-0.1.0',
+    [string]$OutputDirectory = 'D:\WorkSpace\CarPlay\deliverables\CarBridge-0.1.1',
     [switch]$UseLocalTestKey
 )
 $ErrorActionPreference = 'Stop'
@@ -54,7 +54,7 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'MediaBridge checks failed.' }
     } finally { Pop-Location }
     New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
-    Copy-Item -LiteralPath (Join-Path $CarBridgeRoot 'mobile\build\outputs\apk\release\mobile-release.apk') -Destination (Join-Path $OutputDirectory 'CarBridge-0.1.0.apk')
+    Copy-Item -LiteralPath (Join-Path $CarBridgeRoot 'mobile\build\outputs\apk\release\mobile-release.apk') -Destination (Join-Path $OutputDirectory 'CarBridge-0.1.1.apk')
     Copy-Item -LiteralPath (Join-Path $MediaBridgeRoot 'app\build\outputs\apk\release\app-release.apk') -Destination (Join-Path $OutputDirectory 'MediaBridge-2.3.0-carbridge-26100201.apk')
     foreach ($apk in Get-ChildItem -LiteralPath $OutputDirectory -Filter '*.apk') {
         & (Join-Path $env:JAVA_HOME 'bin\java.exe') -jar (Join-Path $Tooling 'android-sdk\build-tools\37.0.0\lib\apksigner.jar') verify --print-certs $apk.FullName

@@ -60,6 +60,8 @@
     <string name="status_attaching_ncm">جارٍ توصيل شبكة NCM/AirPlay</string>
     <string name="status_failed">فشل: %1$s</string>
     <string name="msg_car_hotspot_off">نقطة اتصال السيارة «%1$s» مُغلقة. شغّلها في إعدادات السيارة قبل الاتصال.</string>
+    <string name="msg_car_hotspot_off_unnamed">نقطة اتصال السيارة مُغلقة. شغّلها في إعدادات السيارة قبل الاتصال.</string>
+    <string name="msg_car_hotspot_connect_unnamed">يتصل CarBridge عبر نقطة اتصال السيارة. شغّلها في إعدادات السيارة ثم اتصل.</string>
     <string name="home_public_preview">معاينة عامة  ·\u0020\u0020</string>
     <string name="choose_iphone_prefix">اختر iPhone ·\u0020</string>
     <string name="audio_saved_value">تم الحفظ: %1$d</string>

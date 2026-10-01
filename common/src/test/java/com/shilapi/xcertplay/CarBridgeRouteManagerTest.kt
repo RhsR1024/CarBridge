@@ -1,6 +1,9 @@
 package com.shilapi.xcertplay
 
 import android.os.*
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageInfo
+import android.content.pm.Signature
 import com.shilapi.xcertplay.vehicle.CarBridgeSettings
 import com.shilapi.xcertplay.nowplaying.NowPlayingSnapshot
 import io.github.rhsr1024.interop.BridgeProtocol.*
@@ -15,6 +18,42 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [30], manifest = Config.NONE)
 class CarBridgeRouteManagerTest {
+    @Test fun ordinaryPhoneCanUseAndroidAudioWithoutVehicleServices() {
+        val context = RuntimeEnvironment.getApplication()
+        CarBridgeSettings.prefs(context).edit().clear().putString("vehicle", "GENERIC").commit()
+        val manager = CarBridgeRouteManager(context, {}, { _, _ -> }, {})
+        manager.update(NowPlayingSnapshot("phone"))
+        manager.start()
+        assertTrue(manager.isReady)
+        assertTrue(manager.isDirect)
+        var grant = false
+        manager.requestPlay("phone:1", NowPlayingSnapshot("phone")) { grant = it }
+        assertTrue(grant)
+        manager.close()
+    }
+
+    @Test fun debugPeerIsDiscoveredAndOldManualConfirmationCannotBypassPairing() {
+        val context = RuntimeEnvironment.getApplication()
+        val pm = shadowOf(context.packageManager)
+        val signature = Signature("1234")
+        for (pkg in listOf(context.packageName, "$MEDIABRIDGE.dev")) {
+            pm.installPackage(PackageInfo().apply {
+                packageName = pkg
+                signatures = arrayOf(signature)
+                applicationInfo = ApplicationInfo().apply { packageName = pkg; uid = android.os.Process.myUid() }
+            })
+        }
+        for (mode in listOf("AUTO", "BRIDGE", "DIRECT")) {
+            CarBridgeSettings.prefs(context).edit().clear().putString("vehicle", "GENERIC")
+                .putString("mode", mode).putBoolean("legacy_direct_confirmed", true).commit()
+            val manager = CarBridgeRouteManager(context, {}, { _, _ -> }, {})
+            manager.start()
+            assertFalse(manager.isReady)
+            assertTrue(manager.status, manager.status.contains("同时更新"))
+            manager.close()
+        }
+    }
+
     private class Rig {
         val context = RuntimeEnvironment.getApplication()
         val outgoing = mutableListOf<Message>()

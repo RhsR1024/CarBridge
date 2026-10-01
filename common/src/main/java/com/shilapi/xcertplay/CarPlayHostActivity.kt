@@ -68,6 +68,7 @@ import com.shilapi.xcertplay.host.R
 import com.shilapi.xcertplay.location.AndroidCarPlayLocationProvider
 import com.shilapi.xcertplay.media.AndroidMediaSink
 import com.shilapi.xcertplay.media.CarPlayTouchMapper
+import com.shilapi.xcertplay.media.CarPlayViewport
 import com.shilapi.xcertplay.network.CarPlayVpnService
 import com.shilapi.xcertplay.orchestration.CarPlayController
 import com.shilapi.xcertplay.orchestration.CarPlayRuntimeConfig
@@ -334,6 +335,7 @@ class CarPlayHostActivity : ComponentActivity() {
     private var reconnectScheduled = false
     private var sessionLog: SessionLogFile? = null
     private var gestureSequenceActive = false
+    private var carPlayTouchActive = false
     private var gestureTracking = false
     private var gestureStartX = 0f
     private var gestureStartY = 0f
@@ -392,6 +394,7 @@ class CarPlayHostActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        CarBridgeScreenOrientation.apply(this)
         languagePreferenceAtCreate = AppLocale.preference(this)
         if (intent.action == "android.hardware.usb.action.USB_DEVICE_ATTACHED") {
             AirPlayPersistence.saveWirelessEnabled(this, false)
@@ -571,6 +574,7 @@ class CarPlayHostActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        CarBridgeScreenOrientation.apply(this)
         val languagePreference = AppLocale.preference(this)
         if (Build.VERSION.SDK_INT < 33 && languagePreference != languagePreferenceAtCreate) {
             languagePreferenceAtCreate = languagePreference
@@ -3219,6 +3223,9 @@ class CarPlayHostActivity : ComponentActivity() {
 
     private fun scheduleDisplaySize(width: Int, height: Int) {
         if (width <= 0 || height <= 0 || shuttingDown.get()) return
+        updateVideoViewport(width, height)
+        // iPhone's negotiated canvas belongs to the connection, not the Activity orientation.
+        if (controller != null && !menuOpen && !handshakeResetInProgress) return
         val size = DisplaySize(width, height)
         if (size == activeDisplaySize || size == pendingDisplaySize) return
         pendingDisplaySize = size
@@ -3227,9 +3234,14 @@ class CarPlayHostActivity : ComponentActivity() {
     }
 
     private fun applyDisplaySize(size: DisplaySize) {
+        if (controller != null && !menuOpen && !handshakeResetInProgress) {
+            updateVideoViewport(size.width, size.height)
+            return
+        }
         if (shuttingDown.get() || size == activeDisplaySize) return
         val previous = activeDisplaySize
         activeDisplaySize = size
+        updateVideoViewport(size.width, size.height)
         recordDetectedMaximum(size)
         updateResolutionMenu()
         if (previous == null) {
@@ -3254,6 +3266,23 @@ class CarPlayHostActivity : ComponentActivity() {
         maximumDetectedWidthPixels = width
         maximumDetectedHeightPixels = height
         AirPlayPersistence.saveMaximumDetectedDisplay(this, width, height)
+    }
+
+    private fun videoViewport(width: Int, height: Int): CarPlayViewport {
+        val source = activeDisplaySize
+        return CarPlayViewport.fit(source?.width ?: width, source?.height ?: height, width, height)
+    }
+
+    private fun updateVideoViewport(width: Int, height: Int) {
+        val view = videoView ?: return
+        val viewport = videoViewport(width, height)
+        view.setTransform(android.graphics.Matrix().apply {
+            setScale(viewport.width / width.coerceAtLeast(1), viewport.height / height.coerceAtLeast(1))
+            postTranslate(viewport.left, viewport.top)
+        })
+        // A finger held during rotation must not continue in the old coordinate space.
+        if (carPlayTouchActive) controller?.sendTouch(emptyList())
+        carPlayTouchActive = false
     }
 
     private fun maybeStartCarPlay() {
@@ -3434,6 +3463,7 @@ class CarPlayHostActivity : ComponentActivity() {
             MotionEvent.ACTION_DOWN -> {
                 gestureSequenceActive = false
                 gestureTracking = false
+                carPlayTouchActive = videoViewport(view.width, view.height).contains(event.x, event.y)
             }
             MotionEvent.ACTION_POINTER_DOWN -> {
                 if (event.pointerCount == THREE_FINGER_COUNT && !gestureSequenceActive) {
@@ -3476,8 +3506,10 @@ class CarPlayHostActivity : ComponentActivity() {
             return true
         }
 
-        val contacts = CarPlayTouchMapper.contacts(event, view.width, view.height)
+        if (!carPlayTouchActive) return true
+        val contacts = CarPlayTouchMapper.contacts(event, view.width, view.height, videoViewport(view.width, view.height))
         val queued = controller?.sendTouch(contacts) ?: false
+        if (event.actionMasked == MotionEvent.ACTION_UP || event.actionMasked == MotionEvent.ACTION_CANCEL) carPlayTouchActive = false
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN,
             MotionEvent.ACTION_POINTER_DOWN,

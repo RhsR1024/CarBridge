@@ -36,6 +36,7 @@ import com.shilapi.xcertplay.airplay.CarPlayClusterDisplay
 import com.shilapi.xcertplay.vehicle.CarBridgeSettings
 import com.shilapi.xcertplay.vehicle.VehicleProfile
 import com.shilapi.xcertplay.vehicle.MediaMode
+import com.shilapi.xcertplay.vehicle.ScreenOrientation
 import com.shilapi.xcertplay.hud.BydAdbAccess
 import com.shilapi.xcertplay.hud.BydOutputSettings
 import com.shilapi.xcertplay.host.R
@@ -94,6 +95,7 @@ class DiPlayActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        CarBridgeScreenOrientation.apply(this)
         languagePreferenceAtCreate = AppLocale.preference(this)
         com.shilapi.xcertplay.hud.BydNavigationOutputs.onAppOpened(applicationContext)
         WindowCompat.setDecorFitsSystemWindows(window, true)
@@ -127,6 +129,7 @@ class DiPlayActivity : ComponentActivity() {
     override fun onConfigurationChanged(newConfig: Configuration) { super.onConfigurationChanged(newConfig); render() }
     override fun onResume() {
         super.onResume()
+        CarBridgeScreenOrientation.apply(this)
         if (Build.VERSION.SDK_INT < 33 && AppLocale.preference(this) != languagePreferenceAtCreate) {
             recreate()
             return
@@ -191,7 +194,7 @@ class DiPlayActivity : ComponentActivity() {
         }
         card.addView(label(connectionHint, 15, MUTED).apply { setPadding(0, dp(14), 0, 0) })
         if (carHotspotOff()) {
-            card.addView(label(getString(R.string.msg_car_hotspot_off, AirPlayPersistence.loadManualHotspotSsid(this)), 15, WARNING).apply { setPadding(0, dp(14), 0, 0) })
+            card.addView(label(carHotspotMessage(R.string.msg_car_hotspot_off, R.string.msg_car_hotspot_off_unnamed), 15, WARNING).apply { setPadding(0, dp(14), 0, 0) })
             card.addView(button(getString(R.string.open_car_hotspot_settings), false) { openCarWifiSettings() }, matchButton(10, 56))
         }
         card.addView(button(getString(R.string.choose_iphone), false) { choosePhone() }, matchButton(16, 56))
@@ -255,10 +258,6 @@ class DiPlayActivity : ComponentActivity() {
             card.addView(label(CarPlayMediaKeys.status, 16, MUTED))
             card.addView(label("自动模式跟随配套 MediaBridge 的忽略名单。强制直连会协商排除桥接；强制桥接仍需取消忽略 CarBridge。", 14, MUTED))
             card.addView(button("刷新接入状态", false) { CarPlayMediaKeys.settingsChanged(); render() }, matchButton(10, 56))
-            toggle(card, "旧版手动直连已配置", "仅用于旧版 MediaBridge：确认已将 CarBridge 加入忽略名单，或停止旧版桥接服务。", CarBridgeSettings.legacyDirectAcknowledged(this)) {
-                CarBridgeSettings.prefs(this).edit().putBoolean("legacy_direct_confirmed", it).apply()
-                CarPlayMediaKeys.settingsChanged()
-            }
             toggle(card, "直连在线封面与歌词", "向资源服务发送歌名、歌手和时长以查找资源；关闭后仍可使用原生封面与缓存。桥接模式使用 MediaBridge 自己的资源设置。", CarBridgeSettings.onlineResources(this)) {
                 CarBridgeSettings.prefs(this).edit().putBoolean("online_resources", it).apply()
                 CarPlayMediaKeys.settingsChanged()
@@ -295,6 +294,13 @@ class DiPlayActivity : ComponentActivity() {
             card.addView(button("${getString(R.string.choose_iphone_prefix)}${DiPlayPreferences.phoneName(this)}", false) { choosePhone() }, matchButton(12, 60))
         }
         section(content, getString(R.string.display_and_performance), R.drawable.ic_dp_display) { card ->
+            val orientations = ScreenOrientation.entries
+            choice(card, "屏幕方向", orientations.map { it.label }, orientations.indexOf(CarBridgeSettings.orientation(this)), reconnects = false) {
+                CarBridgeSettings.prefs(this).edit().putString("orientation", orientations[it].name).apply()
+                CarBridgeScreenOrientation.apply(this)
+                render()
+            }
+            card.addView(label("旋转只调整画面显示，不会断开连接；本次连接保持原画面比例。", 14, MUTED))
             carPlaySizeControl(card)
             choice(card, getString(R.string.resolution), listOf(getString(R.string.resolution_native), getString(R.string.s_80_lighter_load), getString(R.string.s_60_lightest_load)), listOf(10, 8, 6).indexOf(AirPlayPersistence.loadDisplayScaleTenths(this)).coerceAtLeast(0)) { AirPlayPersistence.saveDisplayScaleTenths(this, listOf(10, 8, 6)[it]) }
             val bufferPresets = com.shilapi.xcertplay.media.MediaAudioBuffer.presets
@@ -494,10 +500,15 @@ class DiPlayActivity : ComponentActivity() {
 
     private fun carHotspotOffDialog() {
         AlertDialog.Builder(this).setTitle(getString(R.string.car_hotspot_is_off))
-            .setMessage(getString(R.string.msg_car_hotspot_connect, AirPlayPersistence.loadManualHotspotSsid(this)))
+            .setMessage(carHotspotMessage(R.string.msg_car_hotspot_connect, R.string.msg_car_hotspot_connect_unnamed))
             .setPositiveButton(getString(R.string.open_car_settings)) { _, _ -> openCarWifiSettings() }
             .setNeutralButton(getString(R.string.connect)) { _, _ -> connect(true) }
             .setNegativeButton(getString(R.string.cancel), null).show()
+    }
+
+    private fun carHotspotMessage(named: Int, unnamed: Int): String {
+        val ssid = AirPlayPersistence.loadManualHotspotSsid(this)
+        return if (ssid.isBlank()) getString(unnamed) else getString(named, ssid)
     }
 
     // BYD maps the AOSP tether action to its own hotspot screen; other firmware falls back to Wi-Fi settings.
