@@ -1,5 +1,11 @@
 # Credits and license notices
 
+## CarBridge additions (2026-10-02)
+
+CarBridge retains DiPlay v0.2.8 history and notices. The Now Playing/session 12 additions were reviewed against `shilapi/xcertplay` commit `17c92439413638dfd1d7f91d7e1c2e7358398762` (GPL-3.0). The isolated `ecarx` ABI/connection module was extracted from the local MediaBridge source baseline `ece9746c4e33a2134d64d10f2df8a3ca9b3bba5e`; original reverse-engineering comments remain. Vendor interface rights are not relicensed by this extraction. No USB-box control protocol or borrowed application identity is included.
+
+The Geely emblem is cropped from the user-provided reference, with lettering removed. It remains a third-party trademark asset, separate from the code license. Optional online queries use LRCLIB for lyrics and iTunes for artwork; returned content remains with its respective rights holders. Runtime authentication was explicitly supplied via the user's original DiPlay APK and is excluded from Git/source archives. See [implementation provenance](IMPLEMENTATION_ARCHITECTURE.md) for exact boundaries.
+
 ## Receiver
 
 DiPlay is a modified version of [xcertplay by shilapi](https://github.com/shilapi/xcertplay). The upstream receiver is licensed under GNU GPL version 3; the full text is in `LICENSE` and the original README is retained in `docs/UPSTREAM-README.md`.
