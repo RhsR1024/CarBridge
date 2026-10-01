@@ -281,7 +281,7 @@ object Iap2ControlMessages {
                 listOf(1, 4, 6, 12, 26).forEach(::void)
             }
             group(1) {
-                listOf(0, 1, 7).forEach(::void)
+                listOf(0, 1, 2, 3, 7).forEach(::void)
             }
         },
         Iap2Messages.build(Iap2Endpoints.START_ROUTE_GUIDANCE_UPDATES) {

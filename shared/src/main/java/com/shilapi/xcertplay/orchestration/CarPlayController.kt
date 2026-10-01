@@ -147,12 +147,13 @@ class CarPlayController(
     private val locationProvider: Iap2LocationProvider? = null,
     private val vehicleStatusProvider: com.shilapi.xcertplay.transport.VehicleStatusProvider? = null,
 ) : Closeable {
+    private val bydProfile = com.shilapi.xcertplay.vehicle.CarBridgeSettings.isByd(context)
     init {
         require(!config.locationReportingEnabled || locationProvider != null) {
             "A location provider is required when location reporting is enabled"
         }
-        BydNavigationOutputs.start(context.applicationContext)
-        BydNavigationOutputs.setClusterStreamControl(::applyClusterUi)
+        if (bydProfile) BydNavigationOutputs.start(context.applicationContext)
+        if (bydProfile) BydNavigationOutputs.setClusterStreamControl(::applyClusterUi)
     }
 
     private enum class Phase { IDLE, MFI, WIRELESS, IPHONE, REENUMERATION, DATAPATHS, CONTROL }
@@ -197,6 +198,7 @@ class CarPlayController(
     private var clusterUiStream: Pair<AirPlaySession, Int>? = null
     private var clusterUiShown = true
     private val playbackStatus = com.shilapi.xcertplay.media.CarPlayPlaybackStatus()
+    val nowPlaying = com.shilapi.xcertplay.nowplaying.CarPlayNowPlaying(::debugLog)
 
     /** Told when the iPhone starts or stops playing media; may run on any thread. */
     @Volatile var playbackListener: ((Boolean) -> Unit)? = null
@@ -245,8 +247,9 @@ class CarPlayController(
 
     private val sessionListener = object : AirPlaySessionListener {
         override fun onSessionActive(session: AirPlaySession) {
+            nowPlaying.begin()
             if (activeSession !== session) {
-                BydNavigationOutputs.start(appContext)
+                if (bydProfile) BydNavigationOutputs.start(appContext)
                 // The gear may have changed since /info.
                 if (videoListener != null) session.setVideoPlaybackAllowed(VideoInCar.allowed)
             }
@@ -261,7 +264,8 @@ class CarPlayController(
         override fun onSessionEnded(session: AirPlaySession) {
             if (activeSession === session) {
                 activeSession = null
-                BydNavigationOutputs.endNow()
+                nowPlaying.end()
+                if (bydProfile) BydNavigationOutputs.endNow()
                 videoListener?.onVideoSessionEnded()
                 synchronized(playbackStatus) { playbackStatus.clear() }?.let { playing -> playbackListener?.invoke(playing) }
             }
@@ -425,8 +429,9 @@ class CarPlayController(
             closed = true
         }
         videoGate?.close()
-        BydNavigationOutputs.endNow()
-        BydNavigationOutputs.clearClusterStreamControl(::applyClusterUi)
+        nowPlaying.end()
+        if (bydProfile) BydNavigationOutputs.endNow()
+        if (bydProfile) BydNavigationOutputs.clearClusterStreamControl(::applyClusterUi)
         closeReceivers()
         availabilityPollGeneration.incrementAndGet()
         wirelessGeneration.incrementAndGet()
@@ -455,6 +460,7 @@ class CarPlayController(
                     wirelessAirPlayEndpoint = null
                     closeBestEffort("location provider") { locationProvider?.close() }
                 } finally {
+                    nowPlaying.closeFiles()
                     executor.shutdownNow()
                     try {
                         executor.awaitTermination(EXECUTOR_CLOSE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS)
@@ -499,7 +505,9 @@ class CarPlayController(
 
     // HUD (SOME/IP) and cluster (AMap broadcast) keep separate state so one failing cannot stall the other.
     private fun onRouteFrame(frame: com.shilapi.xcertplay.iap2.wire.Iap2Frame) {
-        BydNavigationOutputs.onFrame(frame)
+        if (closed) return
+        nowPlaying.accept(frame)
+        if (bydProfile) BydNavigationOutputs.onFrame(frame)
         synchronized(playbackStatus) { playbackStatus.accept(frame) }?.let { playing -> playbackListener?.invoke(playing) }
     }
 
@@ -1004,6 +1012,7 @@ class CarPlayController(
                 traceContext = "wireless-rfcomm",
                 onTrace = ::debugLog,
             ).also { csm = it }
+            nowPlaying.attachFiles(channel)
             debugLog("wireless iAP2 CSM channel opened over RFCOMM")
             if (isStaleWirelessRun(generation)) {
                 closeWirelessStack()
@@ -1040,7 +1049,7 @@ class CarPlayController(
                 locationProvider = locationProvider,
                 vehicleStatusProvider = vehicleStatusProvider,
                 locationRequest = wirelessLocationRequest,
-                onIncoming = ::onRouteFrame,
+                onIncoming = { frame -> if (csm === channel && wirelessTunnelChannel == null && !isStaleWirelessRun(generation)) onRouteFrame(frame) },
                 onProgress = ::debugLog,
             )
             if (isStaleWirelessRun(generation)) {
@@ -1113,6 +1122,7 @@ class CarPlayController(
             return false
         }
         wirelessTunnelChannel = channel
+        nowPlaying.attachFiles(channel)
         val generation = wirelessGeneration.get()
         debugLog("wireless iAP2 tunnel control starting")
         return try {
@@ -1133,7 +1143,7 @@ class CarPlayController(
                         onReady = {
                             onWirelessTunnelReady(generation)
                         },
-                        onIncoming = ::onRouteFrame,
+                        onIncoming = { frame -> if (wirelessTunnelChannel === channel && !isStaleWirelessRun(generation)) onRouteFrame(frame) },
                         onProgress = { message -> debugLog("iAP tunnel $message") },
                     )
                     if (closed || generation != wirelessGeneration.get()) return@execute
@@ -1573,6 +1583,7 @@ class CarPlayController(
                 onTrace = ::debugLog,
             )
             this.csm = csm
+            nowPlaying.attachFiles(csm)
             debugLog("wired iAP2 CSM channel opened")
 
             val ncmHostMac = ncm.hostMac ?: config.hostMac
@@ -1605,7 +1616,7 @@ class CarPlayController(
                 timeoutMillis = controlLoopTimeoutMillis(),
                 locationProvider = locationProvider,
                 vehicleStatusProvider = vehicleStatusProvider,
-                onIncoming = ::onRouteFrame,
+                onIncoming = { frame -> if (this.csm === csm) onRouteFrame(frame) },
                 onProgress = { message -> debugLog("wired $message") },
             )
             onStatus(

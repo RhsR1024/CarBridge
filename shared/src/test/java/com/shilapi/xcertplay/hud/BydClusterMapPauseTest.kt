@@ -26,6 +26,7 @@ class BydClusterMapPauseTest {
 
     @Test
     fun initializationDoesNotWaitForAPendingAdbRead() {
+        com.shilapi.xcertplay.vehicle.CarBridgeSettings.prefs(context).edit().putString("vehicle", "BYD").commit()
         val reading = CountDownLatch(1)
         // An adbd that accepted the read and has not answered yet.
         BydClusterMapPause.readMode = {

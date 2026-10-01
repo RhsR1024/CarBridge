@@ -21,6 +21,7 @@ import com.shilapi.xcertplay.airplay.MediaSink
 import com.shilapi.xcertplay.airplay.MicrophoneConfig
 import com.shilapi.xcertplay.airplay.VideoCodec
 import com.shilapi.xcertplay.airplay.toHexString
+import com.shilapi.xcertplay.playback.MusicOutputGate
 import java.io.Closeable
 import java.nio.ByteBuffer
 import java.util.concurrent.ConcurrentHashMap
@@ -100,9 +101,9 @@ internal class AudioFocusCoordinator(
     }
 
     private fun AudioChannel.focusPriority(): Int = when (this) {
-        AudioChannel.MEDIA -> 3
-        AudioChannel.PHONE -> 2
-        AudioChannel.ASSISTANT -> 1
+        AudioChannel.MEDIA -> 1
+        AudioChannel.PHONE -> 3
+        AudioChannel.ASSISTANT -> 2
         AudioChannel.NAVIGATION -> 0
     }
 
@@ -136,6 +137,7 @@ class AndroidMediaSink(
     private val onAudioDiagnostic: (String) -> Unit = {},
     /** True while any music ("media") audio stream is running; called from media threads. */
     private val onMediaAudioChanged: (Boolean) -> Unit = {},
+    val musicOutputGate: MusicOutputGate? = null,
 ) : MediaSink {
     private val appContext = context?.applicationContext
     private val audioFocusCoordinator = AudioFocusCoordinator(
@@ -300,6 +302,7 @@ class AndroidMediaSink(
             navigationStreamType,
             mediaBufferMillis,
             onAudioDiagnostic,
+            musicOutputGate,
         ).also { audioRenderers[id] = it }
     }
 }
@@ -674,6 +677,7 @@ private class AudioRenderer(
     private val navigationStreamType: Int,
     private val mediaBufferMillis: Int,
     private val report: (String) -> Unit,
+    private val musicOutputGate: MusicOutputGate?,
 ) : Closeable {
     private data class AudioPacket(val rtp: ByteArray, val sample: Int)
 
@@ -683,7 +687,12 @@ private class AudioRenderer(
     @Volatile private var running = true
     @Volatile private var started = false
     private var codec: MediaCodec? = null
-    private var track: AudioTrack? = null
+    @Volatile private var track: AudioTrack? = null
+    private val pendingMusicReset = AtomicBoolean(false)
+    private var gateObserver: Closeable? = null
+    private val isMusic: Boolean get() = format.audioType == "media"
+    private fun musicAllowed(): Boolean = !isMusic || musicOutputGate == null ||
+        (musicOutputGate.allowed && !pendingMusicReset.get())
     private var pcm = ByteArray(64 * 1024)
     private var playbackStarted = false
     private var prebufferBytes = 0
@@ -757,7 +766,8 @@ private class AudioRenderer(
             createTrack()
             requestAudioFocus()
             while (running) {
-                queue.poll(AUDIO_POLL_MILLIS, TimeUnit.MILLISECONDS)?.let(::handle)
+                resetMusicAfterLoss()
+                queue.poll(AUDIO_POLL_MILLIS, TimeUnit.MILLISECONDS)?.let { if (musicAllowed()) handle(it) }
                 // Output becomes ready asynchronously, including after the last packet of a burst.
                 // Waiting for the next UDP packet can strand decoded sound for hundreds of ms.
                 codec?.let(::drainCodec)
@@ -862,6 +872,17 @@ private class AudioRenderer(
             )
         }
         track = built
+        val outputGate = musicOutputGate
+        if (isMusic && outputGate != null) {
+            var wasOpen = false
+            gateObserver = outputGate.observe {
+                val open = outputGate.allowed
+                // Mute synchronously; the renderer owns flush/codec reset on its next iteration.
+                if (!open || open != wasOpen) pendingMusicReset.set(true)
+                wasOpen = open
+                runCatching { track?.setVolume(if (open && !pendingMusicReset.get()) outputGate.volume else 0f) }
+            }
+        }
         trackAttributes = built.audioAttributes
         val capacityBytes = built.bufferSizeInFrames * frameBytes
         startThresholdBytes = MediaAudioBuffer.startBytesFor(plan.startBytes, capacityBytes, PREBUFFER_WRITE_CHUNK_BYTES)
@@ -939,6 +960,8 @@ private class AudioRenderer(
      * Navigation guidance intentionally takes no focus: it overlays media without ducking it.
      */
     private fun requestAudioFocus() {
+        // The application music coordinator owns this request, independent of PCM stream lifetime.
+        if (isMusic && musicOutputGate != null) return
         val channel = mappedChannel ?: return
         val attributes = trackAttributes ?: return
         if (channel == AudioChannel.NAVIGATION) {
@@ -1137,6 +1160,7 @@ private class AudioRenderer(
 
     private fun writePcm(data: ByteArray, offset: Int = 0, length: Int = data.size) {
         val track = track ?: return
+        if (!musicAllowed()) return
         if (!firstPcmLogged && length > 0) {
             firstPcmLogged = true
             val end = minOf(data.size, offset + minOf(length, 16))
@@ -1151,7 +1175,7 @@ private class AudioRenderer(
             fadeApplied = true
         }
         var written = 0
-        while (written < length && running) {
+        while (written < length && running && musicAllowed()) {
             val writeLength = if (playbackStarted) {
                 length - written
             } else {
@@ -1187,13 +1211,18 @@ private class AudioRenderer(
     }
 
     private fun startPlayback(track: AudioTrack) {
+        if (!musicAllowed()) return
         underrunsAtPlaybackStart = track.underrunCount
-        track.play()
-        playbackStarted = true
+        playbackStarted = if (isMusic && musicOutputGate != null) {
+            var started = false
+            musicOutputGate.startIfAllowed { if (!pendingMusicReset.get()) { track.play(); started = true } }
+            started
+        } else { track.play(); true }
     }
 
     private fun maintainPlaybackBuffer() {
         val track = track ?: return
+        if (!musicAllowed()) return
         if (bufferProgress.shouldRebuffer(mappedChannel == AudioChannel.MEDIA, playbackStarted,
                 track.underrunCount > underrunsAtPlaybackStart, queue.isEmpty(), track.playbackHeadPosition)) {
             // The hardware buffer has actually drained. Pause without flushing or discarding PCM,
@@ -1208,6 +1237,29 @@ private class AudioRenderer(
             System.nanoTime() - lastPcmWriteNs >= BUFFER_TAIL_WAIT_NS) {
             startPlayback(track)
         }
+    }
+
+    private fun resetMusicAfterLoss() {
+        if (!pendingMusicReset.get()) return
+        val outputGate = musicOutputGate ?: return
+        val revision = outputGate.revision
+        runCatching { track?.pause() }
+        runCatching { track?.flush() }
+        queue.clear()
+        runCatching { codec?.flush() }
+        playbackStarted = false
+        prebufferBytes = 0
+        fadeApplied = false
+        bufferProgress.reset()
+        totalWrittenFrames = 0
+        lastPlaybackHeadFrames = null
+        synchronized(outputGate) {
+            if (revision == outputGate.revision) {
+                pendingMusicReset.set(false)
+                runCatching { track?.setVolume(if (outputGate.allowed) outputGate.volume else 0f) }
+            }
+        }
+        report("Audio: music output gated; obsolete buffered music discarded")
     }
 
     // Persist counters even during packet starvation, and flush before disconnect releases the track.
@@ -1276,6 +1328,8 @@ private class AudioRenderer(
 
     @Synchronized
     private fun release() {
+        gateObserver?.close()
+        gateObserver = null
         abandonAudioFocus()
         val codec = codec
         this.codec = null
