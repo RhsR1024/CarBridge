@@ -10,6 +10,7 @@
 | 原始上游基线 | `v0.2.8 / f2d06951b4e8114dbb62f551c12a32a845a3042f` |
 | 已获取的 upstream/main / v0.2.9 | `18429e737228e8d75d9b6c850af89dcca2f591b6` |
 | 集成分支 | `sync/diplay-0.2.9` |
+| 合并提交 | `61c9771dd7f7d202bfff3074013f72ac8ff8af6b` |
 | 历史保留 | 双亲 merge，第一父为同步前 CarBridge，第二父为上述 v0.2.9；本报告随合并提交保存 |
 | CarBridge 版本 | mobile 与 automotive 均为 `0.1.4 / 104`；mobile debug 为 `0.1.4-debug` |
 | 包名 | `io.github.rhsr1024.carbridge`；debug 后缀 `.debug`；automotive 后缀 `.automotive` |

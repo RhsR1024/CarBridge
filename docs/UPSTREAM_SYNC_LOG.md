@@ -58,3 +58,23 @@ APK 包名/版本/签名摘要/哈希（如构建发布）：
 | 完整证据 | LOCAL_VALIDATION_2026-10-02.md、IMPLEMENTATION_STATUS.md、RELEASE_GUIDE_0.1.0.md |
 
 上游接线冲突关注 shared 的 Controller/transport/AndroidMediaSink，以及 common 的 MediaKeys/SessionService/Activity/Persistence。先检查新协议和音乐门控接口，再保留上游新增逻辑；不整文件覆盖。下一次有真实 upstream 新提交时另开同步记录并重复相应构建与设备回归。
+
+## 2026-10-02 — 同步 DiPlay v0.2.9，CarBridge 0.1.4
+
+| 字段 | 记录 |
+| --- | --- |
+| 同步前 CarBridge | 575a9b46d7f887dc7e79faf6a6639328d565ab8c（0.1.3） |
+| 原上游基线 | v0.2.8 / f2d06951b4e8114dbb62f551c12a32a845a3042f |
+| upstream/main 与标签 | v0.2.9 / 18429e737228e8d75d9b6c850af89dcca2f591b6 |
+| 分支 / 合并提交 | sync/diplay-0.2.9 / 61c9771dd7f7d202bfff3074013f72ac8ff8af6b；保留两个父提交 |
+| 版本 | CarBridge mobile / automotive 0.1.4 / 104，包名保持 |
+| 上游主要变化 | 浮动与嵌入地图、导航小组件、启动器示例、仪表歌曲、昼夜模式、摄像头窗口、0–20 音道、乌克兰语、GPS 方向修复 |
+| 六处冲突 | common Manifest、HostActivity、mobile 构建、settings、CarPlayTouchMapper、CarPlayController；按行为合并 |
+| 定制保留 | ECARX 方控、MB 双模式、元数据、音乐互斥、吉利导航焦点与音量目标、Geely 图标；默认旋转不重连及可选旋转重连保留 |
+| 隔离／兼容 | BYD 仪表歌曲按车型开关；旧导航设置兼容；统一会话画布与触摸尺寸；新翻译保留 CarBridge 品牌 |
+| MediaBridge / 协议 | 未修改外部仓库；协议 1.0；此前实车组合见 VEHICLE_VERIFIED_0.1.3.md |
+| 自动化 | shared 341 + common 129 + home 4 = 474 项通过，0 失败／跳过；四项 lint 0 错误；四模块 debug 构建成功；public tree 和资产检查通过 |
+| 设备范围 | 本次未安装车机或进行新一轮 iPhone／目标 ROM 验收；旧 0.1.3 车测不能代替新版回归 |
+| 状态 | 本地同步验证通过并合入 main；未推送、未发布正式或独立车测包 |
+| 详细报告／产物哈希 | [UPSTREAM_SYNC_0.2.9.md](UPSTREAM_SYNC_0.2.9.md) |
+| 回退 | 保留同步前提交；共享主线需要撤回时对合并提交按第一父创建 revert |
