@@ -2,12 +2,16 @@ param(
     [string]$Tooling = 'D:\CarSoft\MediaBridgeApp\tooling',
     [string]$MediaBridgeRoot = 'D:\CarSoft\MediaBridgeApp\MediaBridge-src',
     [string]$AuthenticationAssets = $env:DIPLAY_AUTH_ASSETS_DIR,
-    [string]$OutputDirectory = 'D:\WorkSpace\CarPlay\deliverables\CarBridge-0.1.3',
+    [string]$OutputDirectory = '',
     [switch]$UseLocalTestKey,
     [switch]$IncludePhoneDebug
 )
 $ErrorActionPreference = 'Stop'
 $CarBridgeRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
+$carBridgeVersion = [regex]::Match([IO.File]::ReadAllText((Join-Path $CarBridgeRoot 'mobile/build.gradle.kts')), 'versionName\s*=\s*"([^"]+)"').Groups[1].Value
+$mediaBridgeVersion = [regex]::Match([IO.File]::ReadAllText((Join-Path $MediaBridgeRoot 'app/build.gradle.kts')), 'versionName\s*=\s*"([^"]+)"').Groups[1].Value
+if (-not $carBridgeVersion -or -not $mediaBridgeVersion) { throw 'Could not read paired source versions.' }
+if (-not $OutputDirectory) { $OutputDirectory = "D:\WorkSpace\CarPlay\deliverables\CarBridge-$carBridgeVersion-MediaBridge-$mediaBridgeVersion" }
 if (-not $AuthenticationAssets) { throw 'Provide the explicitly authorized CarPlay authentication asset directory.' }
 foreach ($name in @('identity.pk8', 'certificate.p7b')) {
     if (-not (Test-Path -LiteralPath (Join-Path $AuthenticationAssets "offline-mfi\$name") -PathType Leaf)) {
@@ -57,10 +61,10 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'MediaBridge checks failed.' }
     } finally { Pop-Location }
     New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
-    Copy-Item -LiteralPath (Join-Path $CarBridgeRoot 'mobile\build\outputs\apk\release\mobile-release.apk') -Destination (Join-Path $OutputDirectory 'CarBridge-0.1.3.apk')
-    Copy-Item -LiteralPath (Join-Path $MediaBridgeRoot 'app\build\outputs\apk\release\app-release.apk') -Destination (Join-Path $OutputDirectory 'MediaBridge-2.3.3-carbridge-26100204.apk')
+    Copy-Item -LiteralPath (Join-Path $CarBridgeRoot 'mobile\build\outputs\apk\release\mobile-release.apk') -Destination (Join-Path $OutputDirectory "CarBridge-$carBridgeVersion.apk")
+    Copy-Item -LiteralPath (Join-Path $MediaBridgeRoot 'app\build\outputs\apk\release\app-release.apk') -Destination (Join-Path $OutputDirectory "MediaBridge-$mediaBridgeVersion.apk")
     if ($IncludePhoneDebug) {
-        Copy-Item -LiteralPath (Join-Path $MediaBridgeRoot 'app\build\outputs\apk\debug\app-debug.apk') -Destination (Join-Path $OutputDirectory 'MediaBridge-2.3.3-carbridge-26100204-dev.apk')
+        Copy-Item -LiteralPath (Join-Path $MediaBridgeRoot 'app\build\outputs\apk\debug\app-debug.apk') -Destination (Join-Path $OutputDirectory "MediaBridge-$mediaBridgeVersion-dev.apk")
     }
     foreach ($apk in Get-ChildItem -LiteralPath $OutputDirectory -Filter '*.apk') {
         & (Join-Path $env:JAVA_HOME 'bin\java.exe') -jar (Join-Path $Tooling 'android-sdk\build-tools\37.0.0\lib\apksigner.jar') verify --print-certs $apk.FullName
