@@ -1,5 +1,7 @@
 # CarBridge 开发文档
 
+当前补丁为 **CarBridge 0.1.1 / MediaBridge 2.3.1**，修复手机调试版发现、旋转重连，调整默认显示设置，并增加蓝牙歌词标题导致误搜资源的防护，详情见 [0.1.1 更新与验证](RELEASE_0.1.1.md)。收藏同步的当前限制见 [能力核对](CARBRIDGE_FAVORITES_FEASIBILITY.md)。下表保留首轮 0.1.0 配套交付基线。
+
 更新：2026-10-02。CarBridge 是本 fork，DiPlay 专指原项目。双模式、歌曲信息、音乐仲裁与 Geely 图标的本机实现已完成，两个 APK 已构建；整车验证尚未执行。
 
 ## 交付与基线
