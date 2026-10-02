@@ -30,4 +30,8 @@
 
 ## 本机验证
 
+shared 321、common 92、MediaBridge 158，共 571 项测试，失败/错误/跳过均为 0。覆盖可听 PCM 与静音、尾音时限、重叠导航流、焦点拒绝不循环重试、通话优先、关闭后不可重获焦点、其他车型/关闭焦点不受影响及元数据诊断原因。mobile release lint 0 错误 / 4 告警；MediaBridge release 0 / 16、debug 0 / 14；automotive assembleDebug 通过。沿用的告警未作为设备验收替代。
+
+构建提交：CarBridge `e0471a36522b03c7dddd68e8ea3c04964affec82`；MediaBridge `9b3bf74bf739a2a2332662254710ba86ce7735b0`。构建后仅补充本段验证记录；未推送、未安装到设备。配套 Debug 与正式版来自相同 MediaBridge main 提交。
+
 最终构建、测试、签名和源码提交证据随交付目录的 manifest.json、SHA256SUMS.txt 与 evidence 保存。车机实际音量映射、桥接/直连的歌曲字段和歌词收录仍由实车验收，本机测试不能替代。
