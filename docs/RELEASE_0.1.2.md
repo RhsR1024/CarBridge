@@ -28,4 +28,10 @@
 
 ## 验证与交付
 
-构建及本机测试结果待本轮构建后补充。设备验收：固定横屏/固定竖屏/自动时首页与 CarPlay 往返、通知重新授权后桥接声音和歌曲、音乐互斥、后台播放及方控。没有 ADB 连接，不能以本机测试替代这些结果。
+本机结果：shared 312、common 92、MediaBridge 158，共 **562** 项测试，零失败、错误和跳过。CarBridge mobile release lint 0 错误 / 4 告警；MediaBridge release 0 / 16、debug 0 / 14；automotive assembleDebug 通过。新增测试覆盖转屏稳定/转回/关闭或后台取消/更新画布/无效尺寸、合并标题及增量状态保留、通知已授权但尚未连接的资格拒绝与旧配套兼容。
+
+正式与 Debug 配套包从同一 MediaBridge main 构建；本轮 fetch 后 origin/main 无待合入提交。构建来源：CarBridge `ec996195c1addd0c562ca4f1e71190d34f91ea5d`，MediaBridge `58a57aaae4062efee480fb45a82ea5759b3859bc`。后续仅补充文档。三个 APK 继续使用同一测试签名，CarBridge 认证资产仍来自用户授权原版；安装包内 manifest 已核对两主界面为初始继承方向且新版 `.dev` 可见性仅声明一次。
+
+交付目录 `D:\WorkSpace\CarPlay\deliverables\CarBridge-0.1.2`：三个 APK、README、发布说明、源码归档、manifest.json、SHA256SUMS 及 evidence。日志为 tooling/tmp/carbridge-0.1.2-paired.log 和 carbridge-0.1.2-automotive.log。
+
+新版本设备验收：固定横屏/固定竖屏/自动时首页与 CarPlay 往返、可选转屏重连后的布局/触摸/声音、标题兼容项下的曲目和实际歌词资源、音乐互斥、后台播放及方控。没有 ADB 连接，不能以本机测试替代这些结果。既有 0.1.1 通知重新授权后手机桥接恢复已由用户确认。
