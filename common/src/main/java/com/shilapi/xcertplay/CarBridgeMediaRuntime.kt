@@ -36,6 +36,9 @@ internal class CarBridgeMediaRuntime(
     private val main = Handler(Looper.getMainLooper())
     private val audio = context.getSystemService(AudioManager::class.java)
     private val policy = PlaybackPolicy()
+    // A format change uses the existing explicit reconnect flow, keeping resource ownership
+    // and the untouched protocol store stable for the lifetime of this connection.
+    private val titleFormat = CarBridgeSettings.combinedTitleFormat(context)
     private val session = MediaSession(context, "CarBridge CarPlay")
     private val artworkWorker = ThreadPoolExecutor(1, 1, 30, TimeUnit.SECONDS, ArrayBlockingQueue(2),
         { job -> Thread(job, "CarBridge-Artwork").apply { isDaemon = true } }, ThreadPoolExecutor.DiscardOldestPolicy())
@@ -118,7 +121,8 @@ internal class CarBridgeMediaRuntime(
         }
     }
 
-    private fun update(value: NowPlayingSnapshot) {
+    private fun update(raw: NowPlayingSnapshot) {
+        val value = com.shilapi.xcertplay.nowplaying.CombinedTitleMetadata.resolve(raw, titleFormat)
         if (snapshot.connectionId == value.connectionId && value.revision < snapshot.revision) return
         if (value.connectionId != snapshot.connectionId) {
             abandonFocus()

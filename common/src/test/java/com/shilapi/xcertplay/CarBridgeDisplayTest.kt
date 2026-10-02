@@ -38,6 +38,7 @@ class CarBridgeDisplayTest {
         val prefs = CarBridgeSettings.prefs(activity)
         prefs.edit().clear().commit()
         assertFalse(CarBridgeSettings.reconnectOnRotation(activity))
+        assertEquals(com.shilapi.xcertplay.nowplaying.CombinedTitleFormat.ORIGINAL, CarBridgeSettings.combinedTitleFormat(activity))
         prefs.edit().putBoolean("reconnect_on_rotation", true).commit()
         assertTrue(CarBridgeSettings.reconnectOnRotation(activity))
         CarBridgeScreenOrientation.apply(activity)

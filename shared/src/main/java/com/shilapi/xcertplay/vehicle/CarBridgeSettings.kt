@@ -26,6 +26,9 @@ object CarBridgeSettings {
     }.getOrDefault(ScreenOrientation.LANDSCAPE)
     fun onlineResources(context: Context): Boolean = prefs(context).getBoolean("online_resources", false)
     fun reconnectOnRotation(context: Context): Boolean = prefs(context).getBoolean("reconnect_on_rotation", false)
+    fun combinedTitleFormat(context: Context): com.shilapi.xcertplay.nowplaying.CombinedTitleFormat = runCatching {
+        com.shilapi.xcertplay.nowplaying.CombinedTitleFormat.valueOf(prefs(context).getString("combined_title_format", "ORIGINAL")!!)
+    }.getOrDefault(com.shilapi.xcertplay.nowplaying.CombinedTitleFormat.ORIGINAL)
     fun exclusive(context: Context): Boolean = context.getSharedPreferences("xcertplay_airplay", Context.MODE_PRIVATE)
         .getBoolean("audio_focus_enabled", true)
     fun setExclusive(context: Context, enabled: Boolean) {

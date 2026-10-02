@@ -263,6 +263,11 @@ class DiPlayActivity : ComponentActivity() {
             card.addView(label(CarPlayMediaKeys.status, 16, MUTED))
             card.addView(label("需要 MediaBridge 小窗显示歌曲和控制播放时，请使用自动或桥接，并启用 MediaBridge 的通知使用权与桥接。直连会让 MediaBridge 排除 CarBridge，不在它的小窗显示歌曲。", 14, MUTED))
             card.addView(button("刷新接入状态", false) { CarPlayMediaKeys.settingsChanged(); render() }, matchButton(10, 56))
+            val titleFormats = com.shilapi.xcertplay.nowplaying.CombinedTitleFormat.entries
+            choice(card, "缺失歌手时的标题格式", titleFormats.map { it.label }, titleFormats.indexOf(CarBridgeSettings.combinedTitleFormat(this))) {
+                CarBridgeSettings.prefs(this).edit().putString("combined_title_format", titleFormats[it].name).apply()
+            }
+            card.addView(label("仅歌手为空且标题使用带空格的横线分隔时拆分。已有歌手信息保持原样；例如“周铁男 - 三国杀”选“歌手 - 歌曲名”。修改后重新连接生效。", 14, MUTED))
             toggle(card, "直连在线封面与歌词", "向资源服务发送歌名、歌手和时长以查找资源；关闭后仍可使用原生封面与缓存。桥接模式使用 MediaBridge 自己的资源设置。", CarBridgeSettings.onlineResources(this)) {
                 CarBridgeSettings.prefs(this).edit().putBoolean("online_resources", it).apply()
                 CarPlayMediaKeys.settingsChanged()
@@ -1039,6 +1044,7 @@ class DiPlayActivity : ComponentActivity() {
                     appendLine("CarBridge ${version()} · diagnostic report")
                     appendLine("Media route: ${CarPlayMediaKeys.status}")
                     appendLine("Vehicle: ${CarBridgeSettings.profile(appContext)}; mode: ${CarBridgeSettings.mode(appContext)}")
+                    appendLine("Saved combined-title format (applies on reconnect): ${CarBridgeSettings.combinedTitleFormat(appContext)}")
                     appendLine("Music exclusive: ${CarBridgeSettings.exclusive(appContext)}; audible: ${CarPlayMediaKeys.isAudible}")
                     appendLine("NowPlaying: ${CarPlayMediaKeys.snapshot?.let { "connection=${it.connectionId} track=${it.trackGeneration} revision=${it.revision} playback=${it.playback} artwork=${it.artworkSource}" }}")
                     appendLine("Android ${Build.VERSION.RELEASE} / API ${Build.VERSION.SDK_INT}")
