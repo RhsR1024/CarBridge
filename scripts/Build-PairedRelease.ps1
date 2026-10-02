@@ -3,7 +3,8 @@ param(
     [string]$MediaBridgeRoot = 'D:\CarSoft\MediaBridgeApp\MediaBridge-src',
     [string]$AuthenticationAssets = $env:DIPLAY_AUTH_ASSETS_DIR,
     [string]$OutputDirectory = 'D:\WorkSpace\CarPlay\deliverables\CarBridge-0.1.1',
-    [switch]$UseLocalTestKey
+    [switch]$UseLocalTestKey,
+    [switch]$IncludePhoneDebug
 )
 $ErrorActionPreference = 'Stop'
 $CarBridgeRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
@@ -50,12 +51,17 @@ try {
     $env:JAVA_HOME = Join-Path $Tooling 'jdk\jdk-17.0.16+8'
     Push-Location $MediaBridgeRoot
     try {
-        & (Join-Path $Tooling 'gradle\gradle-8.9\bin\gradle.bat') :app:testDebugUnitTest :app:lintRelease :app:assembleRelease --console=plain
+        $checks = @(':app:testDebugUnitTest', ':app:lintRelease', ':app:assembleRelease')
+        if ($IncludePhoneDebug) { $checks += @(':app:lintDebug', ':app:assembleDebug') }
+        & (Join-Path $Tooling 'gradle\gradle-8.9\bin\gradle.bat') @checks --console=plain
         if ($LASTEXITCODE -ne 0) { throw 'MediaBridge checks failed.' }
     } finally { Pop-Location }
     New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null
     Copy-Item -LiteralPath (Join-Path $CarBridgeRoot 'mobile\build\outputs\apk\release\mobile-release.apk') -Destination (Join-Path $OutputDirectory 'CarBridge-0.1.1.apk')
-    Copy-Item -LiteralPath (Join-Path $MediaBridgeRoot 'app\build\outputs\apk\release\app-release.apk') -Destination (Join-Path $OutputDirectory 'MediaBridge-2.3.0-carbridge-26100201.apk')
+    Copy-Item -LiteralPath (Join-Path $MediaBridgeRoot 'app\build\outputs\apk\release\app-release.apk') -Destination (Join-Path $OutputDirectory 'MediaBridge-2.3.1-carbridge-26100202.apk')
+    if ($IncludePhoneDebug) {
+        Copy-Item -LiteralPath (Join-Path $MediaBridgeRoot 'app\build\outputs\apk\debug\app-debug.apk') -Destination (Join-Path $OutputDirectory 'MediaBridge-2.3.1-carbridge-26100202-dev.apk')
+    }
     foreach ($apk in Get-ChildItem -LiteralPath $OutputDirectory -Filter '*.apk') {
         & (Join-Path $env:JAVA_HOME 'bin\java.exe') -jar (Join-Path $Tooling 'android-sdk\build-tools\37.0.0\lib\apksigner.jar') verify --print-certs $apk.FullName
         if ($LASTEXITCODE -ne 0) { throw "Signature verification failed: $($apk.Name)" }
