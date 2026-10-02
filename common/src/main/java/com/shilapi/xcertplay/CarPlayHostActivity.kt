@@ -341,6 +341,21 @@ class CarPlayHostActivity : ComponentActivity() {
     private var gestureStartY = 0f
     private val shuttingDown = AtomicBoolean(false)
     private val mainHandler = Handler(Looper.getMainLooper())
+    private var uiResumed = false
+    private val rotationRestart = CarBridgeRotationRestart(mainHandler,
+        permitted = {
+            uiResumed && hasWindowFocus() && !shuttingDown.get() && !menuOpen &&
+                !handshakeResetInProgress && controller != null && CarPlayBackgroundSession.isOwner(this) &&
+                com.shilapi.xcertplay.vehicle.CarBridgeSettings.orientation(this) == com.shilapi.xcertplay.vehicle.ScreenOrientation.AUTO &&
+                com.shilapi.xcertplay.vehicle.CarBridgeSettings.reconnectOnRotation(this)
+        },
+        canvas = { activeDisplaySize?.let { CarBridgeRotationRestart.Size(it.width, it.height) } },
+        restart = { size ->
+            activeDisplaySize = DisplaySize(size.width, size.height)
+            updateVideoViewport(size.width, size.height)
+            recordDetectedMaximum(DisplaySize(size.width, size.height))
+            restartCarPlay("Updating native CarPlay layout after rotation to ${size.width}x${size.height}", followDisplay = true)
+        })
     private val teardownExecutor: ExecutorService = Executors.newSingleThreadExecutor()
     private val airPlayCommandExecutor: ExecutorService = Executors.newSingleThreadExecutor()
     private val logLines = ArrayDeque<LogEntry>()
@@ -377,6 +392,7 @@ class CarPlayHostActivity : ComponentActivity() {
         }
 
         override fun onSurfaceTextureDestroyed(texture: SurfaceTexture): Boolean {
+            rotationRestart.cancel()
             if (currentSurfaceTexture !== texture) return true
             currentSurface?.let { surface ->
                 sink?.clearSurface(SCREEN_TYPE_MAIN, surface)
@@ -393,8 +409,8 @@ class CarPlayHostActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         CarBridgeScreenOrientation.apply(this)
+        super.onCreate(savedInstanceState)
         languagePreferenceAtCreate = AppLocale.preference(this)
         if (intent.action == "android.hardware.usb.action.USB_DEVICE_ATTACHED") {
             AirPlayPersistence.saveWirelessEnabled(this, false)
@@ -561,6 +577,7 @@ class CarPlayHostActivity : ComponentActivity() {
     }
 
     override fun onNewIntent(intent: Intent) {
+        CarBridgeScreenOrientation.apply(this)
         super.onNewIntent(intent)
         setIntent(intent)
         if (intent.action == "android.hardware.usb.action.USB_DEVICE_ATTACHED" && wirelessEnabled) {
@@ -574,6 +591,7 @@ class CarPlayHostActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
+        uiResumed = true
         CarBridgeScreenOrientation.apply(this)
         val languagePreference = AppLocale.preference(this)
         if (Build.VERSION.SDK_INT < 33 && languagePreference != languagePreferenceAtCreate) {
@@ -598,6 +616,7 @@ class CarPlayHostActivity : ComponentActivity() {
         ensureClusterPresentation()
         maybeStartCarPlay()
         applyFullscreenMode()
+        refreshDisplaySizeAfterLayout()
     }
 
     // Experimental: the CarPlay instrument-cluster stream on the BYD cluster projection display.
@@ -743,7 +762,14 @@ class CarPlayHostActivity : ComponentActivity() {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) applyFullscreenMode()
+        if (hasFocus) { applyFullscreenMode(); refreshDisplaySizeAfterLayout() }
+        else rotationRestart.cancel()
+    }
+
+    override fun onPause() {
+        uiResumed = false
+        rotationRestart.cancel()
+        super.onPause()
     }
 
     override fun onStop() {
@@ -768,6 +794,7 @@ class CarPlayHostActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        rotationRestart.cancel()
         clusterMonitor?.stop()
         dismissClusterPresentation()
         mainHandler.removeCallbacks(applyDisplaySize)
@@ -3225,7 +3252,13 @@ class CarPlayHostActivity : ComponentActivity() {
         if (width <= 0 || height <= 0 || shuttingDown.get()) return
         updateVideoViewport(width, height)
         // iPhone's negotiated canvas belongs to the connection, not the Activity orientation.
-        if (controller != null && !menuOpen && !handshakeResetInProgress) return
+        if (controller != null && !menuOpen && !handshakeResetInProgress) {
+            mainHandler.removeCallbacks(applyDisplaySize)
+            pendingDisplaySize = null
+            rotationRestart.observe(CarBridgeRotationRestart.Size(width, height))
+            return
+        }
+        rotationRestart.cancel()
         val size = DisplaySize(width, height)
         if (size == activeDisplaySize || size == pendingDisplaySize) return
         pendingDisplaySize = size
@@ -3236,6 +3269,7 @@ class CarPlayHostActivity : ComponentActivity() {
     private fun applyDisplaySize(size: DisplaySize) {
         if (controller != null && !menuOpen && !handshakeResetInProgress) {
             updateVideoViewport(size.width, size.height)
+            rotationRestart.observe(CarBridgeRotationRestart.Size(size.width, size.height))
             return
         }
         if (shuttingDown.get() || size == activeDisplaySize) return
@@ -3340,9 +3374,10 @@ class CarPlayHostActivity : ComponentActivity() {
     }
 
     /** Full-stack fallback when an AirPlay-only reconnect is unavailable. */
-    private fun restartCarPlay(reason: String) {
+    private fun restartCarPlay(reason: String, followDisplay: Boolean = false) {
         if (!CarPlayBackgroundSession.isOwner(this)) return
         if (shuttingDown.get() || menuOpen || handshakeResetInProgress) return
+        rotationRestart.cancel()
         val size = activeDisplaySize ?: return
         appendLog(reason)
         activeScreenStreamTypes.clear()
@@ -3363,7 +3398,16 @@ class CarPlayHostActivity : ComponentActivity() {
             runOnUiThread {
                 if (!shuttingDown.get() && generation == restartGeneration) {
                     handshakeResetInProgress = false
-                    startCarPlay(size)
+                    // A second rotation during teardown must not negotiate the stale first size.
+                    val nextSize = if (followDisplay) currentActivitySize() ?: size else size
+                    if (followDisplay) {
+                        mainHandler.removeCallbacks(applyDisplaySize)
+                        pendingDisplaySize = null
+                        activeDisplaySize = nextSize
+                        updateVideoViewport(nextSize.width, nextSize.height)
+                        recordDetectedMaximum(nextSize)
+                    }
+                    startCarPlay(nextSize)
                 }
             }
         }
@@ -3422,6 +3466,7 @@ class CarPlayHostActivity : ComponentActivity() {
 
     private fun shutdown(terminateProcess: Boolean, reason: String, completion: () -> Unit = {}) {
         if (!shuttingDown.compareAndSet(false, true)) { completion(); return }
+        rotationRestart.cancel()
         restartGeneration += 1
         mainHandler.removeCallbacks(applyDisplaySize)
         val oldController = controller

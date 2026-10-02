@@ -36,6 +36,8 @@ internal class CarBridgeRouteManager(
     private var policyIgnored = false
     private var policyEnabled = false
     private var policyReady = false
+    private var policyUnavailable = ""
+    private var lastPolicyDiagnostic = ""
     private var lastResponse = 0L
     private var target = ""
     private var route = ""
@@ -109,6 +111,12 @@ internal class CarBridgeRouteManager(
             if (revision != policyRevision) { route = ""; negotiating = false }
             policyRevision = revision; policyIgnored = b.getBoolean("ignored")
             policyEnabled = b.getBoolean("enabled"); policyReady = b.getBoolean("ready")
+            policyUnavailable = b.getString("unavailable", "")
+            val diagnostic = "peer=$peerPackage enabled=$policyEnabled ignored=$policyIgnored ready=$policyReady unavailable=$policyUnavailable"
+            if (lastPolicyDiagnostic != diagnostic) {
+                lastPolicyDiagnostic = diagnostic
+                CarBridgeDiagnostics.record("RoutePolicy", diagnostic)
+            }
             choose(); return
         }
         if (b.getString("server") != server) return
@@ -155,7 +163,14 @@ internal class CarBridgeRouteManager(
             MediaMode.AUTO -> if (policyIgnored || !policyEnabled) "DIRECT" else if (policyReady) "BRIDGE" else "WAIT"
         }
         if (desired == "IGNORED" || desired == "WAIT") {
-            fail(if (desired == "IGNORED") "请在 MediaBridge 中取消忽略 CarBridge" else "等待 MediaBridge 的授权与车机服务就绪")
+            val reason = when (policyUnavailable) {
+                "NOTIFICATION_ACCESS" -> "请开启配套 MediaBridge 的通知使用权"
+                "LISTENER_DISCONNECTED" -> "MediaBridge 通知监听未连接；请关闭后重新开启它的通知使用权"
+                "BACKEND_NOT_READY" -> "MediaBridge 媒体服务未就绪；手机请开启手机调试模式"
+                "DISABLED" -> "请启用 MediaBridge 桥接"
+                else -> "等待 MediaBridge 的授权与车机服务就绪"
+            }
+            fail(if (desired == "IGNORED") "请在 MediaBridge 中取消忽略 CarBridge" else reason)
             return
         }
         if ((route == desired || negotiating && target == desired) && !releasePending) return
@@ -243,12 +258,13 @@ internal class CarBridgeRouteManager(
     }
     private fun fail(reason: String, retry: Boolean = true) {
         val wasActive = route.isNotEmpty() || negotiating
+        val logChange = status != reason || wasActive
         if (peer != null && server.isNotEmpty()) io.github.rhsr1024.interop.BridgeProtocol.send(peer, receiver, CLOSE, message())
         peer = null; server = ""; unbind()
         route = ""; negotiating = false; status = reason; onReady(false)
         if (wasActive) onYield(reason)
         if (direct != null && !releasePending) releaseDirect { }
-        CarBridgeDiagnostics.record("Route", "$reason instance=$instance epoch=$epoch")
+        if (logChange) CarBridgeDiagnostics.record("Route", "$reason instance=$instance epoch=$epoch")
         if (retry && !closed && peerPackage.isNotEmpty()) main.postDelayed({ if (!closed && !bound && !releasePending && !releaseUncertain) bind() }, 2000)
     }
     private fun unbind() { if (bound) runCatching { context.unbindService(connection) }; bound = false }

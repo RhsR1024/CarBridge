@@ -37,6 +37,9 @@ class CarBridgeDisplayTest {
         val activity = Robolectric.buildActivity(Activity::class.java).get()
         val prefs = CarBridgeSettings.prefs(activity)
         prefs.edit().clear().commit()
+        assertFalse(CarBridgeSettings.reconnectOnRotation(activity))
+        prefs.edit().putBoolean("reconnect_on_rotation", true).commit()
+        assertTrue(CarBridgeSettings.reconnectOnRotation(activity))
         CarBridgeScreenOrientation.apply(activity)
         assertEquals(ScreenOrientation.LANDSCAPE.activityValue, activity.requestedOrientation)
         for (mode in ScreenOrientation.entries) {

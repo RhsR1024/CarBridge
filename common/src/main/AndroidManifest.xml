@@ -13,7 +13,6 @@
     <queries>
         <package android:name="com.mediabridge.app" />
         <package android:name="com.mediabridge.app.dev" />
-        <package android:name="com.mediabridge.app.dev" />
         <package android:name="ecarx.xsf.mediacenter" />
         <package android:name="com.ecarx.sdk.openapi" />
         <package android:name="com.ecarx.mediacenter" />
@@ -23,7 +22,7 @@
             android:authorities="${applicationId}.artwork" android:exported="false" android:grantUriPermissions="true" />
         <activity android:name="com.shilapi.xcertplay.DiPlayActivity"
             android:exported="true" android:launchMode="singleTop"
-            android:screenOrientation="landscape"
+            android:screenOrientation="behind"
             android:configChanges="density|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:theme="@style/Theme.Xcertplay">
             <intent-filter>
@@ -40,7 +39,7 @@
             android:exported="true"
             android:launchMode="singleTask"
             android:resizeableActivity="true"
-            android:screenOrientation="landscape"
+            android:screenOrientation="behind"
             android:theme="@style/Theme.Xcertplay"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>

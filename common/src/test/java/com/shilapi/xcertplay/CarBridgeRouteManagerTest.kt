@@ -120,4 +120,29 @@ class CarBridgeRouteManagerTest {
         assertFalse(r.manager.isReady)
         r.manager.close()
     }
+
+    @Test fun disconnectedListenerIsExplainedWithoutGrantingPlayback() {
+        val r = Rig()
+        r.receive(POLICY, r.bundle().apply {
+            putBoolean("enabled", true); putBoolean("ready", false); putBoolean("ignored", false)
+            putString("unavailable", "LISTENER_DISCONNECTED")
+        })
+        assertTrue(r.manager.status, r.manager.status.contains("通知监听未连接"))
+        assertFalse(r.manager.isReady)
+        assertFalse(r.outgoing.any { it.what == PREPARE })
+        var granted: Boolean? = null
+        r.manager.requestPlay("phone-1:1", NowPlayingSnapshot("phone-1")) { granted = it }
+        assertEquals(false, granted)
+        r.manager.close()
+    }
+
+    @Test fun olderCompanionWithoutDiagnosticFieldStillWaitsSafely() {
+        val r = Rig()
+        r.receive(POLICY, r.bundle().apply {
+            putBoolean("enabled", true); putBoolean("ready", false)
+        })
+        assertEquals("等待 MediaBridge 的授权与车机服务就绪", r.manager.status)
+        assertFalse(r.manager.isReady)
+        r.manager.close()
+    }
 }

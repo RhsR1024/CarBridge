@@ -49,6 +49,8 @@ MediaBridge 已新增显式绑定的 `CarBridgeCompanionService`，使用基于 
 
 ### 3.2 能力与事实快照
 
+0.1.2 / MediaBridge 2.3.2 在现有 `POLICY` 增加可选字符串 `unavailable`：空串表示无就绪障碍，或 `DISABLED`、`NOTIFICATION_ACCESS`、`LISTENER_DISCONNECTED`、`BACKEND_NOT_READY`。只用于解释已有 `ready`，不授予额外资格；旧客户端忽略该字段，新客户端遇到缺失/未知值显示通用等待提示。仅原因变化而 ignored/enabled/ready 不变时不递增 policy revision，不重启所有权交接。协议 major/minor 保持 1.0。
+
 `hello()` 返回版本与实例；`getPolicy(carBridgePackage)` 返回 `ignored/enabled/trusted/policyRevision`；`getReadiness()` 返回监听授权与连接、车机后端连接和注册、路由准备情况、最近错误。
 
 建议能力位：`ROUTE_HANDOVER_V1`、`PLAY_INTENT_V1`、`SOURCE_YIELD_V1`、`COMMAND_ID_V1`、`CONTENT_URI_V1`、`LYRICS_DESCRIPTOR_V1`。自动模式至少要求前三项，不能靠“对端版本号较新”猜支持。

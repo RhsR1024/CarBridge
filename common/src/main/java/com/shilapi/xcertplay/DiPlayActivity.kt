@@ -94,8 +94,10 @@ class DiPlayActivity : ComponentActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        // Match the saved choice before constructing/restoring the window. The manifest inherits
+        // the previous Activity's orientation so a portrait return never starts as landscape.
         CarBridgeScreenOrientation.apply(this)
+        super.onCreate(savedInstanceState)
         languagePreferenceAtCreate = AppLocale.preference(this)
         com.shilapi.xcertplay.hud.BydNavigationOutputs.onAppOpened(applicationContext)
         WindowCompat.setDecorFitsSystemWindows(window, true)
@@ -121,6 +123,7 @@ class DiPlayActivity : ComponentActivity() {
     }
 
     override fun onNewIntent(intent: Intent) {
+        CarBridgeScreenOrientation.apply(this)
         super.onNewIntent(intent); setIntent(intent)
         page = intent.getStringExtra("page") ?: "home"; render()
         handleWirelessRecovery()
@@ -251,12 +254,14 @@ class DiPlayActivity : ComponentActivity() {
                 CarBridgeSettings.prefs(this).edit().putString("vehicle", profiles[it].name).apply()
                 CarPlayMediaKeys.settingsChanged(); render()
             }
-            choice(card, "媒体接入方式", modes.map { it.label }, modes.indexOf(CarBridgeSettings.mode(this)), reconnects = false) {
+            choice(card, "媒体接入方式", modes.map {
+                if (it == MediaMode.DIRECT && CarBridgeSettings.profile(this) != VehicleProfile.GEELY) "本机直连（不经 MediaBridge）" else it.label
+            }, modes.indexOf(CarBridgeSettings.mode(this)), reconnects = false) {
                 CarBridgeSettings.prefs(this).edit().putString("mode", modes[it].name).apply()
                 CarPlayMediaKeys.settingsChanged(); render()
             }
             card.addView(label(CarPlayMediaKeys.status, 16, MUTED))
-            card.addView(label("自动模式跟随配套 MediaBridge 的忽略名单。强制直连会协商排除桥接；强制桥接仍需取消忽略 CarBridge。", 14, MUTED))
+            card.addView(label("需要 MediaBridge 小窗显示歌曲和控制播放时，请使用自动或桥接，并启用 MediaBridge 的通知使用权与桥接。直连会让 MediaBridge 排除 CarBridge，不在它的小窗显示歌曲。", 14, MUTED))
             card.addView(button("刷新接入状态", false) { CarPlayMediaKeys.settingsChanged(); render() }, matchButton(10, 56))
             toggle(card, "直连在线封面与歌词", "向资源服务发送歌名、歌手和时长以查找资源；关闭后仍可使用原生封面与缓存。桥接模式使用 MediaBridge 自己的资源设置。", CarBridgeSettings.onlineResources(this)) {
                 CarBridgeSettings.prefs(this).edit().putBoolean("online_resources", it).apply()
@@ -300,7 +305,10 @@ class DiPlayActivity : ComponentActivity() {
                 CarBridgeScreenOrientation.apply(this)
                 render()
             }
-            card.addView(label("旋转只调整画面显示，不会断开连接；本次连接保持原画面比例。", 14, MUTED))
+            card.addView(label("自动旋转保持连接和原画面比例。需要 CarPlay 原生竖屏布局时，请先断开连接，选择固定竖屏后再连接。", 14, MUTED))
+            toggle(card, "转屏时更新 CarPlay 原生布局", "仅自动旋转时生效；方向稳定后重新连接，让 iPhone 按横屏或竖屏重新排版。画面和声音会短暂中断，连接后可能需要再次点击播放。默认关闭。", CarBridgeSettings.reconnectOnRotation(this)) {
+                CarBridgeSettings.prefs(this).edit().putBoolean("reconnect_on_rotation", it).apply()
+            }
             carPlaySizeControl(card)
             choice(card, getString(R.string.resolution), listOf(getString(R.string.resolution_native), getString(R.string.s_80_lighter_load), getString(R.string.s_60_lightest_load)), listOf(10, 8, 6).indexOf(AirPlayPersistence.loadDisplayScaleTenths(this)).coerceAtLeast(0)) { AirPlayPersistence.saveDisplayScaleTenths(this, listOf(10, 8, 6)[it]) }
             val bufferPresets = com.shilapi.xcertplay.media.MediaAudioBuffer.presets
@@ -1041,6 +1049,7 @@ class DiPlayActivity : ComponentActivity() {
                     appendLine("Saved video preference (may differ from active session): ${if (AirPlayPersistence.loadHevcEnabled(appContext)) "HEVC" else "H.264"}; ${AirPlayPersistence.loadFps(appContext)} fps")
                     appendLine("CarPlay size: ${com.shilapi.xcertplay.airplay.CarPlaySize.fromWidthMillimeters(AirPlayPersistence.loadWidthPhysicalMm(appContext)).label}")
                     appendLine("Saved resolution preference (may differ from active session): ${AirPlayPersistence.loadDisplayScaleTenths(appContext) * 10}%")
+                    appendLine("Saved orientation: ${CarBridgeSettings.orientation(appContext)}; reconnect on rotation: ${CarBridgeSettings.reconnectOnRotation(appContext)}")
                     appendLine("Session: ${if (CarPlayBackgroundSession.active) "active" else if (CarPlayBackgroundSession.hasSession()) "connecting" else "stopped"}")
                     appendLine("Head-unit board: ${Build.BOARD}; hardware: ${Build.HARDWARE}; build: ${Build.DISPLAY}")
                     appendLine()
