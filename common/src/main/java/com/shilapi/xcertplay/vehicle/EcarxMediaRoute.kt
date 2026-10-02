@@ -37,6 +37,7 @@ internal class EcarxMediaRoute(
     private var api: MediaCenterAPI? = null
     private var failed = false
     private var lastStateKey = ""
+    private var lastResourceDiagnostic = ""
     private var lyricText: String? = null
     private var lyricLines = emptyList<com.shilapi.xcertplay.nowplaying.SynchronizedLyrics.Line>()
     private var lastLine: String? = null
@@ -134,6 +135,13 @@ internal class EcarxMediaRoute(
     private fun publish() {
         if (!registered || closed || failed) return
         val value = snapshot
+        if (lyricText != value.lyrics) {
+            lyricText = value.lyrics
+            lyricLines = com.shilapi.xcertplay.nowplaying.SynchronizedLyrics.parse(value.lyrics)
+            lastLine = null
+        }
+        val tune = CarBridgeSettings.prefs(context).getInt("lyrics_offset_ms", 0).coerceIn(-10000, 10000)
+        val line = com.shilapi.xcertplay.nowplaying.SynchronizedLyrics.current(lyricLines, currentPosition(), tune.toLong()) ?: "暂无歌词"
         val launch = context.packageManager.getLaunchIntentForPackage(context.packageName)
         val pending = launch?.let { PendingIntent.getActivity(context, 71, it, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE) }
         val next = MusicPlaybackInfo().apply {
@@ -146,8 +154,14 @@ internal class EcarxMediaRoute(
             playbackStatus = if (audible && value.playback == Playback.PLAYING) 1 else 0
             setSupportVrCtrlPlayStatus(true)
             lyricContent = value.lyrics ?: ""
+            currentLyricSentence = line
         }
         info = next
+        val resourceKey = "${value.trackKey}:${value.title}:${value.artist}:${value.artworkUri}:${value.lyrics?.length ?: 0}"
+        if (resourceKey != lastResourceDiagnostic) {
+            lastResourceDiagnostic = resourceKey
+            com.shilapi.xcertplay.CarBridgeDiagnostics.record("ECARX", "publish track=${value.trackGeneration} titlePresent=${!value.title.isNullOrBlank()} artistPresent=${!value.artist.isNullOrBlank()} artwork=${value.artworkSource} lyricsChars=${value.lyrics?.length ?: 0} lyricLines=${lyricLines.size}")
+        }
         val key = "${value.trackKey}:${value.revision}:$audible"
         if (key != lastStateKey) {
             api?.updateMusicPlaybackState(token, next)
@@ -155,9 +169,6 @@ internal class EcarxMediaRoute(
         }
         if (playingIntent.isNotEmpty()) {
             api?.updateCurrentProgress(token, currentPosition() ?: 0)
-            if (lyricText != value.lyrics) { lyricText = value.lyrics; lyricLines = com.shilapi.xcertplay.nowplaying.SynchronizedLyrics.parse(value.lyrics); lastLine = null }
-            val tune = CarBridgeSettings.prefs(context).getInt("lyrics_offset_ms", 0).coerceIn(-10000, 10000)
-            val line = com.shilapi.xcertplay.nowplaying.SynchronizedLyrics.current(lyricLines, currentPosition(), tune.toLong()) ?: "暂无歌词"
             if (line != lastLine) { api?.updateCurrentLyric(token, line); lastLine = line }
         }
     }

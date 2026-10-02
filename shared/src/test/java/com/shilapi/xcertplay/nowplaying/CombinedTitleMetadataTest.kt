@@ -4,6 +4,13 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class CombinedTitleMetadataTest {
+    @Test fun diagnosticsExplainWhyCombinedTitleWasNotSplit() {
+        val raw = NowPlayingSnapshot("phone", title = "袁娅维TIA RAY - 说散就散")
+        assertTrue(CombinedTitleMetadata.diagnostic(raw, CombinedTitleFormat.ARTIST_TITLE).contains("reason=split"))
+        assertTrue(CombinedTitleMetadata.diagnostic(raw.copy(artist = "—"), CombinedTitleFormat.ARTIST_TITLE).contains("reason=native_artist_present"))
+        assertTrue(CombinedTitleMetadata.diagnostic(raw.copy(title = "歌手-歌曲"), CombinedTitleFormat.ARTIST_TITLE).contains("reason=ambiguous_or_missing_separator"))
+        assertTrue(CombinedTitleMetadata.diagnostic(raw, CombinedTitleFormat.ORIGINAL).contains("reason=original_format"))
+    }
     private val source = NowPlayingSnapshot("phone", trackGeneration = 7, revision = 30,
         title = "周铁男 - 三国杀", durationMs = 199722, positionMs = 61000,
         artworkUri = "content://art/7", artworkSource = "native", playback = Playback.PLAYING)

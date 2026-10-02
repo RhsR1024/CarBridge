@@ -37,19 +37,27 @@ internal class AudioFocusCoordinator(
     context: Context?,
     private val enabled: Boolean,
     private val report: (String) -> Unit = {},
+    private val guidanceEnabled: Boolean = false,
+    private val volumeControl: (Int) -> Unit = {},
 ) {
-    private data class Entry(val channel: AudioChannel, val attributes: AudioAttributes)
+    private data class Entry(val channel: AudioChannel, val attributes: AudioAttributes, val volumeStream: Int)
 
     private val manager = context?.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
     private val active = LinkedHashMap<AudioTrack, Entry>()
     private var request: AudioFocusRequest? = null
     private var requestedChannel: AudioChannel? = null
+    private var closed = false
     private val listener = AudioManager.OnAudioFocusChangeListener { change ->
         synchronized(this) {
+            if (closed || request == null) return@synchronized
             runCatching { report("Audio: focus change=$change activeTracks=${active.size}") }
             when (change) {
                 AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> setVolume(DUCKED_VOLUME)
-                AudioManager.AUDIOFOCUS_GAIN -> setVolume(FULL_VOLUME)
+                AudioManager.AUDIOFOCUS_GAIN -> {
+                    setVolume(FULL_VOLUME)
+                    active.values.maxByOrNull { it.channel.focusPriority() }?.let { publishVolume(it.volumeStream) }
+                }
+                AudioManager.AUDIOFOCUS_LOSS, AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> publishVolume(Int.MIN_VALUE)
                 // Keep CarPlay audio running on permanent or transient loss. Some head units
                 // do not send a later gain callback after taking focus back.
             }
@@ -58,8 +66,14 @@ internal class AudioFocusCoordinator(
 
     @Synchronized
     fun acquire(track: AudioTrack, channel: AudioChannel, attributes: AudioAttributes) {
-        if (!enabled || manager == null || channel == AudioChannel.NAVIGATION) return
-        active[track] = Entry(channel, attributes)
+        if (closed || !enabled || manager == null || (channel == AudioChannel.NAVIGATION && !guidanceEnabled)) return
+        val stream = runCatching { track.streamType }.getOrDefault(Int.MIN_VALUE)
+        // Android's generic navigation attributes often resolve to MUSIC. Pinning that stream
+        // would defeat the OEM's focus-based navigation volume policy. Let the system choose.
+        val volumeStream = if (channel == AudioChannel.NAVIGATION &&
+            attributes.usage == AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE && stream == AudioManager.STREAM_MUSIC)
+            Int.MIN_VALUE else stream
+        active[track] = Entry(channel, attributes, volumeStream)
         refreshRequest()
     }
 
@@ -68,12 +82,24 @@ internal class AudioFocusCoordinator(
         if (active.remove(track) != null) refreshRequest()
     }
 
+    @Synchronized fun close() {
+        closed = true
+        active.clear()
+        refreshRequest()
+    }
+
+    private fun publishVolume(stream: Int) {
+        if (guidanceEnabled) volumeControl(stream)
+    }
+
     private fun refreshRequest() {
         val primary = active.values.maxByOrNull { it.channel.focusPriority() }
         if (primary == null) {
+            if (request != null) runCatching { report("Audio: focus released channel=$requestedChannel activeTracks=0") }
             request?.let { manager?.abandonAudioFocusRequest(it) }
             request = null
             requestedChannel = null
+            publishVolume(Int.MIN_VALUE)
             return
         }
         if (request != null && requestedChannel == primary.channel) return
@@ -82,7 +108,7 @@ internal class AudioFocusCoordinator(
             AudioChannel.MEDIA -> AudioManager.AUDIOFOCUS_GAIN
             AudioChannel.PHONE -> AudioManager.AUDIOFOCUS_GAIN_TRANSIENT
             AudioChannel.ASSISTANT -> AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK
-            AudioChannel.NAVIGATION -> return
+            AudioChannel.NAVIGATION -> AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK
         }
         val next = AudioFocusRequest.Builder(gain)
             .setAudioAttributes(primary.attributes)
@@ -90,8 +116,10 @@ internal class AudioFocusCoordinator(
             .build()
         request = next
         requestedChannel = primary.channel
-        val result = manager?.requestAudioFocus(next)
-        val line = "Audio: focus requested channel=${primary.channel} gain=$gain granted=$result activeTracks=${active.size}"
+        val result = runCatching { manager?.requestAudioFocus(next) }.getOrNull()
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) setVolume(FULL_VOLUME)
+        publishVolume(if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) primary.volumeStream else Int.MIN_VALUE)
+        val line = "Audio: focus requested channel=${primary.channel} usage=${primary.attributes.usage} gain=$gain granted=$result volumeStream=${primary.volumeStream} activeTracks=${active.size}"
         Log.i(TAG, line)
         runCatching { report(line) }
     }
@@ -104,7 +132,7 @@ internal class AudioFocusCoordinator(
         AudioChannel.MEDIA -> 1
         AudioChannel.PHONE -> 3
         AudioChannel.ASSISTANT -> 2
-        AudioChannel.NAVIGATION -> 0
+        AudioChannel.NAVIGATION -> 1
     }
 
     private companion object {
@@ -138,12 +166,35 @@ class AndroidMediaSink(
     /** True while any music ("media") audio stream is running; called from media threads. */
     private val onMediaAudioChanged: (Boolean) -> Unit = {},
     val musicOutputGate: MusicOutputGate? = null,
+    /** Opt-in OEM guidance focus/volume policy; other vehicle profiles retain their routing. */
+    private val guidanceFocusEnabled: Boolean = false,
 ) : MediaSink {
+    private val volumeLock = Any()
+    private var volumeStream = Int.MIN_VALUE
+    private var volumeListener: ((Int) -> Unit)? = null
+    private var volumeOwner: Any? = null
+    fun setVolumeControlListener(owner: Any, listener: (Int) -> Unit) = synchronized(volumeLock) {
+        volumeOwner = owner
+        volumeListener = listener
+        listener(volumeStream)
+    }
+    fun clearVolumeControlListener(owner: Any) = synchronized(volumeLock) {
+        if (volumeOwner === owner) { volumeOwner = null; volumeListener = null }
+    }
+    private fun publishVolumeStream(stream: Int) = synchronized(volumeLock) {
+        if (volumeStream != stream) {
+            volumeStream = stream
+            onAudioDiagnostic("Audio: volume target stream=$stream (MIN_VALUE=system default)")
+            volumeListener?.invoke(stream)
+        }
+    }
     private val appContext = context?.applicationContext
     private val audioFocusCoordinator = AudioFocusCoordinator(
         appContext,
         audioFocusEnabled,
         onAudioDiagnostic,
+        guidanceFocusEnabled,
+        ::publishVolumeStream,
     )
     private val screenStateLock = Any()
     private val activeScreenTypes = mutableSetOf<Int>()
@@ -268,6 +319,7 @@ class AndroidMediaSink(
         recoveryExecutor.shutdownNow()
         audioRenderers.values.forEach(AudioRenderer::close)
         audioRenderers.clear()
+        audioFocusCoordinator.close()
         val hadMedia = synchronized(mediaAudioTypes) { mediaAudioTypes.isNotEmpty().also { mediaAudioTypes.clear() } }
         if (hadMedia) onMediaAudioChanged(false)
         microphoneUplinks.values.forEach(MicrophoneUplink::close)
@@ -303,6 +355,7 @@ class AndroidMediaSink(
             mediaBufferMillis,
             onAudioDiagnostic,
             musicOutputGate,
+            guidanceFocusEnabled,
         ).also { audioRenderers[id] = it }
     }
 }
@@ -678,7 +731,10 @@ private class AudioRenderer(
     private val mediaBufferMillis: Int,
     private val report: (String) -> Unit,
     private val musicOutputGate: MusicOutputGate?,
+    private val guidanceFocusEnabled: Boolean,
 ) : Closeable {
+    private val guidanceActivity = GuidanceActivity()
+    private var guidanceActive = false
     private data class AudioPacket(val rtp: ByteArray, val sample: Int)
 
     private var trackAttributes: AudioAttributes? = null
@@ -772,6 +828,7 @@ private class AudioRenderer(
                 // Waiting for the next UDP packet can strand decoded sound for hundreds of ms.
                 codec?.let(::drainCodec)
                 maintainPlaybackBuffer()
+                updateGuidanceFocus()
                 logStatsIfDue()
             }
         } catch (_: InterruptedException) {
@@ -890,6 +947,9 @@ private class AudioRenderer(
             "rate=${format.sampleRate} channels=${format.channels} " +
             "route=$routeLabel " +
             "bufferMs=${capacityBytes * 1000L / bytesPerSecond} startMs=${startThresholdBytes * 1000L / bytesPerSecond}")
+        report("Audio: routing channel=${selection.channel} actualUsage=${built.audioAttributes.usage} " +
+            "actualContent=${built.audioAttributes.contentType} actualStream=${built.streamType} override=$streamOverride " +
+            "advanced=$advancedAudioChannelMapping focus=$audioFocusEnabled guidanceFocus=$guidanceFocusEnabled")
         Log.i(
             TAG,
             "audio track prepared type=${format.payloadType} audioType=${format.audioType} " +
@@ -957,7 +1017,7 @@ private class AudioRenderer(
 
     /**
      * Shares a sink-level focus request across all active non-navigation renderers.
-     * Navigation guidance intentionally takes no focus: it overlays media without ducking it.
+     * Guidance focus is acquired only for audible PCM, never merely for an open stream.
      */
     private fun requestAudioFocus() {
         // The application music coordinator owns this request, independent of PCM stream lifetime.
@@ -965,7 +1025,6 @@ private class AudioRenderer(
         val channel = mappedChannel ?: return
         val attributes = trackAttributes ?: return
         if (channel == AudioChannel.NAVIGATION) {
-            Log.i(TAG, "audio focus skipped channel=NAVIGATION; overlays without ducking")
             return
         }
         track?.let { audioFocusCoordinator.acquire(it, channel, attributes) }
@@ -973,6 +1032,17 @@ private class AudioRenderer(
 
     private fun abandonAudioFocus() {
         track?.let(audioFocusCoordinator::release)
+    }
+
+    private fun updateGuidanceFocus() {
+        if (!guidanceFocusEnabled || !audioFocusEnabled || mappedChannel != AudioChannel.NAVIGATION) return
+        val active = guidanceActivity.active(android.os.SystemClock.elapsedRealtime())
+        if (active == guidanceActive) return
+        guidanceActive = active
+        report("Audio: guidance audible=$active audioType=${format.audioType}")
+        val current = track ?: return
+        if (active) trackAttributes?.let { audioFocusCoordinator.acquire(current, AudioChannel.NAVIGATION, it) }
+        else audioFocusCoordinator.release(current)
     }
 
     private fun pcmFormat(encoding: Int, channelMask: Int) = AndroidAudioFormat.Builder()
@@ -1161,6 +1231,13 @@ private class AudioRenderer(
     private fun writePcm(data: ByteArray, offset: Int = 0, length: Int = data.size) {
         val track = track ?: return
         if (!musicAllowed()) return
+        if (guidanceFocusEnabled && mappedChannel == AudioChannel.NAVIGATION) {
+            val head = track.playbackHeadPosition.toLong() and 0xffff_ffffL
+            val queuedMs = (totalWrittenFrames - head).coerceAtLeast(0) * 1000 / format.sampleRate +
+                length * 1000L / bytesPerSecond.coerceAtLeast(1)
+            guidanceActivity.pcm(data, offset, length, android.os.SystemClock.elapsedRealtime(), queuedMs)
+            updateGuidanceFocus()
+        }
         if (!firstPcmLogged && length > 0) {
             firstPcmLogged = true
             val end = minOf(data.size, offset + minOf(length, 16))

@@ -1,5 +1,7 @@
 # CarBridge 0.1 实现与维护边界
 
+0.1.3 修订：下文“导航保留原有覆盖路径”仅对非吉利配置保持。吉利新增 GuidanceActivity 与 AudioFocusCoordinator 导航临时焦点，并经 CarPlayHostActivity 的前台绑定跟随音量目标；不更改音乐 PlaybackPolicy 或协作协议。详细行为和可观测边界见 RELEASE_0.1.3.md。
+
 日期：2026-10-02；配套 MediaBridge 2.3.0-carbridge-26100201；协作协议 1.0。
 
 ## 代码落点

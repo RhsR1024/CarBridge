@@ -22,4 +22,21 @@ object CombinedTitleMetadata {
         return if (format == CombinedTitleFormat.ARTIST_TITLE) source.copy(title = second, artist = first)
             else source.copy(title = first, artist = second)
     }
+
+    fun diagnostic(source: NowPlayingSnapshot, format: CombinedTitleFormat): String {
+        val resolved = resolve(source, format)
+        val reason = when {
+            format == CombinedTitleFormat.ORIGINAL -> "original_format"
+            !source.artist.isNullOrBlank() -> "native_artist_present"
+            source.title == null -> "missing_title"
+            source.title.length > 512 || source.title.any { it == '\n' || it == '\r' } -> "invalid_title"
+            resolved === source -> "ambiguous_or_missing_separator"
+            else -> "split"
+        }
+        fun field(value: String?): String = value?.take(180)?.replace("\\", "\\\\")
+            ?.replace("\r", "\\r")?.replace("\n", "\\n")?.replace("\t", "\\t")?.replace("\"", "\\\"")
+            ?.let { "\"$it\"" } ?: "null"
+        return "format=$format reason=$reason rawTitle=${field(source.title)} rawArtist=${field(source.artist)} " +
+            "title=${field(resolved.title)} artist=${field(resolved.artist)} duration=${source.durationMs}"
+    }
 }

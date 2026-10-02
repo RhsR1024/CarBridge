@@ -1045,6 +1045,8 @@ class DiPlayActivity : ComponentActivity() {
                     appendLine("Media route: ${CarPlayMediaKeys.status}")
                     appendLine("Vehicle: ${CarBridgeSettings.profile(appContext)}; mode: ${CarBridgeSettings.mode(appContext)}")
                     appendLine("Saved combined-title format (applies on reconnect): ${CarBridgeSettings.combinedTitleFormat(appContext)}")
+                    appendLine("Active metadata: ${CarPlayMediaKeys.metadataDiagnostic}")
+                    appendLine("Saved audio: focus=${AirPlayPersistence.loadAudioFocusEnabled(appContext)} advanced=${AirPlayPersistence.loadAdvancedAudioChannelMapping(appContext)} mediaOverride=${AirPlayPersistence.loadMediaAudioChannel(appContext)} navigationOverride=${AirPlayPersistence.loadNavigationAudioChannel(appContext)}")
                     appendLine("Music exclusive: ${CarBridgeSettings.exclusive(appContext)}; audible: ${CarPlayMediaKeys.isAudible}")
                     appendLine("NowPlaying: ${CarPlayMediaKeys.snapshot?.let { "connection=${it.connectionId} track=${it.trackGeneration} revision=${it.revision} playback=${it.playback} artwork=${it.artworkSource}" }}")
                     appendLine("Android ${Build.VERSION.RELEASE} / API ${Build.VERSION.SDK_INT}")

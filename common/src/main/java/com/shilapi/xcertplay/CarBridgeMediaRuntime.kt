@@ -56,6 +56,8 @@ internal class CarBridgeMediaRuntime(
     @Volatile private var closed = false
     private var commandSequence = 0L
     private var metadataKey = ""
+    @Volatile var metadataDiagnostic = "No metadata received"; private set
+    private var diagnosticIdentity = ""
     private var pausedPosition: Long? = null
     private var publishedPlaying = false
     var snapshot = NowPlayingSnapshot(""); private set
@@ -124,6 +126,12 @@ internal class CarBridgeMediaRuntime(
     private fun update(raw: NowPlayingSnapshot) {
         val value = com.shilapi.xcertplay.nowplaying.CombinedTitleMetadata.resolve(raw, titleFormat)
         if (snapshot.connectionId == value.connectionId && value.revision < snapshot.revision) return
+        val identity = listOf(raw.trackKey, raw.title, raw.artist, raw.album, raw.durationMs).toString()
+        if (identity != diagnosticIdentity) {
+            diagnosticIdentity = identity
+            metadataDiagnostic = com.shilapi.xcertplay.nowplaying.CombinedTitleMetadata.diagnostic(raw, titleFormat)
+            log("metadata track=${raw.trackGeneration} revision=${raw.revision} $metadataDiagnostic")
+        }
         if (value.connectionId != snapshot.connectionId) {
             abandonFocus()
             pendingGrant = null

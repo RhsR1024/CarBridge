@@ -17,6 +17,7 @@ internal object CarPlayMediaKeys {
     val sessionToken: MediaSession.Token? get() = runtime?.sessionToken
     val status: String get() = runtime?.status ?: "未连接 iPhone"
     val isAudible: Boolean get() = runtime?.isAudible == true
+    val metadataDiagnostic: String get() = runtime?.metadataDiagnostic ?: "No active runtime"
 
     fun attach(context: Context, next: CarPlayController, gate: MusicOutputGate) {
         if (controller === next) return

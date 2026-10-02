@@ -30,18 +30,28 @@ internal class DirectMusicResources(private val context: Context, private val re
         if (!direct || !value.hasTrack) { if (lastKey.isNotEmpty()) { lastKey = ""; generation++ }; return }
         val online = CarBridgeSettings.onlineResources(context)
         val request = "${value.trackKey}|${value.title}|${value.artist}|${value.album}|${value.durationMs}|$online"
-        if (request == lastKey || value.artist.isNullOrBlank() || (value.durationMs ?: 0) <= 0) return
+        if (request == lastKey) return
         lastKey = request; val expected = ++generation
+        if (value.title.isNullOrBlank() || value.artist.isNullOrBlank() || (value.durationMs ?: 0) <= 0) {
+            log("request=$expected track=${value.trackGeneration} skipped=incomplete_metadata titlePresent=${!value.title.isNullOrBlank()} artistPresent=${!value.artist.isNullOrBlank()} duration=${value.durationMs}")
+            return
+        }
+        log("request=$expected track=${value.trackGeneration} direct=true online=$online nativeArtwork=${value.artworkSource == "native"}")
         worker.execute {
             val identity = "${value.title}\n${value.artist}\n${value.album}\n${value.durationMs}"
             val hash = MessageDigest.getInstance("SHA-256").digest(identity.toByteArray()).joinToString("") { "%02x".format(it) }
             val cache = File(directory, "$hash.json")
             val saved = runCatching { if (cache.length() in 1..100000) JSONObject(cache.readText()) else null }.getOrNull()
             val fresh = saved != null && (saved.optBoolean("found") || System.currentTimeMillis() - cache.lastModified() < 3600000)
+            log("request=$expected cache=${if (fresh) "hit" else if (saved != null) "expired" else "miss"}")
             val data = if (fresh || !online) saved else {
                 val found = JSONObject()
-                val lyrics = runCatching { findLyrics(value) }.getOrNull()
-                val art = if (value.artworkSource != "native") runCatching { findArtwork(value) }.getOrNull() else null
+                val lyrics = runCatching { findLyrics(value) }.onFailure {
+                    log("request=$expected lyricsFailure=${it.javaClass.simpleName} detail=${it.message.orEmpty().take(100)}")
+                }.getOrNull()
+                val art = if (value.artworkSource != "native") runCatching { findArtwork(value) }.onFailure {
+                    log("request=$expected artworkFailure=${it.javaClass.simpleName}")
+                }.getOrNull() else null
                 if (lyrics != null) found.put("lyrics", lyrics)
                 if (art != null) found.put("art", art)
                 found.put("found", lyrics != null || art != null)
@@ -52,12 +62,13 @@ internal class DirectMusicResources(private val context: Context, private val re
                 }
                 found
             }
-            if (expected != generation) return@execute
+            if (expected != generation) { log("request=$expected discarded=stale"); return@execute }
             val art = data?.optString("art")?.takeIf { it.isNotBlank() }?.let { uri ->
                 // A cached content URI may have been evicted by the bounded artwork store.
                 runCatching { context.contentResolver.openInputStream(android.net.Uri.parse(uri))?.use { }; uri }.getOrNull()
             }
             val lyrics = data?.optString("lyrics")?.takeIf { it.isNotBlank() }
+            log("request=$expected result lyricsChars=${lyrics?.length ?: 0} synchronized=${!com.shilapi.xcertplay.nowplaying.SynchronizedLyrics.parse(lyrics).isEmpty()} artwork=${art != null}")
             main.post { if (expected == generation) result(value, art, lyrics) }
         }
     }
@@ -67,7 +78,10 @@ internal class DirectMusicResources(private val context: Context, private val re
             "&album_name=${query(v.album.orEmpty())}&duration=${(v.durationMs ?: 0) / 1000}"
         val json = JSONObject(String(download(url, 100000), Charsets.UTF_8))
         if (!matches(v.title, json.optString("trackName")) || !matches(v.artist, json.optString("artistName")) ||
-            abs(json.optDouble("duration", -100.0) * 1000 - (v.durationMs ?: 0)) > 3000) return null
+            abs(json.optDouble("duration", -100.0) * 1000 - (v.durationMs ?: 0)) > 3000) {
+            log("lyrics rejected=metadata_mismatch track=${v.trackGeneration}")
+            return null
+        }
         return json.optString("syncedLyrics").takeIf { it.isNotBlank() && it != "null" && it.length <= 65536 }
             ?: json.optString("plainLyrics").takeIf { it.isNotBlank() && it != "null" && it.length <= 65536 }
     }
@@ -93,7 +107,7 @@ internal class DirectMusicResources(private val context: Context, private val re
             connection.connectTimeout = 5000; connection.readTimeout = 5000
             connection.instanceFollowRedirects = false
             connection.setRequestProperty("User-Agent", "CarBridge/0.1 (https://github.com/RhsR1024/CarBridge)")
-            check(connection.responseCode == 200)
+            check(connection.responseCode == 200) { "HTTP ${connection.responseCode}" }
             check(connection.contentLengthLong <= limit)
             return connection.inputStream.use { input -> val out = java.io.ByteArrayOutputStream()
                 val chunk = ByteArray(8192)
@@ -102,6 +116,7 @@ internal class DirectMusicResources(private val context: Context, private val re
         } finally { connection.disconnect() }
     }
     fun close() { generation++; worker.shutdownNow(); main.removeCallbacksAndMessages(null) }
+    private fun log(message: String) = com.shilapi.xcertplay.CarBridgeDiagnostics.record("Resources", message)
     companion object {
         internal fun matches(expected: String?, actual: String): Boolean {
             fun normalize(s: String) = Normalizer.normalize(s, Normalizer.Form.NFKC).lowercase(java.util.Locale.ROOT)

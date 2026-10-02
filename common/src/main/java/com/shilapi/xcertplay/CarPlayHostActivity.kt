@@ -615,6 +615,7 @@ class CarPlayHostActivity : ComponentActivity() {
         }
         ensureClusterPresentation()
         maybeStartCarPlay()
+        bindGuidanceVolume()
         applyFullscreenMode()
         refreshDisplaySizeAfterLayout()
     }
@@ -768,6 +769,7 @@ class CarPlayHostActivity : ComponentActivity() {
 
     override fun onPause() {
         uiResumed = false
+        unbindGuidanceVolume()
         rotationRestart.cancel()
         super.onPause()
     }
@@ -794,6 +796,7 @@ class CarPlayHostActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
+        unbindGuidanceVolume()
         rotationRestart.cancel()
         clusterMonitor?.stop()
         dismissClusterPresentation()
@@ -3004,7 +3007,34 @@ class CarPlayHostActivity : ComponentActivity() {
             },
             onMediaAudioChanged = CarPlayMediaKeys::onMediaAudioChanged,
             musicOutputGate = com.shilapi.xcertplay.playback.MusicOutputGate(),
+            guidanceFocusEnabled = com.shilapi.xcertplay.vehicle.CarBridgeSettings.profile(this) ==
+                com.shilapi.xcertplay.vehicle.VehicleProfile.GEELY,
         )
+    }
+
+    private var volumeBoundSink: AndroidMediaSink? = null
+    private var savedVolumeStream: Int? = null
+    private fun bindGuidanceVolume() {
+        if (!uiResumed || com.shilapi.xcertplay.vehicle.CarBridgeSettings.profile(this) !=
+            com.shilapi.xcertplay.vehicle.VehicleProfile.GEELY) return
+        val renderer = sink ?: return
+        if (volumeBoundSink === renderer) return
+        unbindGuidanceVolume()
+        savedVolumeStream = volumeControlStream
+        volumeBoundSink = renderer
+        renderer.setVolumeControlListener(this) { stream -> runOnUiThread {
+            if (uiResumed && volumeBoundSink === renderer) {
+                volumeControlStream = stream
+                CarBridgeDiagnostics.record("Volume", "foreground stream=$stream default=${Int.MIN_VALUE}")
+            }
+        } }
+    }
+
+    private fun unbindGuidanceVolume() {
+        volumeBoundSink?.clearVolumeControlListener(this)
+        volumeBoundSink = null
+        savedVolumeStream?.let { volumeControlStream = it }
+        savedVolumeStream = null
     }
 
     private fun createMediaEngine(sink: AndroidMediaSink): CarPlayMediaEngine =
@@ -3101,6 +3131,7 @@ class CarPlayHostActivity : ComponentActivity() {
         displayDiagnosticAttempt = DisplayDiagnosticSnapshot.currentAttempt(this)
         controller = snapshot.controller
         sink = snapshot.sink
+        bindGuidanceVolume()
         CarPlayBackgroundSession.store(snapshot.controller, snapshot.sink, snapshot.width, snapshot.height, this) { completion ->
             runOnUiThread {
                 shutdown(false, "DiPlay disconnect", completion)
@@ -3183,6 +3214,7 @@ class CarPlayHostActivity : ComponentActivity() {
             controllerGeneration = controllerGeneration,
         )
         sink = renderer
+        bindGuidanceVolume()
         currentSurface?.let(::attachSurface)
         clusterSurface?.let { renderer.setSurface(SCREEN_TYPE_ALT, it) }
         val media = createMediaEngine(renderer)
