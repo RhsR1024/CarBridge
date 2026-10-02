@@ -250,6 +250,7 @@ class CarPlayController(
             nowPlaying.begin()
             if (activeSession !== session) {
                 if (bydProfile) BydNavigationOutputs.start(appContext)
+                com.shilapi.xcertplay.glance.CarPlayGlance.setConnected(true)
                 // The gear may have changed since /info.
                 if (videoListener != null) session.setVideoPlaybackAllowed(VideoInCar.allowed)
             }
@@ -266,6 +267,7 @@ class CarPlayController(
                 activeSession = null
                 nowPlaying.end()
                 if (bydProfile) BydNavigationOutputs.endNow()
+                com.shilapi.xcertplay.glance.CarPlayGlance.setConnected(false)
                 videoListener?.onVideoSessionEnded()
                 synchronized(playbackStatus) { playbackStatus.clear() }?.let { playing -> playbackListener?.invoke(playing) }
             }
@@ -432,6 +434,7 @@ class CarPlayController(
         nowPlaying.end()
         if (bydProfile) BydNavigationOutputs.endNow()
         if (bydProfile) BydNavigationOutputs.clearClusterStreamControl(::applyClusterUi)
+        com.shilapi.xcertplay.glance.CarPlayGlance.setConnected(false)
         closeReceivers()
         availabilityPollGeneration.incrementAndGet()
         wirelessGeneration.incrementAndGet()
@@ -508,6 +511,7 @@ class CarPlayController(
         if (closed) return
         nowPlaying.accept(frame)
         if (bydProfile) BydNavigationOutputs.onFrame(frame)
+        com.shilapi.xcertplay.glance.CarPlayGlance.onFrame(frame)
         synchronized(playbackStatus) { playbackStatus.accept(frame) }?.let { playing -> playbackListener?.invoke(playing) }
     }
 

@@ -7,10 +7,16 @@ import com.shilapi.xcertplay.airplay.AirPlayContact
 object CarPlayTouchMapper {
     private const val MAX_CONTACTS = 2
 
-    fun contacts(event: MotionEvent, viewWidth: Int, viewHeight: Int,
-                 viewport: CarPlayViewport = CarPlayViewport.fit(viewWidth, viewHeight, viewWidth, viewHeight)): List<AirPlayContact> {
-        val width = viewport.width.coerceAtLeast(1f)
-        val height = viewport.height.coerceAtLeast(1f)
+    fun contacts(event: MotionEvent, viewWidth: Int, viewHeight: Int): List<AirPlayContact> =
+        contacts(event, CarPlayVideoLayout(0f, 0f, viewWidth.toFloat(), viewHeight.toFloat()))
+
+    // Retain the CarBridge viewport overload for existing callers.
+    fun contacts(event: MotionEvent, viewWidth: Int, viewHeight: Int, viewport: CarPlayViewport): List<AirPlayContact> =
+        contacts(event, viewport)
+
+    fun contacts(event: MotionEvent, content: CarPlayVideoLayout): List<AirPlayContact> {
+        val width = content.width.coerceAtLeast(1f)
+        val height = content.height.coerceAtLeast(1f)
         val action = event.actionMasked
         val liftedIndex = if (action == MotionEvent.ACTION_POINTER_UP) event.actionIndex else -1
         val allUp = action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL
@@ -20,8 +26,8 @@ object CarPlayTouchMapper {
             contacts.add(
                 AirPlayContact(
                     id = index,
-                    x = ((event.getX(index).toDouble() - viewport.left) / width).coerceIn(0.0, 1.0),
-                    y = ((event.getY(index).toDouble() - viewport.top) / height).coerceIn(0.0, 1.0),
+                    x = ((event.getX(index) - content.left).toDouble() / width).coerceIn(0.0, 1.0),
+                    y = ((event.getY(index) - content.top).toDouble() / height).coerceIn(0.0, 1.0),
                     down = !allUp && index != liftedIndex,
                 ),
             )
