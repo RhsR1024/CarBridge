@@ -1274,6 +1274,15 @@ class DiPlayActivity : ComponentActivity() {
         heading.addView(label(title, 22, TEXT, true), LinearLayout.LayoutParams(0, -2, 1f))
         card.addView(heading)
         build(card)
+        // Choices and action buttons can be mixed in any order. Keep one gap between
+        // their borders, accounting for the trailing space a choice already reserves.
+        for (index in 1 until card.childCount) {
+            val previous = card.getChildAt(index - 1) as? Button ?: continue
+            val current = card.getChildAt(index) as? Button ?: continue
+            val before = previous.layoutParams as LinearLayout.LayoutParams
+            val after = current.layoutParams as LinearLayout.LayoutParams
+            after.topMargin = (dp(SETTINGS_BUTTON_GAP) - before.bottomMargin).coerceAtLeast(0)
+        }
         parent.addView(card, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(18) })
     }
     private fun toggle(parent: LinearLayout, title: String, description: String, value: Boolean, save: (Boolean) -> Unit) {
@@ -1301,7 +1310,7 @@ class DiPlayActivity : ComponentActivity() {
                     }
                 }.setNegativeButton(getString(R.string.cancel), null).show()
         }
-        parent.addView(button, matchButton(0, 60)); parent.addView(space(12))
+        parent.addView(button, matchButton(0, 60).apply { bottomMargin = dp(SETTINGS_BUTTON_GAP) })
     }
     private fun card() = column().apply { background = rounded(SURFACE, BORDER); setPadding(dp(24), dp(24), dp(24), dp(24)) }
     private fun column() = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; layoutParams = LinearLayout.LayoutParams(-1, -2) }
@@ -1323,6 +1332,7 @@ class DiPlayActivity : ComponentActivity() {
     private fun space(height: Int) = View(this).apply { layoutParams = LinearLayout.LayoutParams(1, dp(height)) }
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
     companion object {
+        private const val SETTINGS_BUTTON_GAP = 12
         private val BG = Color.rgb(12, 17, 27)
         private val SURFACE = Color.rgb(21, 30, 44)
         private val BORDER = Color.rgb(42, 56, 75)
