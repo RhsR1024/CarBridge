@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">MediaBridge</string>
+    <string name="section_about">关于</string>
+    <string name="about_developer">由RhsR1024开发</string>
+    <string name="about_version">版本 %1$s</string>
+    <string name="notification_channel_name">媒体桥接</string>
+    <string name="notification_channel_description">将当前播放器信息桥接到车机媒体中心</string>
+</resources>

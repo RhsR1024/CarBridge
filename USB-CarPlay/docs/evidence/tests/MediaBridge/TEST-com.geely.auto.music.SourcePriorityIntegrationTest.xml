@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.geely.auto.music.SourcePriorityIntegrationTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-10-03T09:08:12" hostname="DESKTOP-IQJOR7V" time="0.527">
+  <properties/>
+  <testcase name="otherNativeAndThirdPartyPlayersCanStillStartWithoutMetadata" classname="com.geely.auto.music.SourcePriorityIntegrationTest" time="0.036"/>
+  <testcase name="fixedSelectionDoesNotBypassCarPlayControlSessionGuard" classname="com.geely.auto.music.SourcePriorityIntegrationTest" time="0.034"/>
+  <testcase name="nativePauseAndOldMetadataCannotResumeStaleThirdPartyPlayback" classname="com.geely.auto.music.SourcePriorityIntegrationTest" time="0.038"/>
+  <testcase name="suspendedClientRejectsAllVehicleTransportAndCollectionCommands" classname="com.geely.auto.music.SourcePriorityIntegrationTest" time="0.032"/>
+  <testcase name="ignoredBufferingSourceAlsoHasPriority" classname="com.geely.auto.music.SourcePriorityIntegrationTest" time="0.038"/>
+  <testcase name="vehicleSourceSelectionNeedsFreshPlayEvenWithoutNativeMediaSession" classname="com.geely.auto.music.SourcePriorityIntegrationTest" time="0.042"/>
+  <testcase name="listenerRecreationDoesNotTreatCachedPlayingAsNewPlayback" classname="com.geely.auto.music.SourcePriorityIntegrationTest" time="0.042"/>
+  <testcase name="vehicleSelectingCarPlayStillYieldsAndRequiresFreshThirdPartyPlay" classname="com.geely.auto.music.SourcePriorityIntegrationTest" time="0.045"/>
+  <testcase name="onlyUserBridgeIgnoreListOverridesFixedPlayer" classname="com.geely.auto.music.SourcePriorityIntegrationTest" time="0.037"/>
+  <testcase name="freshThirdPartyPlaybackDuringNativeStopCanResumeAfterNativeActuallyPauses" classname="com.geely.auto.music.SourcePriorityIntegrationTest" time="0.031"/>
+  <testcase name="multipleIgnoredPlayersDoNotOscillateEpochOrSuppressARealLaterStart" classname="com.geely.auto.music.SourcePriorityIntegrationTest" time="0.031"/>
+  <testcase name="ignoredCarPlayEmptyPlayingSessionDoesNotPermanentlyBlockThirdParty" classname="com.geely.auto.music.SourcePriorityIntegrationTest" time="0.031"/>
+  <testcase name="carPlayEmptyPlayingSessionCannotReplaceThirdPartyOrBecomeFallback" classname="com.geely.auto.music.SourcePriorityIntegrationTest" time="0.031"/>
+  <testcase name="realCarPlayMetadataCannotBypassCompanionHandshakeOrUserIgnoreList" classname="com.geely.auto.music.SourcePriorityIntegrationTest" time="0.029"/>
+  <testcase name="sourceIdentityRemainsMediaBridgeWhileInputPlayerAndTrackChange" classname="com.geely.auto.music.SourcePriorityIntegrationTest" time="0.028"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+]]></system-err>
+</testsuite>

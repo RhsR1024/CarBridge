@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.geely.auto.music.BridgeCoordinatorTest" tests="21" skipped="0" failures="0" errors="0" timestamp="2026-10-03T09:08:11" hostname="DESKTOP-IQJOR7V" time="0.018">
+  <properties/>
+  <testcase name="nativeFocusStopsOutputAndMetadataAndReconnectDoNotReclaimIt" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.01"/>
+  <testcase name="reconnectReplaysLatestSnapshotButDoesNotReclaimFocus" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.0"/>
+  <testcase name="managedPlayingEchoNeverRequestsVehicleFocus" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.0"/>
+  <testcase name="terminalRejectionStopsRetrying" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.0"/>
+  <testcase name="stateObserverSeesCommittedActiveMode" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.0"/>
+  <testcase name="favoriteIsVisibleByDefaultAndCanBeIgnoredPerPlayer" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.0"/>
+  <testcase name="readOnlyProbeDoesNotReconnectOrRequestPlaybackFocus" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.0"/>
+  <testcase name="switchRollsBackAtThirtySecondsWithoutWaitingForAnotherFailure" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.002"/>
+  <testcase name="connectionInitializationAndRegistrationHaveIndependentDeadlines" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.0"/>
+  <testcase name="closesOldBackendBeforeModeSwitchAndIgnoresLateReady" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.0"/>
+  <testcase name="duplicateStartDoesNotReplaceWorkingConnection" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.0"/>
+  <testcase name="failedSwitchRestoresItsOwnTune" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.0"/>
+  <testcase name="retryFailureImmediatelyInvalidatesOldGeneration" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.001"/>
+  <testcase name="onlyLatestSnapshotIsReplayedAfterConnectionRecovery" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.0"/>
+  <testcase name="lateServicesAtFiveThirtyAndOneHundredTwentySecondsCanRecover" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.001"/>
+  <testcase name="duplicateOldFailuresDoNotIncreaseBackoff" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.0"/>
+  <testcase name="stopRemovesEveryTimerAndIgnoresLateCallbacks" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.0"/>
+  <testcase name="oldManagedGrantCannotActivateNewBackendAndFenceWaits" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.001"/>
+  <testcase name="oldConnectionFocusCallbackCannotSuppressNewConnection" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.0"/>
+  <testcase name="managedIntentCanRequestFocusWhileRealSnapshotIsPaused" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.001"/>
+  <testcase name="repeatedPhaseDoesNotExtendItsDeadline" classname="com.geely.auto.music.BridgeCoordinatorTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

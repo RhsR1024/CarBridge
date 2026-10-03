@@ -1,0 +1,11 @@
+_build/
+_tooling/
+.venv/
+__pycache__/
+*.class
+*.idsig
+# Explicitly version only the requested baseline and reviewed deliverables.
+!baselines/*.apk
+!releases/*.apk
+# Public certificate fixture (contains no private key).
+!mediabridge/protocol-fixtures/usbbox-public-cert.pem

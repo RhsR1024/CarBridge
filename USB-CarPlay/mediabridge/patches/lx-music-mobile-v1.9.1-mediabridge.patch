@@ -1,0 +1,124 @@
+diff --git a/src/plugins/player/utils.ts b/src/plugins/player/utils.ts
+index 9d52867..6c09e60 100644
+--- a/src/plugins/player/utils.ts
++++ b/src/plugins/player/utils.ts
+@@ -1,4 +1,4 @@
+-import TrackPlayer, { Capability, Event, RepeatMode, State } from 'react-native-track-player'
++import TrackPlayer, { Capability, Event, RatingType, RepeatMode, State } from 'react-native-track-player'
+ import BackgroundTimer from 'react-native-background-timer'
+ import { playMusic as handlePlayMusic } from './playList'
+ import { existsFile, moveFile, privateStorageDirectoryPath, temporaryDirectoryPath } from '@/utils/fs'
+@@ -262,8 +262,13 @@ export const updateOptions = async(options = {
+     Capability.SeekTo,
+     Capability.SkipToNext,
+     Capability.SkipToPrevious,
++    Capability.SetRating,
+   ],
+ 
++  // Expose Android's standard heart rating contract. MediaBridge and other
++  // MediaController clients can then collect/uncollect without opening LX UI.
++  ratingType: RatingType.Heart,
++
+   notificationCapabilities: [
+     Capability.Play,
+     Capability.Pause,
+diff --git a/src/plugins/player/service.ts b/src/plugins/player/service.ts
+index 91b2502..0a852d1 100644
+--- a/src/plugins/player/service.ts
++++ b/src/plugins/player/service.ts
+@@ -6,7 +6,7 @@ import { isTempId, isEmpty } from './utils'
+ // import { play as lrcPlay, pause as lrcPause } from '@/core/lyric'
+ import { exitApp } from '@/core/common'
+ import { getCurrentTrackId } from './playList'
+-import { pause, play, playNext, playPrev } from '@/core/player/player'
++import { collectMusic, pause, play, playNext, playPrev, uncollectMusic } from '@/core/player/player'
+ 
+ let isInitialized = false
+ 
+@@ -76,6 +76,15 @@ const registerPlaybackService = async() => {
+     global.app_event.setProgress(position as number)
+   })
+ 
++  TrackPlayer.addEventListener(TPEvent.RemoteSetRating, async({ rating }) => {
++    if (typeof rating !== 'boolean') return
++    try {
++      await (rating ? collectMusic() : uncollectMusic())
++    } catch (error) {
++      console.log('remote-set-rating failed', error)
++    }
++  })
++
+   TrackPlayer.addEventListener(TPEvent.PlaybackState, async info => {
+     if (global.lx.gettingUrlId || isTempId()) return
+     // let currentIsPlaying = false
+diff --git a/src/plugins/player/playList.ts b/src/plugins/player/playList.ts
+index 7833959..e48083d 100644
+--- a/src/plugins/player/playList.ts
++++ b/src/plugins/player/playList.ts
+@@ -4,6 +4,8 @@ import { defaultUrl } from '@/config'
+ // import { action as playerAction } from '@/store/modules/player'
+ import settingState from '@/store/setting/state'
+ import playerState from '@/store/player/state'
++import { LIST_IDS } from '@/config/constant'
++import { getListMusics } from '@/core/list'
+ 
+ 
+ const list: LX.Player.Track[] = []
+@@ -213,6 +215,7 @@ const updateMetaInfo = async(mInfo: LX.Player.MusicInfo) => {
+   state.isPlaying = await TrackPlayer.getState() == State.Playing
+   let artwork = isShowNotificationImage ? mInfo.pic ?? prevArtwork : undefined
+   if (mInfo.pic) prevArtwork = mInfo.pic
++  const isCollected = (await getListMusics(LIST_IDS.LOVE)).some(music => music.id == mInfo.id)
+   let title: string
+   let artist: string
+   if (playerState.lastLyric == null) {
+@@ -227,6 +230,7 @@ const updateMetaInfo = async(mInfo: LX.Player.MusicInfo) => {
+     artist,
+     album: mInfo.album ?? undefined,
+     artwork,
++    rating: isCollected,
+     duration: state.prevDuration || 0,
+     lyric: getCurrentFullLyric(mInfo.id),
+   }, state.isPlaying)
+diff --git a/src/core/player/player.ts b/src/core/player/player.ts
+index 1fd9049..d305e95 100644
+--- a/src/core/player/player.ts
++++ b/src/core/player/player.ts
+@@ -1,4 +1,4 @@
+-import { isInitialized, initial as playerInitial, isEmpty, setPause, setPlay, setResource, setStop, initTrackInfo } from '@/plugins/player'
++import { isInitialized, initial as playerInitial, isEmpty, setPause, setPlay, setResource, setStop, initTrackInfo, updateMetaData } from '@/plugins/player'
+ import {
+   setStatusText,
+ } from '@/core/player/playStatus'
+@@ -635,25 +635,27 @@ export const togglePlay = () => {
+ /**
+  * 收藏当前播放的歌曲
+  */
+-export const collectMusic = () => {
++export const collectMusic = async() => {
+   if (!playerState.playMusicInfo.musicInfo) return
+-  void addListMusics(LIST_IDS.LOVE, [
++  await addListMusics(LIST_IDS.LOVE, [
+     'progress' in playerState.playMusicInfo.musicInfo
+       ? playerState.playMusicInfo.musicInfo.metadata.musicInfo
+       : playerState.playMusicInfo.musicInfo,
+   ], settingState.setting['list.addMusicLocationType'])
++  await updateMetaData(playerState.musicInfo, playerState.isPlay)
+ }
+ 
+ /**
+  * 取消收藏当前播放的歌曲
+  */
+-export const uncollectMusic = () => {
++export const uncollectMusic = async() => {
+   if (!playerState.playMusicInfo.musicInfo) return
+-  void removeListMusics(LIST_IDS.LOVE, [
++  await removeListMusics(LIST_IDS.LOVE, [
+     'progress' in playerState.playMusicInfo.musicInfo
+       ? playerState.playMusicInfo.musicInfo.metadata.musicInfo.id
+       : playerState.playMusicInfo.musicInfo.id,
+   ])
++  await updateMetaData(playerState.musicInfo, playerState.isPlay)
+ }
+ 
+ /**

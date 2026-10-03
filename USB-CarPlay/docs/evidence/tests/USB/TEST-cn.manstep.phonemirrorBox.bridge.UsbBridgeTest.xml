@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-10-03T09:16:33" hostname="DESKTOP-IQJOR7V" time="3.427">
+  <properties/>
+  <testcase name="oldCompanionWithoutUsbCapabilityCannotAuthorizeRoute" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="2.752"/>
+  <testcase name="failedDirectUnregisterBlocksNewRoute" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.083"/>
+  <testcase name="metadataModeChangeYieldAndHeartbeatFailureNeverSendUsbCommands" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.037"/>
+  <testcase name="modeSelectionCoversAllPolicyCombinations" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.034"/>
+  <testcase name="pausedSessionRemainsActiveAndPlayPauseUseOriginalCallbacksOnce" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.032"/>
+  <testcase name="bridgeRequiresPreparedAndReadyAndNeitherHandoverSendsPhoneControl" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.03"/>
+  <testcase name="disconnectedMetadataIsDroppedAndReconnectStartsEmpty" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.032"/>
+  <testcase name="incrementalMetadataAndNewSongNeverRetainOldArtist" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.029"/>
+  <testcase name="settingsRetainsTheExactOriginalViewAndItsChildren" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.342"/>
+  <testcase name="staleAndRepeatedCommandsCannotReachPhone" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.025"/>
+  <testcase name="directRegistrationAndMetadataDoNotAutoplayAndClosedCallbacksAreFenced" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.03"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

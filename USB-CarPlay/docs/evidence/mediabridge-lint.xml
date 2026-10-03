@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.7.3">
+
+    <issue
+        id="OldTargetApi"
+        severity="Warning"
+        message="Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the `android.os.Build.VERSION_CODES` javadoc for details."
+        category="Correctness"
+        priority="6"
+        summary="Target SDK attribute is not targeting latest version"
+        explanation="When your application runs on a version of Android that is more recent than your `targetSdkVersion` specifies that it has been tested with, various compatibility modes kick in. This ensures that your application continues to work, but it may look out of place. For example, if the `targetSdkVersion` is less than 14, your app may get an option button in the UI.&#xA;&#xA;To fix this issue, set the `targetSdkVersion` to the highest available value. Then test your app to make sure everything works correctly. You may want to consult the compatibility notes to see what changes apply to each version you are adding support for: https://developer.android.com/reference/android/os/Build.VERSION_CODES.html as well as follow this guide:&#xA;https://developer.android.com/distribute/best-practices/develop/target-sdk.html"
+        url="https://developer.android.com/distribute/best-practices/develop/target-sdk.html"
+        urls="https://developer.android.com/distribute/best-practices/develop/target-sdk.html,https://developer.android.com/reference/android/os/Build.VERSION_CODES.html"
+        errorLine1="        targetSdk = 34"
+        errorLine2="        ~~~~~~~~~~~~~~">
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\build.gradle.kts"
+            line="25"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="GradleDependency"
+        severity="Warning"
+        message="A newer version of org.robolectric:robolectric than 4.14.1 is available: 4.17"
+        category="Correctness"
+        priority="4"
+        summary="Obsolete Gradle Dependency"
+        explanation="This detector looks for usages of libraries where the version you are using is not the current stable release. Using older versions is fine, and there are cases where you deliberately want to stick with an older version. However, you may simply not be aware that a more recent version is available, and that is what this lint check helps find."
+        errorLine1="    testImplementation(&quot;org.robolectric:robolectric:4.14.1&quot;)"
+        errorLine2="                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\build.gradle.kts"
+            line="78"
+            column="24"/>
+    </issue>
+
+    <issue
+        id="DiscouragedApi"
+        severity="Warning"
+        message="Use of this function is discouraged because resource reflection makes it harder to perform build optimizations and compile-time verification of code. It is much more efficient to retrieve resources by identifier (e.g. `R.foo.bar`) than by name (e.g. `getIdentifier(&quot;bar&quot;, &quot;foo&quot;, null)`)."
+        category="Correctness"
+        priority="2"
+        summary="Using discouraged APIs"
+        explanation="Discouraged APIs are allowed and are not deprecated, but they may be unfit for common use (e.g. due to slow performance or subtle behavior)."
+        errorLine1="            int alertTitleId = getResources().getIdentifier(&quot;alertTitle&quot;, &quot;id&quot;, &quot;android&quot;);"
+        errorLine2="                                              ~~~~~~~~~~~~~">
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\java\com\geely\auto\music\SettingsActivity.java"
+            line="984"
+            column="47"/>
+    </issue>
+
+    <issue
+        id="ExportedContentProvider"
+        severity="Warning"
+        message="Exported content providers can provide access to potentially sensitive data"
+        category="Security"
+        priority="5"
+        summary="Content provider does not require permission"
+        explanation="Content providers are exported by default and any application on the system can potentially use them to read and write data. If the content provider provides access to sensitive data, it should be protected by specifying `export=false` in the manifest or by protecting it with a permission that can be granted to other applications."
+        url="https://goo.gle/ExportedContentProvider"
+        urls="https://goo.gle/ExportedContentProvider"
+        errorLine1="        &lt;provider"
+        errorLine2="         ~~~~~~~~">
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\AndroidManifest.xml"
+            line="105"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ExportedService"
+        severity="Warning"
+        message="Exported service does not require permission"
+        category="Security"
+        priority="5"
+        summary="Exported service does not require permission"
+        explanation="Exported services (services which either set `exported=true` or contain an intent-filter and do not specify `exported=false`) should define a permission that an entity must have in order to launch the service or bind to it. Without this, any application can use this service."
+        url="https://goo.gle/ExportedService"
+        urls="https://goo.gle/ExportedService"
+        errorLine1="            &lt;service android:name=&quot;com.geely.auto.music.CarBridgeCompanionService&quot; android:exported=&quot;true&quot; />"
+        errorLine2="             ~~~~~~~">
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\AndroidManifest.xml"
+            line="129"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        severity="Warning"
+        message="The resource `R.mipmap.ic_launcher` appears to be unused"
+        category="Performance"
+        priority="3"
+        summary="Unused resources"
+        explanation="Unused resources make applications larger and slow down builds.&#xA;&#xA;&#xA;The unused resource check can ignore tests. If you want to include resources that are only referenced from tests, consider packaging them in a test source set instead.&#xA;&#xA;You can include test sources in the unused resource check by setting the system property lint.unused-resources.include-tests =true, and to exclude them (usually for performance reasons), use lint.unused-resources.exclude-tests =true.&#xA;,"
+        errorLine1="&lt;adaptive-icon xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-anydpi\ic_launcher.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        severity="Warning"
+        message="The resource `R.mipmap.ic_launcher_round` appears to be unused"
+        category="Performance"
+        priority="3"
+        summary="Unused resources"
+        explanation="Unused resources make applications larger and slow down builds.&#xA;&#xA;&#xA;The unused resource check can ignore tests. If you want to include resources that are only referenced from tests, consider packaging them in a test source set instead.&#xA;&#xA;You can include test sources in the unused resource check by setting the system property lint.unused-resources.include-tests =true, and to exclude them (usually for performance reasons), use lint.unused-resources.exclude-tests =true.&#xA;,"
+        errorLine1="&lt;adaptive-icon xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;>"
+        errorLine2="^">
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-anydpi\ic_launcher_round.xml"
+            line="2"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="IconXmlAndPng"
+        severity="Warning"
+        message="The following images appear both as density independent `.xml` files and as bitmap files: src\main\res\mipmap-anydpi\ic_launcher_blue.xml, src\main\res\mipmap-hdpi\ic_launcher_blue.webp"
+        category="Usability:Icons"
+        priority="7"
+        summary="Icon is specified both as `.xml` file and as a bitmap"
+        explanation="If a drawable resource appears as an `.xml` file in the `drawable/` folder, it&apos;s usually not intentional for it to also appear as a bitmap using the same name; generally you expect the drawable XML file to define states and each state has a corresponding drawable bitmap.">
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-xxxhdpi\ic_launcher_blue.webp"/>
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-xxhdpi\ic_launcher_blue.webp"/>
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-xhdpi\ic_launcher_blue.webp"/>
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-mdpi\ic_launcher_blue.webp"/>
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-hdpi\ic_launcher_blue.webp"/>
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-anydpi\ic_launcher_blue.xml"/>
+    </issue>
+
+    <issue
+        id="IconXmlAndPng"
+        severity="Warning"
+        message="The following images appear both as density independent `.xml` files and as bitmap files: src\main\res\mipmap-anydpi\ic_launcher_blue_round.xml, src\main\res\mipmap-hdpi\ic_launcher_blue_round.webp"
+        category="Usability:Icons"
+        priority="7"
+        summary="Icon is specified both as `.xml` file and as a bitmap"
+        explanation="If a drawable resource appears as an `.xml` file in the `drawable/` folder, it&apos;s usually not intentional for it to also appear as a bitmap using the same name; generally you expect the drawable XML file to define states and each state has a corresponding drawable bitmap.">
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-xxxhdpi\ic_launcher_blue_round.webp"/>
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-xxhdpi\ic_launcher_blue_round.webp"/>
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-xhdpi\ic_launcher_blue_round.webp"/>
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-mdpi\ic_launcher_blue_round.webp"/>
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-hdpi\ic_launcher_blue_round.webp"/>
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-anydpi\ic_launcher_blue_round.xml"/>
+    </issue>
+
+    <issue
+        id="IconDuplicates"
+        severity="Warning"
+        message="The following unrelated icon files have identical contents: ic_launcher_blue.webp, ic_launcher_blue_round.webp"
+        category="Usability:Icons"
+        priority="3"
+        summary="Duplicated icons under different names"
+        explanation="If an icon is repeated under different names, you can consolidate and just use one of the icons and delete the others to make your application smaller. However, duplicated icons usually are not intentional and can sometimes point to icons that were accidentally overwritten or accidentally not updated.">
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-hdpi\ic_launcher_blue_round.webp"/>
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-hdpi\ic_launcher_blue.webp"/>
+    </issue>
+
+    <issue
+        id="IconDuplicates"
+        severity="Warning"
+        message="The following unrelated icon files have identical contents: ic_launcher_blue.webp, ic_launcher_blue_round.webp"
+        category="Usability:Icons"
+        priority="3"
+        summary="Duplicated icons under different names"
+        explanation="If an icon is repeated under different names, you can consolidate and just use one of the icons and delete the others to make your application smaller. However, duplicated icons usually are not intentional and can sometimes point to icons that were accidentally overwritten or accidentally not updated.">
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-mdpi\ic_launcher_blue_round.webp"/>
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-mdpi\ic_launcher_blue.webp"/>
+    </issue>
+
+    <issue
+        id="IconDuplicates"
+        severity="Warning"
+        message="The following unrelated icon files have identical contents: ic_launcher_blue.webp, ic_launcher_blue_round.webp"
+        category="Usability:Icons"
+        priority="3"
+        summary="Duplicated icons under different names"
+        explanation="If an icon is repeated under different names, you can consolidate and just use one of the icons and delete the others to make your application smaller. However, duplicated icons usually are not intentional and can sometimes point to icons that were accidentally overwritten or accidentally not updated.">
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-xhdpi\ic_launcher_blue_round.webp"/>
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-xhdpi\ic_launcher_blue.webp"/>
+    </issue>
+
+    <issue
+        id="IconDuplicates"
+        severity="Warning"
+        message="The following unrelated icon files have identical contents: ic_launcher_blue.webp, ic_launcher_blue_round.webp"
+        category="Usability:Icons"
+        priority="3"
+        summary="Duplicated icons under different names"
+        explanation="If an icon is repeated under different names, you can consolidate and just use one of the icons and delete the others to make your application smaller. However, duplicated icons usually are not intentional and can sometimes point to icons that were accidentally overwritten or accidentally not updated.">
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-xxhdpi\ic_launcher_blue_round.webp"/>
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-xxhdpi\ic_launcher_blue.webp"/>
+    </issue>
+
+    <issue
+        id="IconDuplicates"
+        severity="Warning"
+        message="The following unrelated icon files have identical contents: ic_launcher_blue.webp, ic_launcher_blue_round.webp"
+        category="Usability:Icons"
+        priority="3"
+        summary="Duplicated icons under different names"
+        explanation="If an icon is repeated under different names, you can consolidate and just use one of the icons and delete the others to make your application smaller. However, duplicated icons usually are not intentional and can sometimes point to icons that were accidentally overwritten or accidentally not updated.">
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-xxxhdpi\ic_launcher_blue_round.webp"/>
+        <location
+            file="D:\WorkSpace\CarPlay\analysis\mediabridge-usbbox\app\src\main\res\mipmap-xxxhdpi\ic_launcher_blue.webp"/>
+    </issue>
+
+</issues>

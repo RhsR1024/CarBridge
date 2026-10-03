@@ -1,0 +1,28 @@
+{
+  "supportService": {
+    "action": "com.ecarx.eas.core.intent.action.SUPPORT_SERVICE",
+    "component": "ecarx.xsf.mediacenter/ecarx.xsf.mediacenter.MediaCenterService",
+    "descriptor": "com.ecarx.eas.framework.sdk.IEASFrameworkSuppportService",
+    "getMainBinderTransaction": 1,
+    "module": "mediacenter",
+    "api": "MediaCenterAPI",
+    "method": "getMainBinder"
+  },
+  "mediaCenter": {
+    "descriptor": "ecarx.xsf.mediacenter.IMediaCenterSvc",
+    "sourceType": 6,
+    "transactions": {
+      "registerMusic": 1,
+      "unregister": 4,
+      "requestPlay": 5,
+      "updateMusicPlaybackState": 6,
+      "updateMediaSourceTypeList": 7,
+      "updateCurrentSourceType": 8,
+      "updateCurrentProgress": 10,
+      "updateCurrentLyric": 14,
+      "declareSupportCollectTypes": 15,
+      "registerInMusic": 19,
+      "declareMediaCenterCapability": 30
+    }
+  }
+}

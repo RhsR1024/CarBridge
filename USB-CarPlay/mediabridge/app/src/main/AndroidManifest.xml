@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
+
+    <queries>
+        <package android:name="com.flyme.auto.energy" />
+        <package android:name="io.github.rhsr1024.carbridge" />
+        <package android:name="io.github.rhsr1024.carbridge.debug" />
+        <package android:name="com.ecarx.sdk.openapi" />
+        <package android:name="com.flyme.auto.music" />
+        <package android:name="com.netease.cloudmusic.iot" />
+        <package android:name="ecarx.xsf.mediacenter" />
+        <package android:name="com.netease.cloudmusic.iou" />
+        <package android:name="com.netease.cloudmusic.iov" />
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
+    <application
+        android:name="com.geely.auto.music.MediaBridgeApplication"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher_blue"
+        android:label="@string/app_name"
+        android:logo="@mipmap/ic_launcher_blue"
+        android:roundIcon="@mipmap/ic_launcher_blue_round"
+        android:supportsRtl="true"
+        android:theme="@style/MediaBridgeTheme">
+        <activity
+            android:name="com.geely.auto.music.MainActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:icon="@mipmap/ic_launcher_blue"
+            android:logo="@mipmap/ic_launcher_blue">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.INFO" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.geely.auto.music.SettingsActivity"
+            android:exported="true" android:label="MediaBridge 设置"
+            android:taskAffinity="${applicationId}.settings">
+            <intent-filter android:priority="-1">
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.geely.auto.music.PhoneDebugActivity"
+            android:enabled="@bool/enable_phone_debug"
+            android:exported="false"
+            android:label="MediaBridge 手机调试台" />
+        <activity android:name="com.geely.auto.music.VehiclePlayerActivity"
+            android:exported="false" android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <service
+            android:name="com.geely.auto.music.MediaListenerService"
+            android:exported="true"
+            android:label="MediaBridge 媒体监听"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="com.geely.auto.music.UniversalBridgeService"
+            android:exported="true"
+            android:foregroundServiceType="specialUse"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="ecarx.xsf.mediacenter.intent.action.SUPPORT_SERVICE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="ecarx.xsf.mediacenter.provider"
+                android:resource="@xml/res_mediacenter" />
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="vehicle_media_metadata_bridge" />
+        </service>
+
+        <meta-data
+            android:name="ecarx.xsf.mediacenter.provider"
+            android:resource="@xml/res_mediacenter" />
+
+
+        <provider
+            android:name="com.geely.auto.music.ArtworkContentProvider"
+            android:authorities="${applicationId}.artwork"
+            android:exported="true"
+            android:grantUriPermissions="true" />
+
+        <receiver
+            android:name="com.geely.auto.music.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_UNLOCKED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.geely.auto.music.PackageEventsReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_ADDED" />
+                <action android:name="android.intent.action.PACKAGE_CHANGED" />
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <data android:scheme="package" />
+            </intent-filter>
+            <intent-filter><action android:name="android.intent.action.LOCALE_CHANGED" /></intent-filter>
+        </receiver>
+            <service android:name="com.geely.auto.music.CarBridgeCompanionService" android:exported="true" />
+    </application>
+</manifest>

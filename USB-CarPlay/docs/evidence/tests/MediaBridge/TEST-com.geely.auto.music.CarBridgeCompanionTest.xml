@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.geely.auto.music.CarBridgeCompanionTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-03T09:08:11" hostname="DESKTOP-IQJOR7V" time="0.168">
+  <properties/>
+  <testcase name="protocolRejectsOversizedOrArbitraryParcelableInputs" classname="com.geely.auto.music.CarBridgeCompanionTest" time="0.043"/>
+  <testcase name="unconfirmedBackendReleaseDoesNotAuthorizeDirectHandover" classname="com.geely.auto.music.CarBridgeCompanionTest" time="0.031"/>
+  <testcase name="wrongUidAndOldProcessCannotPrepareOrReceiveCommands" classname="com.geely.auto.music.CarBridgeCompanionTest" time="0.031"/>
+  <testcase name="grantedAccessWithoutSystemBindRemainsUnreadyAndDoesNotChangeOwnershipRevision" classname="com.geely.auto.music.CarBridgeCompanionTest" time="0.035"/>
+  <testcase name="managedInputIsExcludedBeforeHandshakeAndInDirectMode" classname="com.geely.auto.music.CarBridgeCompanionTest" time="0.028"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

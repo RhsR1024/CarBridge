@@ -1,0 +1,35 @@
+{
+  "artifacts": {
+    "CarPlay-USBBox-Slim-MediaModes.apk": {
+      "bytes": 7561620,
+      "sha256": "fcfed40a8934f67c5ec8d694b805aad9cafc88b9080f4690edf67a8726de3c6a"
+    },
+    "MediaBridge-2.3.9-usbbox.apk": {
+      "bytes": 632450,
+      "sha256": "78653d8271b45505997e0eae4588ce9b743c21caebc08a641ffba02a185e34c7"
+    },
+    "CarPlay-USBBox-F25-MultiTouch-Slim.apk": {
+      "bytes": 7545236,
+      "sha256": "10dc853023f48cf0a11f44f99a6da1dd64cb08010550e0b1a72e8030cf94d796"
+    }
+  },
+  "tests": {
+    "USB": {
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "MediaBridge": {
+      "tests": 182,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "mediabridge_lint_errors": 0,
+  "usb_original_methods_unchanged": 37720,
+  "usb_original_methods_changed": 4,
+  "same_signed_usb_sha256_after_independent_rebuild": true,
+  "vehicle_test": "Pending for newly added media modes"
+}

@@ -1,0 +1,291 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index d987ac2..c0fbf74 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -1,5 +1,10 @@
+ # 变更记录
+ 
++## 2.3.8-entry-probe-26100301 — 2026-10-03
++
++- 增加小窗播放器入口生命周期、实例/任务和启动分支日志，记录会话入口发送、普通入口启动及设置回退的返回或异常。
++- 启动调用正常返回明确标记前台显示尚未确认；保持原有跳转、播放和权限策略。详见 `docs/VEHICLE_ENTRY_TRACE_2.3.8.md`。
++
+ ## 2.2.0-carplay-guard-26100101 — 2026-10-01
+ 
+ - 小窗播放来源名称固定为 MediaBridge，与自身包名、图标及来源目录保持一致；实际输入播放器名称仍保留在本应用页面，歌曲信息和控制目标不变。
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+index 37d07fc..f21fde6 100644
+--- a/app/build.gradle.kts
++++ b/app/build.gradle.kts
+@@ -23,8 +23,8 @@ android {
+         applicationId = "com.mediabridge.app"
+         minSdk = 28
+         targetSdk = 34
+-        versionCode = 26100208
+-        versionName = "2.3.7-carbridge-26100208"
++        versionCode = 26100301
++        versionName = "2.3.8-entry-probe-26100301"
+         testInstrumentationRunner = "android.test.InstrumentationTestRunner"
+     }
+ 
+diff --git a/app/src/main/java/com/geely/auto/music/EntryDiagnostics.java b/app/src/main/java/com/geely/auto/music/EntryDiagnostics.java
+index 4d4657a..a809432 100644
+--- a/app/src/main/java/com/geely/auto/music/EntryDiagnostics.java
++++ b/app/src/main/java/com/geely/auto/music/EntryDiagnostics.java
+@@ -7,21 +7,40 @@ import android.net.Uri;
+ /** Observational only: caller hints must never be used as authorization or routing rules. */
+ final class EntryDiagnostics {
+     static void record(Activity activity, String event, Intent intent) {
++        record(activity, "SETTINGS_ENTRY", event, intent, "");
++    }
++    static void record(Activity activity, String category, String event, Intent intent, String details) {
+         try {
+             Uri referrer = activity.getReferrer();
+             String referrerPackage = referrer != null && "android-app".equals(referrer.getScheme())
+                     ? referrer.getHost() : "unknown";
+-            DiagnosticsLog.i("SETTINGS_ENTRY event=" + event
++            DiagnosticsLog.i(category + " event=" + event
++                    + " pid=" + android.os.Process.myPid()
++                    + " entry=" + activity.getClass().getSimpleName()
+                     + " instance=" + Integer.toHexString(System.identityHashCode(activity))
+                     + " task=" + activity.getTaskId() + " root=" + activity.isTaskRoot()
+-                    + " action=" + (intent == null ? null : intent.getAction())
++                    + " finishing=" + activity.isFinishing()
++                    + " changingConfig=" + activity.isChangingConfigurations()
++                    + " windowFocus=" + activity.hasWindowFocus()
++                    + " action=" + identifier(intent == null ? null : intent.getAction())
+                     + " launcher=" + (intent != null && intent.hasCategory(Intent.CATEGORY_LAUNCHER))
+                     + " flags=" + (intent == null ? "0" : Integer.toHexString(intent.getFlags()))
+-                    + " component=" + (intent == null ? null : intent.getComponent())
+-                    + " caller=" + activity.getCallingPackage() + " referrerPackage=" + referrerPackage);
++                    + " component=" + component(intent)
++                    + " caller=" + identifier(activity.getCallingPackage())
++                    + " referrerPackage=" + identifier(referrerPackage) + details);
+         } catch (RuntimeException error) {
+-            DiagnosticsLog.w("SETTINGS_ENTRY event=" + event + " probe_failed=" + error.getClass().getSimpleName());
++            DiagnosticsLog.w(category + " event=" + event + " probe_failed=" + error.getClass().getSimpleName());
+         }
+     }
++    // Only identifiers are useful here. Never serialize Intent data/extras or exception messages.
++    static String identifier(String value) {
++        if (value == null || value.isEmpty()) return "none";
++        return value.length() <= 200 && value.matches("[A-Za-z0-9_.$-]+") ? value : "redacted";
++    }
++    static String component(Intent intent) {
++        if (intent == null || intent.getComponent() == null) return "none";
++        return identifier(intent.getComponent().getPackageName()) + "/"
++                + identifier(intent.getComponent().getClassName());
++    }
+     private EntryDiagnostics() {}
+ }
+diff --git a/app/src/main/java/com/geely/auto/music/VehiclePlayerActivity.java b/app/src/main/java/com/geely/auto/music/VehiclePlayerActivity.java
+index ddd2739..f1b532c 100644
+--- a/app/src/main/java/com/geely/auto/music/VehiclePlayerActivity.java
++++ b/app/src/main/java/com/geely/auto/music/VehiclePlayerActivity.java
+@@ -5,10 +5,16 @@ import android.app.PendingIntent;
+ import android.content.Context;
+ import android.content.Intent;
+ import android.os.Bundle;
++import android.os.Build;
++import android.os.SystemClock;
+ import android.widget.Toast;
+ 
+ /** Open a player UI without sending any playback command. Also used by the package launcher. */
+ public class VehiclePlayerActivity extends Activity {
++    private final long createdAt = SystemClock.elapsedRealtime();
++    private String targetPackage = "";
++    private String route = "none";
++    private String phase = "created";
+     static PendingIntent entry(Context context) {
+         return PendingIntent.getActivity(context, 7301,
+                 new Intent(context, VehiclePlayerActivity.class).setAction("com.geely.auto.music.OPEN_PLAYER"),
+@@ -22,25 +28,107 @@ public class VehiclePlayerActivity extends Activity {
+     }
+     @Override public void onCreate(Bundle state) {
+         super.onCreate(state);
++        lifecycle("create", getIntent(), " restored=" + (state != null));
+         String requested = getClass() == VehiclePlayerActivity.class ? getIntent().getStringExtra("resumePackage") : null;
+-        String pkg = requested != null && LastPlayerStore.allowed(this, requested) ? requested : target(this);
++        boolean requestedAllowed = requested != null && LastPlayerStore.allowed(this, requested);
++        String pkg = requestedAllowed ? requested : target(this);
++        targetPackage = pkg;
++        PlayerSnapshot active = BridgeStateStore.getSnapshot();
++        String source = requestedAllowed ? "internal_request" : pkg.isEmpty() ? "none"
++                : active != null && pkg.equals(active.packageName) ? "current_snapshot" : "last_player";
+         DiagnosticsLog.i("VEHICLE_ENTRY target=" + pkg + " action=open_player entry=" + getClass().getSimpleName());
++        launchEvent("target_selected", " source=" + source);
++        String fallbackReason = "no_target";
+         if (!pkg.isEmpty()) {
+             PendingIntent session = MediaListenerService.playerSessionActivity(pkg);
+-            if (session != null && pkg.equals(session.getCreatorPackage())
+-                    && (android.os.Build.VERSION.SDK_INT < 31 || session.isActivity())) {
+-                try { session.send(); finish(); return; }
++            String creator = session == null ? null : session.getCreatorPackage();
++            boolean sameCreator = session != null && pkg.equals(creator);
++            boolean activityEntry = sameCreator && (Build.VERSION.SDK_INT < 31 || session.isActivity());
++            String type = session == null ? "none" : Build.VERSION.SDK_INT < 31 ? "unknown_pre31"
++                    : !sameCreator ? "not_checked" : activityEntry ? "activity" : "non_activity";
++            launchEvent("session_checked", " present=" + (session != null)
++                    + " creator=" + EntryDiagnostics.identifier(creator) + " type=" + type
++                    + " eligible=" + activityEntry);
++            if (activityEntry) {
++                route = "session";
++                try {
++                    launchEvent("session_send_requested", "");
++                    session.send();
++                    launchEvent("session_send_returned", " foreground=unverified");
++                    finish(); return;
++                }
+                 catch (PendingIntent.CanceledException | RuntimeException error) {
+                     DiagnosticsLog.w("VEHICLE_ENTRY session_unavailable target=" + pkg);
++                    launchEvent("session_send_failed", " error=" + error.getClass().getSimpleName());
+                 }
++            } else {
++                launchEvent("session_skipped", " reason=" + (session == null ? "missing"
++                        : !sameCreator ? "creator_mismatch" : "not_activity"));
+             }
++            route = "launcher";
+             try {
+                 Intent launch = PlayerFeatures.playerIntent(this, pkg);
+-                if (launch != null) { startActivity(launch); finish(); return; }
+-            } catch (RuntimeException error) { DiagnosticsLog.w("VEHICLE_ENTRY launch_failed target=" + pkg); }
++                launchEvent("launcher_resolved", " present=" + (launch != null) + intentDetails(launch));
++                if (launch != null) {
++                    launchEvent("launcher_start_requested", "");
++                    startActivity(launch);
++                    launchEvent("launcher_start_returned", " foreground=unverified");
++                    finish(); return;
++                }
++                fallbackReason = "launcher_missing";
++            } catch (RuntimeException error) {
++                DiagnosticsLog.w("VEHICLE_ENTRY launch_failed target=" + pkg);
++                launchEvent("launcher_start_failed", " error=" + error.getClass().getSimpleName());
++                fallbackReason = "launcher_exception";
++            }
+         }
++        route = "settings";
++        launchEvent("settings_fallback", " reason=" + fallbackReason);
+         Toast.makeText(this, "上次播放器不可用，请在 MediaBridge 中选择播放器", Toast.LENGTH_LONG).show();
+-        startActivity(new Intent(this, SettingsActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
++        try {
++            startActivity(new Intent(this, SettingsActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
++            launchEvent("settings_start_returned", " foreground=unverified");
++        } catch (RuntimeException error) {
++            launchEvent("settings_start_failed", " error=" + error.getClass().getSimpleName());
++            throw error;
++        }
+         finish();
+     }
++    @Override protected void onStart() { super.onStart(); lifecycle("start"); }
++    @Override protected void onRestart() { super.onRestart(); lifecycle("restart"); }
++    @Override protected void onResume() { super.onResume(); lifecycle("resume"); }
++    @Override protected void onPause() { lifecycle("pause"); super.onPause(); }
++    @Override protected void onStop() { lifecycle("stop"); super.onStop(); }
++    @Override protected void onDestroy() { lifecycle("destroy"); super.onDestroy(); }
++    @Override protected void onNewIntent(Intent intent) {
++        super.onNewIntent(intent);
++        setIntent(intent);
++        // Observe a reused task without introducing a second launch or changing routing policy.
++        lifecycle("new_intent", intent, "");
++    }
++    @Override public void onWindowFocusChanged(boolean hasFocus) {
++        super.onWindowFocusChanged(hasFocus);
++        lifecycle("window_focus", getIntent(), " hasFocus=" + hasFocus);
++    }
++    @Override public void finish() {
++        lifecycle("finish_requested");
++        super.finish();
++    }
++    private void lifecycle(String event) { lifecycle(event, getIntent(), ""); }
++    private void lifecycle(String event, Intent intent, String details) {
++        EntryDiagnostics.record(this, "VEHICLE_ENTRY_LIFECYCLE", event, intent, routeDetails() + details);
++    }
++    private void launchEvent(String event, String details) {
++        phase = event;
++        EntryDiagnostics.record(this, "VEHICLE_LAUNCH", event, getIntent(), routeDetails() + details);
++    }
++    private String routeDetails() {
++        return " target=" + EntryDiagnostics.identifier(targetPackage) + " route=" + route + " phase=" + phase
++                + " elapsedMs=" + Math.max(0L, SystemClock.elapsedRealtime() - createdAt);
++    }
++    private static String intentDetails(Intent intent) {
++        return " launchAction=" + EntryDiagnostics.identifier(intent == null ? null : intent.getAction())
++                + " launchComponent=" + EntryDiagnostics.component(intent)
++                + " launchFlags=" + (intent == null ? "0" : Integer.toHexString(intent.getFlags()));
++    }
+ }
+diff --git a/app/src/test/java/com/geely/auto/music/VehicleResumeTest.java b/app/src/test/java/com/geely/auto/music/VehicleResumeTest.java
+index 83869a9..c547dd2 100644
+--- a/app/src/test/java/com/geely/auto/music/VehicleResumeTest.java
++++ b/app/src/test/java/com/geely/auto/music/VehicleResumeTest.java
+@@ -167,6 +167,70 @@ public class VehicleResumeTest {
+             assertTrue(screen.get().isFinishing());
+         }
+     }
++    @Test @Config(sdk = 30)
++    public void sessionDispatchIsLoggedWithoutClaimingForegroundOrLaunchingTwice() throws Exception {
++        String pkg = "third.party";
++        installPlayerLauncher(pkg);
++        MediaController third = player(pkg); sessions(third); LastPlayerStore.remember(context, pkg);
++        android.app.PendingIntent session = android.app.PendingIntent.getActivity(context, 91,
++                new Intent().setComponent(new ComponentName(pkg, pkg + ".NowPlayingActivity")),
++                android.app.PendingIntent.FLAG_IMMUTABLE);
++        Shadows.shadowOf(session).setCreatorPackage(pkg);
++        Shadows.shadowOf(third).setSessionActivity(session);
++        long before = action(third);
++        try (org.robolectric.android.controller.ActivityController<MainActivity> screen = Robolectric.buildActivity(MainActivity.class).create()) {
++            Intent opened = Shadows.shadowOf((Application) context).getNextStartedActivity();
++            assertEquals(pkg + ".NowPlayingActivity", opened.getComponent().getClassName());
++            assertNull(Shadows.shadowOf((Application) context).getNextStartedActivity());
++            assertTrue(screen.get().isFinishing());
++            assertEquals(before, action(third));
++            String log = DiagnosticsLog.dump();
++            assertTrue(log.contains("type=unknown_pre31 eligible=true"));
++            assertTrue(log.contains("event=session_send_returned"));
++            assertTrue(log.contains("foreground=unverified"));
++            assertTrue(log.contains("event=finish_requested"));
++            assertFalse(log.contains("event=launcher_start_requested"));
++        }
++    }
++    @Test @Config(sdk = 30)
++    public void canceledSessionRecordsFailureAndFallsBackToLauncher() throws Exception {
++        String pkg = "third.party";
++        installPlayerLauncher(pkg);
++        MediaController third = player(pkg); sessions(third); LastPlayerStore.remember(context, pkg);
++        android.app.PendingIntent session = android.app.PendingIntent.getActivity(context, 92,
++                new Intent().setComponent(new ComponentName(pkg, pkg + ".NowPlayingActivity")),
++                android.app.PendingIntent.FLAG_IMMUTABLE);
++        Shadows.shadowOf(session).setCreatorPackage(pkg);
++        session.cancel(); Shadows.shadowOf(third).setSessionActivity(session);
++        try (org.robolectric.android.controller.ActivityController<MainActivity> screen = Robolectric.buildActivity(MainActivity.class).create()) {
++            Intent opened = Shadows.shadowOf(screen.get()).getNextStartedActivity();
++            assertEquals(pkg + ".PlayerActivity", opened.getComponent().getClassName());
++            assertTrue(screen.get().isFinishing());
++            String log = DiagnosticsLog.dump();
++            assertTrue(log.contains("event=session_send_failed"));
++            assertTrue(log.contains("error=CanceledException"));
++            assertTrue(log.contains("event=launcher_start_returned"));
++        }
++    }
++    @Test public void newIntentDiagnosticsDoNotRelaunchOrExposeIncomingData() {
++        installPlayerLauncher("third.party"); LastPlayerStore.remember(context, "third.party");
++        try (org.robolectric.android.controller.ActivityController<MainActivity> screen = Robolectric.buildActivity(MainActivity.class).create()) {
++            assertNotNull(Shadows.shadowOf(screen.get()).getNextStartedActivity());
++            Intent incoming = new Intent("https://private.invalid/secret-action")
++                    .setData(android.net.Uri.parse("custom://private/secret-data"))
++                    .putExtra("password", "secret-extra")
++                    .putExtra(Intent.EXTRA_REFERRER, android.net.Uri.parse("android-app://caller.app/private-secret"));
++            screen.newIntent(incoming);
++            assertNull(Shadows.shadowOf(screen.get()).getNextStartedActivity());
++            String log = DiagnosticsLog.dump();
++            assertTrue(log.contains("VEHICLE_ENTRY_LIFECYCLE event=new_intent"));
++            assertTrue(log.contains("referrerPackage=caller.app"));
++            assertFalse(log.contains("secret-action"));
++            assertFalse(log.contains("secret-data"));
++            assertFalse(log.contains("secret-extra"));
++            assertFalse(log.contains("private-secret"));
++        }
++    }
+     @Test public void missingPlayerFallsBackToSeparateSettingsTaskWithoutLoop() {
+         LastPlayerStore.remember(context, "missing.player");
+         try (org.robolectric.android.controller.ActivityController<MainActivity> screen = Robolectric.buildActivity(MainActivity.class).create()) {

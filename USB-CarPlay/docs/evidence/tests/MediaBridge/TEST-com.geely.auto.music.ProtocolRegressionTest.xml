@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.geely.auto.music.ProtocolRegressionTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-03T09:08:12" hostname="DESKTOP-IQJOR7V" time="0.205">
+  <properties/>
+  <testcase name="playbackInfoBinderReadsLatestClientStateAfterRegistration" classname="com.geely.auto.music.ProtocolRegressionTest" time="0.024"/>
+  <testcase name="registrationExtensionsAndPlayStatePreserveOriginalEasPayloads" classname="com.geely.auto.music.ProtocolRegressionTest" time="0.028"/>
+  <testcase name="allUsedMediaCenterTransactionsMatchFixtureAndArgumentOrder" classname="com.geely.auto.music.ProtocolRegressionTest" time="0.028"/>
+  <testcase name="accessDeniedIsTerminalAndRegisterInMusicFallsBackOnlyWhenUnavailable" classname="com.geely.auto.music.ProtocolRegressionTest" time="0.021"/>
+  <testcase name="easMessageAndReplyPreserveGoldenParcelFieldOrder" classname="com.geely.auto.music.ProtocolRegressionTest" time="0.019"/>
+  <testcase name="easProxyUsesOneFourSixAndPropagatesUnsupportedTransactions" classname="com.geely.auto.music.ProtocolRegressionTest" time="0.019"/>
+  <testcase name="probeCallbacksLogArgumentsWithoutChangingResults" classname="com.geely.auto.music.ProtocolRegressionTest" time="0.026"/>
+  <testcase name="f25DirectoriesUseDistinctDescriptorsAndTransactionNumbers" classname="com.geely.auto.music.ProtocolRegressionTest" time="0.019"/>
+  <testcase name="rejectedPlaybackTokenTriggersRecoverableFailureWithoutBinderDeath" classname="com.geely.auto.music.ProtocolRegressionTest" time="0.02"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

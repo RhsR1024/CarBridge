@@ -1,0 +1,15 @@
+{
+  "source_sha256": "79ffe2174498a84f9b84522780fc56cb6a9693ca8e6d8aab6340e4b92029c139",
+  "source_bytes": 31195629,
+  "removed_asset": "assets/pppppppppppppppppppppppppppppppp.bin",
+  "removed_bytes": 23396044,
+  "unique_byte": "P (0x50)",
+  "literal_references_outside_signatures": [],
+  "all_remaining_file_contents_identical": true,
+  "dex_unchanged": true,
+  "native_libraries_resources_manifest_unchanged": true,
+  "note": "Pure padding removal; no code logic changes. Dynamic construction cannot be disproved solely by literal scanning.",
+  "signed_slim_bytes": 7545236,
+  "signed_slim_sha256": "10dc853023f48cf0a11f44f99a6da1dd64cb08010550e0b1a72e8030cf94d796",
+  "signed_payload_comparison_passed": true
+}

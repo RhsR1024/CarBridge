@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.geely.auto.music.VehicleResumeTest" tests="19" skipped="0" failures="0" errors="0" timestamp="2026-10-03T09:08:13" hostname="DESKTOP-IQJOR7V" time="2.019">
+  <properties/>
+  <testcase name="newForeignSelectionAllowsAnotherImmediateExplicitReturn" classname="com.geely.auto.music.VehicleResumeTest" time="0.052"/>
+  <testcase name="multipleSessionsWithoutOriginalTokenAreNotGuessed" classname="com.geely.auto.music.VehicleResumeTest" time="0.04"/>
+  <testcase name="launcherOpensPausedCurrentPlayerWithoutPlayingAndFinishes" classname="com.geely.auto.music.VehicleResumeTest" time="0.358"/>
+  <testcase name="missingPlayerFallsBackToSeparateSettingsTaskWithoutLoop" classname="com.geely.auto.music.VehicleResumeTest" time="0.045"/>
+  <testcase name="explicitSourceSelectionResumesRetainedSessionWithoutPublishingFakePlayback" classname="com.geely.auto.music.VehicleResumeTest" time="0.043"/>
+  <testcase name="registrationAndOwnRequestEchoCannotAutoplayHistory" classname="com.geely.auto.music.VehicleResumeTest" time="0.035"/>
+  <testcase name="duplicateSelectionDoesNotSendAgainAndNoNextOrPauseFallbackExists" classname="com.geely.auto.music.VehicleResumeTest" time="0.038"/>
+  <testcase name="sessionDispatchIsLoggedWithoutClaimingForegroundOrLaunchingTwice" classname="com.geely.auto.music.VehicleResumeTest" time="0.617"/>
+  <testcase name="newIntentDiagnosticsDoNotRelaunchOrExposeIncomingData" classname="com.geely.auto.music.VehicleResumeTest" time="0.047"/>
+  <testcase name="delayedSelectionCannotOverrideNewerForeignOwner" classname="com.geely.auto.music.VehicleResumeTest" time="0.036"/>
+  <testcase name="bridgeCarBridgeResumeUsesOneCompanionCommandInsteadOfTransportControl" classname="com.geely.auto.music.VehicleResumeTest" time="0.045"/>
+  <testcase name="coldPlayerOnlyOpensEntryWithoutDelayedPlay" classname="com.geely.auto.music.VehicleResumeTest" time="0.032"/>
+  <testcase name="entryRemainsSeparateFromLauncherAndSurvivesEmptyCard" classname="com.geely.auto.music.VehicleResumeTest" time="0.037"/>
+  <testcase name="ignoredFixedMismatchDisabledAndOldGenerationCannotResume" classname="com.geely.auto.music.VehicleResumeTest" time="0.042"/>
+  <testcase name="settingsIconIsExportedAndHasSeparateTaskFromVehicleLauncher" classname="com.geely.auto.music.VehicleResumeTest" time="0.364"/>
+  <testcase name="disconnectedCarBridgeIsNeverResumedFromSavedHint" classname="com.geely.auto.music.VehicleResumeTest" time="0.033"/>
+  <testcase name="onlyPlayingPublishedInputIsRememberedAndSurvivesClear" classname="com.geely.auto.music.VehicleResumeTest" time="0.04"/>
+  <testcase name="launcherOpensRememberedPlayerWhenSnapshotEmpty" classname="com.geely.auto.music.VehicleResumeTest" time="0.041"/>
+  <testcase name="canceledSessionRecordsFailureAndFallsBackToLauncher" classname="com.geely.auto.music.VehicleResumeTest" time="0.072"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+]]></system-err>
+</testsuite>

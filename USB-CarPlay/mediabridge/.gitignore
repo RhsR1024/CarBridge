@@ -1,0 +1,8 @@
+.gradle/
+build/
+app/build/
+.codegraph/
+*.apk
+*.idsig
+local.properties
+apkinspect/

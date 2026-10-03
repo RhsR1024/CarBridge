@@ -1,0 +1,8 @@
+<resources>
+    <style name="MediaBridgeTheme" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#2F7DFF</item>
+        <item name="android:navigationBarColor">#30344F</item>
+        <item name="android:statusBarColor">#30344F</item>
+    </style>
+</resources>

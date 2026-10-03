@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<service-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <packageName>com.mediabridge.app.dev</packageName>
+    <sourceType-list><type>6</type></sourceType-list>
+    <semantic-list>
+        <semantic>67371008</semantic>
+        <semantic>67108865</semantic>
+        <semantic>33554434</semantic>
+        <semantic>33556480</semantic>
+    </semantic-list>
+</service-config>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.geely.auto.music.UsbBoxCompanionTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-03T09:08:03" hostname="DESKTOP-IQJOR7V" time="3.015">
+  <properties/>
+  <testcase name="usbMetadataWithoutKnownDurationDoesNotGuessOnlineIdentity" classname="com.geely.auto.music.UsbBoxCompanionTest" time="2.773"/>
+  <testcase name="directExcludesUsbInputAndDrainKeepsUsbIdentity" classname="com.geely.auto.music.UsbBoxCompanionTest" time="0.088"/>
+  <testcase name="originalUsbSignatureIsScopedToExactPackageAndUid" classname="com.geely.auto.music.UsbBoxCompanionTest" time="0.053"/>
+  <testcase name="bridgeHandoverAllowsOnlyUsbCommandsAndCloseRevokesIt" classname="com.geely.auto.music.UsbBoxCompanionTest" time="0.049"/>
+  <testcase name="uncertainPreviousOutputDoesNotGrantUsbDirectOwnership" classname="com.geely.auto.music.UsbBoxCompanionTest" time="0.052"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

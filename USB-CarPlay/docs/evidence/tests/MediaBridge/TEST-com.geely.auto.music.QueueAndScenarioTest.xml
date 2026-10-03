@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.geely.auto.music.QueueAndScenarioTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-03T09:08:12" hostname="DESKTOP-IQJOR7V" time="0.067">
+  <properties/>
+  <testcase name="queueSnapshotCopiesFrameworkItemsAndTracksActiveEntry" classname="com.geely.auto.music.QueueAndScenarioTest" time="0.018"/>
+  <testcase name="scenarioEvaluatorRequiresObservablePlayerFeedback" classname="com.geely.auto.music.QueueAndScenarioTest" time="0.018"/>
+  <testcase name="browserSnapshotKeepsOnlyPublicDescriptionData" classname="com.geely.auto.music.QueueAndScenarioTest" time="0.016"/>
+  <testcase name="storeDropsQueueWhenSelectedSessionChanges" classname="com.geely.auto.music.QueueAndScenarioTest" time="0.015"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

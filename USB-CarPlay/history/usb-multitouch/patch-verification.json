@@ -1,0 +1,13 @@
+{
+  "original_apk_sha256": "14659850cd85dda1b1f156ca65438d2beb866de6d7c6101408a62866c4dc1e6d",
+  "modified_method": "Lcn/manstep/phonemirrorBox/p0/c;->a()Z",
+  "instruction_offset": 2278328,
+  "old_instructions_hex": "12000f00",
+  "new_instructions_hex": "12100f00",
+  "non_header_dex_changed_offsets": [
+    2278329
+  ],
+  "other_zip_payloads_unchanged": true,
+  "original_apk_unchanged": true,
+  "purpose": "Experimental existing USB message 23 path in CarPlay; requires box firmware validation"
+}

@@ -1,0 +1,2 @@
+fcfed40a8934f67c5ec8d694b805aad9cafc88b9080f4690edf67a8726de3c6a  CarPlay-USBBox-Slim-MediaModes.apk
+78653d8271b45505997e0eae4588ce9b743c21caebc08a641ffba02a185e34c7  MediaBridge-2.3.9-usbbox.apk

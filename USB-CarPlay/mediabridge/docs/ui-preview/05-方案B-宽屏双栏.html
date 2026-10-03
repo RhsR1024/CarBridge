@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>方案B · 宽屏双栏（15.4寸 2.5K 车机 · 日/夜双主题）</title>
+<style>
+:root{
+  color-scheme: dark;
+  font-family:"Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;
+  font-size:clamp(17px,1.02vw,26px);
+  /* ── 夜间（默认） ── */
+  --bg1:#3a3f5c; --bg2:#2b2f47;
+  --card:#4b5170; --card-hi:#565d80;
+  --text:#fdf6e9; --muted:#c3c8dc;
+  --blue:#2f7dff; --blue-deep:#1b5fd9; --blue-soft:#274a86;
+  --line:#ffffff22; --line-soft:#ffffff1a;
+  --btn:#6a7194; --btn-hover:#7a82a8; --btn-text:#fdf6e9;
+  --switch-off:#7d84a0; --thumb:#ffffff;
+  --sec-title:#5ea0ff; --val:#8fc2ff;
+  --shadow:0 4px 18px #0004;
+  --r:14px;
+}
+/* ── 日间 ── */
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    color-scheme: light;
+    --bg1:#eceef3; --bg2:#e0e3ec;
+    --card:#f7f8fc; --card-hi:#ffffff;
+    --text:#24283c; --muted:#6d7286;
+    --blue:#1f6bff; --blue-deep:#1b5fd9; --blue-soft:#dbe8ff;
+    --line:#0000001c; --line-soft:#00000012;
+    --btn:#e3e6ef; --btn-hover:#d5d9e6; --btn-text:#2b3048;
+    --switch-off:#b9bfd0;
+    --sec-title:#1f6bff; --val:#1b5fd9;
+    --shadow:0 4px 14px #00000012;
+  }
+}
+:root[data-theme="light"]{
+  color-scheme: light;
+  --bg1:#eceef3; --bg2:#e0e3ec;
+  --card:#f7f8fc; --card-hi:#ffffff;
+  --text:#24283c; --muted:#6d7286;
+  --blue:#1f6bff; --blue-deep:#1b5fd9; --blue-soft:#dbe8ff;
+  --line:#0000001c; --line-soft:#00000012;
+  --btn:#e3e6ef; --btn-hover:#d5d9e6; --btn-text:#2b3048;
+  --switch-off:#b9bfd0;
+  --sec-title:#1f6bff; --val:#1b5fd9;
+  --shadow:0 4px 14px #00000012;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(160deg,var(--bg1),var(--bg2) 70%);color:var(--text);min-height:100vh}
+button{font:inherit;cursor:pointer}
+.page{max-width:2200px;margin:0 auto;padding:32px 44px 56px}
+h1{font-size:2rem;font-weight:700;margin:0 0 24px}
+
+/* 双栏：左主 58% / 右辅 42% */
+.cols{display:grid;grid-template-columns:1.4fr 1fr;gap:26px;align-items:start}
+.col{display:flex;flex-direction:column;min-width:0}
+
+/* 主开关横幅 */
+.hero{display:flex;align-items:center;gap:24px;background:linear-gradient(115deg,var(--card-hi),var(--card));
+  border-radius:var(--r);padding:22px 28px;margin-bottom:24px;box-shadow:var(--shadow)}
+.hero .dot{width:14px;height:14px;border-radius:50%;background:#4ade80;box-shadow:0 0 10px #4ade80;flex:none}
+.hero .dot.off{background:#9aa0b5;box-shadow:none}
+.hero b{font-size:1.3rem;display:block}
+.hero small{color:var(--muted);font-size:.8rem;display:block;margin-top:4px}
+.hero .grow{flex:1}
+
+h2{color:var(--sec-title);font-size:1rem;font-weight:700;margin:26px 0 12px}
+.card{background:var(--card);border-radius:var(--r);padding:18px 24px;margin-bottom:12px;
+  display:flex;align-items:center;gap:22px;min-height:96px;box-shadow:var(--shadow)}
+.card .txt{flex:1;min-width:0}
+.card b{font-size:1.08rem;font-weight:650;display:block}
+.card small{color:var(--muted);font-size:.78rem;display:block;margin-top:5px;line-height:1.5}
+
+.switch{position:relative;flex:none;width:92px;height:50px}
+.switch input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;width:100%;height:100%}
+.switch .tr{width:92px;height:50px;border-radius:25px;background:var(--switch-off);transition:background .18s;pointer-events:none}
+.switch .tr::after{content:"";position:absolute;top:7px;left:8px;width:36px;height:36px;border-radius:50%;
+  background:var(--thumb);box-shadow:0 2px 6px #0006;transition:transform .18s}
+.switch input:checked+.tr{background:var(--blue)}
+.switch input:checked+.tr::after{transform:translateX(40px)}
+
+/* 单选横排两卡（利用横向空间） */
+.mode2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mode2 label{display:flex;align-items:center;gap:16px;background:var(--card);border-radius:var(--r);
+  padding:18px 22px;cursor:pointer;min-height:92px;box-shadow:var(--shadow)}
+.mode2 input{appearance:none;width:28px;height:28px;border:3px solid #b9c0d8;border-radius:50%;margin:0;flex:none}
+.mode2 label:has(input:checked){background:var(--blue-soft);box-shadow:inset 0 0 0 2px var(--blue)}
+.mode2 input:checked{border-color:#7db4ff;background:#7db4ff;box-shadow:inset 0 0 0 6px var(--blue-deep)}
+.mode2 b{font-size:1.02rem;display:block}
+.mode2 small{color:var(--muted);font-size:.74rem;display:block;margin-top:4px}
+
+.btn{min-height:54px;padding:10px 24px;border:0;border-radius:10px;background:var(--btn);color:var(--btn-text);
+  font-weight:600;font-size:.92rem}
+.btn:hover{background:var(--btn-hover)}
+.btn.blue{background:var(--blue-deep);color:#fff}
+.btn.ghost{background:transparent;box-shadow:inset 0 0 0 2px #8b93b4;color:var(--sec-title)}
+.btn.sm{min-height:48px;padding:8px 18px;font-size:.86rem}
+
+/* 微调行 */
+.tune{display:flex;align-items:center;gap:14px;margin-top:14px;flex-wrap:wrap;
+  border-top:1px solid var(--line);padding-top:16px}
+.tune .val{font-size:1rem;font-weight:700;color:var(--val);font-variant-numeric:tabular-nums}
+
+/* 忽略名单 */
+.ign{background:var(--card);border-radius:var(--r);padding:4px 24px;margin-bottom:12px;box-shadow:var(--shadow)}
+.ign .row{display:flex;align-items:center;gap:18px;padding:16px 0;border-bottom:1px solid var(--line)}
+.ign .row:last-of-type{border-bottom:0}
+.ign input[type=checkbox]{width:26px;height:26px;accent-color:var(--blue);flex:none}
+.ign b{font-size:1rem;display:block}
+.ign small{color:var(--muted);font-size:.74rem;display:block;margin-top:3px;overflow-wrap:anywhere}
+
+/* 状态 */
+.status{background:var(--card);border-radius:var(--r);padding:18px 24px;box-shadow:var(--shadow)}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:4px 28px}
+.sg div{padding:9px 0;border-bottom:1px solid var(--line-soft);font-size:.86rem}
+.sg span{color:var(--muted);font-size:.72rem;display:block;margin-bottom:2px}
+.now{display:flex;align-items:center;gap:18px;padding:12px 0 8px;border-bottom:1px solid var(--line);margin-bottom:6px}
+.now .cover{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#6a79b8,#3d4776);
+  display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#fff;flex:none}
+.now b{font-size:1.04rem}
+.now small{color:var(--muted);display:block;margin-top:4px;font-size:.78rem}
+.act{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.act .btn{width:100%}
+
+.about{color:var(--muted);font-size:.76rem;margin-top:22px;line-height:1.7}
+
+.theme-toggle{position:fixed;right:26px;bottom:26px;z-index:9;min-height:52px;padding:10px 22px;
+  border-radius:26px;border:0;background:var(--blue-deep);color:#fff;font-weight:600;font-size:.9rem;
+  box-shadow:0 6px 20px #0006}
+
+@media (max-width:1500px){ .cols{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>MediaBridge</h1>
+  <div class="cols">
+
+    <!-- 左栏：核心功能 -->
+    <div class="col">
+      <div class="hero">
+        <span class="dot" id="dot"></span>
+        <div class="grow"><b>启用媒体桥接</b><small>默认开启；关闭后记住你的选择</small></div>
+        <label class="switch"><input type="checkbox" checked onchange="toggleHero()"><span class="tr"></span></label>
+      </div>
+
+      <h2>接入模式</h2>
+      <div class="mode2">
+        <label><input type="radio" name="mode" checked><span><b>MediaBridge 标准</b><small>ECARX 标准通道（推荐）</small></span></label>
+        <label><input type="radio" name="mode"><span><b>F25 兼容</b><small>实验性不可用 · 独立接入未实现</small></span></label>
+      </div>
+
+      <h2>显示收藏</h2>
+      <div class="card">
+        <div class="txt"><b>显示收藏</b><small>在原车媒体界面提供收藏/取消收藏；需要播放器和接入模式支持</small></div>
+        <label class="switch"><input type="checkbox" checked><span class="tr"></span></label>
+      </div>
+
+      <h2>显示歌词</h2>
+      <div class="card" style="flex-wrap:wrap">
+        <div class="txt"><b>显示歌词</b><small>获取歌词并同步到原车媒体界面</small></div>
+        <label class="switch"><input type="checkbox" checked><span class="tr"></span></label>
+        <div class="tune" style="width:100%">
+          <span class="val">偏移 +0ms</span>
+          <button class="btn sm">－100ms</button>
+          <button class="btn sm">＋100ms</button>
+          <button class="btn sm ghost">归零</button>
+          <button class="btn sm ghost" style="margin-left:auto">重新获取当前歌词</button>
+        </div>
+        <small style="width:100%">歌词慢了点＋（提前）· 快了点－（延后）· 当前歌曲立即生效 · 范围 -3000～+3000ms</small>
+      </div>
+    </div>
+
+    <!-- 右栏：名单 / 状态 / 其他 -->
+    <div class="col">
+      <h2>应用忽略名单</h2>
+      <div class="ign">
+        <div class="row"><input type="checkbox" checked><span style="flex:1"><b>酷我音乐</b><small>cn.kuwo.kwmusiccar</small></span></div>
+        <div class="row"><input type="checkbox" checked><span style="flex:1"><b>音乐 concentrator</b><small>cn.toside.music.mobile</small></span></div>
+      </div>
+      <div class="card" style="min-height:0;padding:14px 24px">
+        <div class="txt"><b style="font-size:.95rem">勾选的应用将被忽略，不参与桥接</b></div>
+        <button class="btn sm blue">＋ 手动添加</button>
+        <button class="btn sm ghost">清空名单</button>
+      </div>
+
+      <h2>运行状态</h2>
+      <div class="status">
+        <div class="now">
+          <div class="cover">♪</div>
+          <div style="flex:1">
+            <b>当前播放器：酷我音乐</b>
+            <small>示例歌曲 / 示例歌手 · cn.kuwo.kwmusiccar · 用户 0</small>
+          </div>
+        </div>
+        <div class="sg">
+          <div><span>通知访问</span>已授权</div>
+          <div><span>可用性</span>播放器已就绪</div>
+          <div><span>输入</span>正常</div>
+          <div><span>输出（车机）</span>已注册</div>
+          <div><span>目标 / 实际模式</span>标准 / 标准</div>
+          <div><span>连接代次</span>4</div>
+        </div>
+        <div class="act">
+          <button class="btn sm">固定当前播放器</button>
+          <button class="btn sm">恢复自动选择</button>
+          <button class="btn sm">忽略当前播放器</button>
+          <button class="btn sm">打开当前播放器</button>
+        </div>
+      </div>
+
+      <h2>其他设置</h2>
+      <div class="card" style="min-height:0;padding:14px 24px">
+        <div class="txt"><b style="font-size:.98rem">通知访问</b><small>未开启时桥接无法读取播放器</small></div>
+        <button class="btn sm blue">去开启</button>
+        <button class="btn sm ghost">重新检查</button>
+      </div>
+      <div class="card" style="min-height:0;padding:14px 24px">
+        <div class="txt"><b style="font-size:.98rem">重新连接车机媒体中心</b></div>
+        <button class="btn sm">重连</button>
+      </div>
+      <div class="card" style="min-height:0;padding:14px 24px">
+        <div class="txt"><b style="font-size:.98rem">导出诊断日志</b><small>默认去除敏感数据</small></div>
+        <button class="btn sm">导出</button>
+      </div>
+
+      <div class="about">关于<br>由 dmkcv 开发，瘦身优化版 · 版本 1.8</div>
+    </div>
+
+  </div>
+</div>
+
+<button class="theme-toggle" onclick="toggleTheme()">切换 日间/夜间</button>
+<script>
+function toggleHero(){
+  var on=document.getElementById('bridge').checked;
+  document.getElementById('dot').className=on?'dot':'dot off';
+}
+function toggleTheme(){
+  var r=document.documentElement;
+  var cur=r.dataset.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');
+  r.dataset.theme=cur==='light'?'dark':'light';
+}
+</script>
+</body>
+</html>

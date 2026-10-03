@@ -1,0 +1,6 @@
+* text=auto eol=lf
+*.apk -text
+*.jar -text
+*.png -text
+*.webp -text
+*.patch -text

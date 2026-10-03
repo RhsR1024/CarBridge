@@ -1,0 +1,30 @@
+{
+  "scope": "Actual DEX control-flow regression with external Android/ECARX/USB service doubles; no car runtime test",
+  "method_count": 37724,
+  "unchanged_method_instruction_streams": 37714,
+  "changed_methods": [
+    "Lcn/manstep/phonemirrorBox/e0/c$a$a;run()V",
+    "Lcn/manstep/phonemirrorBox/third/ZqUtil$c;onKey(I)V",
+    "Lcom/zqsdk/OooOo00$OooO0O0;onAPIReady(Z)V",
+    "Lcom/zqsdk/OooOo00;OooO00o(Ljava/lang/String; Ljava/lang/String; Z)V",
+    "Lcom/zqsdk/OooOo00;OooO00o(Ljava/lang/String; Ljava/lang/String;)V",
+    "Lcom/zqsdk/OooOo00;OooO00o(Z)V",
+    "Lcom/zqsdk/OooOo0;onNext()Z",
+    "Lcom/zqsdk/OooOo0;onPause()Z",
+    "Lcom/zqsdk/OooOo0;onPlay()Z",
+    "Lcom/zqsdk/OooOo0;onPrevious()Z"
+  ],
+  "class_and_field_sets_unchanged": true,
+  "multitouch_still_enabled": true,
+  "tests_passed": [
+    "paused / no Android focus -> explicit PLAY 201",
+    "repeated PAUSE is idempotent; queued resume stays cancelled",
+    "pause/repeated state never claims; each new playing transition claims once",
+    "metadata and metadata+state use the same deduplicated state path",
+    "delayed resume requires pending + focus + paused; executes at most once",
+    "F25 supported callbacks acknowledge dispatch; absent callback stays unhandled",
+    "unready API / missing context / missing info do not claim",
+    "F25 registration contains no playback request"
+  ],
+  "dex_sha256": "8d32ba3e805116fa715b51428e3beaca12242e5a12c592e1a71a057bbd14780d"
+}
