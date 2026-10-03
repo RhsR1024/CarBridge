@@ -25,6 +25,7 @@ import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.*
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
@@ -168,9 +169,20 @@ class DiPlayActivity : ComponentActivity() {
     }
     override fun onPause() { handler.removeCallbacks(tick); super.onPause() }
 
+    // Re-rendering the same page (for example after changing a setting) must not throw the
+    // user back to the top. The latest offset is tracked as the user scrolls and re-applied
+    // below; navigating to a different page starts at the top.
+    private var contentScrollY = 0
+    private var renderedPage: String? = null
+
     private fun render() {
         status = null; connectButton = null; disconnectButton = null; lastRunning = null
-        val scroll = ScrollView(this).apply { setBackgroundColor(BG); isFillViewport = true; clipToPadding = false }
+        val restoreScrollY = if (renderedPage == page) contentScrollY else 0
+        if (renderedPage != page) contentScrollY = 0
+        val scroll = ScrollView(this).apply {
+            setBackgroundColor(BG); isFillViewport = true; clipToPadding = false
+            setOnScrollChangeListener { _, _, scrollY, _, _ -> contentScrollY = scrollY }
+        }
         val content = column().apply { setPadding(dp(32), dp(24), dp(32), dp(32)) }
         scroll.addView(content)
         val header = row().apply { gravity = Gravity.CENTER_VERTICAL }
@@ -189,6 +201,16 @@ class DiPlayActivity : ComponentActivity() {
             else -> home(content)
         }
         setContentView(scroll)
+        renderedPage = page
+        if (restoreScrollY > 0) {
+            // Restore after the first layout pass, when the content height is known.
+            scroll.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    if (scroll.viewTreeObserver.isAlive) scroll.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                    scroll.scrollTo(0, restoreScrollY)
+                }
+            })
+        }
         refreshStatus()
     }
 
