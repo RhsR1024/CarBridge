@@ -42,7 +42,7 @@ powershell -ExecutionPolicy Bypass -File scripts/run_tests.ps1
 
 USB 测试用独立 Android 测试工程，避免其原厂 SDK 编译替身与 MediaBridge 自有 SDK 实现冲突。测试原控制回调时，以记录输入按键的替身作为边界；实际原链路另由 DEX 全量比对和历史字节码测试验证。
 
-`mediabridge/` 为完整源码快照，可直接使用其 Gradle Wrapper。未提供签名变量时生成未签名 release。使用与当前配套版相同的本机签名，须通过环境变量提供 `MEDIABRIDGE_STORE_FILE`、`MEDIABRIDGE_STORE_PASSWORD`、`MEDIABRIDGE_KEY_ALIAS`、`MEDIABRIDGE_KEY_PASSWORD`。不要把口令或 keystore 写进仓库。
+`mediabridge/` 仅保留 2.3.9 历史源码快照，不再参与当前构建。正式源码在 `D:\CarSoft\MediaBridgeApp\MediaBridge-src` 的 `main`；其他机器通过 `MEDIABRIDGE_ROOT` 指向它的克隆。脚本检查正式仓库协议并运行其测试。未提供签名变量时生成未签名 release。使用与当前配套版相同的本机签名，须通过环境变量提供 `MEDIABRIDGE_STORE_FILE`、`MEDIABRIDGE_STORE_PASSWORD`、`MEDIABRIDGE_KEY_ALIAS`、`MEDIABRIDGE_KEY_PASSWORD`。不要把口令或 keystore 写进仓库。
 
 USB 端与 MediaBridge 端的 `BridgeProtocol.java` 必须完全相同；构建脚本会检查。当前 USB 信任原公开 AOSP 证书；配套 MediaBridge 信任指纹见验证记录。更换配套签名时须更新双方信任策略、重跑身份验证测试，并明确安装兼容性。
 

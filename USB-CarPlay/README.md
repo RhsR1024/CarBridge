@@ -12,11 +12,15 @@
 | 原 APK 编译接口声明；不装入 APK | `stubs/` |
 | 精确接线、构建、签名、全量比对 | `scripts/`、`tools/` |
 | USB 接入运行测试 | `tests/`、`test-project/` |
-| 配套 MediaBridge 完整源码快照 | `mediabridge/` |
+| MediaBridge 2.3.9 历史源码快照（不再作为构建入口） | `mediabridge/` |
 | 以往补丁源码、原始验证材料 | `history/` |
 | 修改、使用、重建与验证说明 | `docs/` |
 
 请先看 [安装与使用](docs/USAGE.md)、[修改记录与边界](docs/CHANGES.md)、[构建与维护](docs/BUILDING.md) 和 [验证记录](docs/VALIDATION.md)。
+
+2026-10-03 修复封面/歌词接入、增量歌曲混合和断连占用，见 [本次修复](docs/METADATA_HANDOFF_2026-10-03.md)。MediaBridge 正式源码在 `D:\CarSoft\MediaBridgeApp\MediaBridge-src` 的 `main`，可设置 `MEDIABRIDGE_ROOT` 指向其他克隆；构建和测试脚本直接检查该仓库。
+
+CarBridge 的“缺失歌手时的标题格式”和“直连在线封面与歌词”本次未迁移；适用场景、实测依据和后续扩展范围见 [配置适用性分析](docs/CARBRIDGE_SETTINGS_APPLICABILITY.md)。
 
 三模式只接管车机侧的媒体注册与发布。盒子协议、USB 收发、音视频、触控编码及现有命令发送函数保持基线实现。新媒体按键调用原有 F25 控制链。
 

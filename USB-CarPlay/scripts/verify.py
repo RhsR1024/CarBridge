@@ -22,6 +22,7 @@ om,nm=methods(old),methods(new);assert om.keys()<=nm.keys()
 changed={k for k in om if insns(om[k])!=insns(nm[k])}
 expected={('Lcom/zqsdk/OooOo00;','OooO00o','()V'),
  ('Lcn/manstep/phonemirrorBox/v0/d;','C','(Ljava/lang/String;)V'),
+ ('Lcn/manstep/phonemirrorBox/v0/d;','A','([B)V'),
  ('Lcn/manstep/phonemirrorBox/third/ZqUtil;','release','()V'),
  ('Lcn/manstep/phonemirrorBox/y;','N0','(Landroid/view/LayoutInflater; Landroid/view/ViewGroup; Landroid/os/Bundle;)Landroid/view/View;')}
 assert changed==expected,('unexpected',changed-expected,'missing',expected-changed)
@@ -52,7 +53,7 @@ for k in expected:
         if skip_result:
             assert op=='move-result-object';skip_result=False;continue
         cleaned.append((op,operand))
-    # Three hooks are inserted at method tail, leaving branch deltas unchanged.
+    # Four hooks are inserted at method tail, leaving branch deltas unchanged.
     assert cleaned==before,k
 for prefix in ['Lcn/manstep/phonemirrorBox/BoxInterface/', 'Lcn/manstep/phonemirrorBox/e0/',
                'Lcn/manstep/phonemirrorBox/t0/', 'Lcn/manstep/phonemirrorBox/p0/']:
@@ -89,7 +90,7 @@ report={'baseline':base.name,'baseline_sha256':hashlib.sha256(base.read_bytes())
  'original_method_count':len(om),'original_unchanged_methods':len(om)-len(changed),
  'changed_original_methods':[''.join(k) for k in sorted(changed)],'new_classes':len(nc)-len(oc),
  'all_original_class_fields_and_signatures_preserved':True,
- 'three_tail_hooks_preserve_all_original_instructions':True,
+ 'four_tail_hooks_preserve_all_original_instructions':True,
  'usb_transport_audio_focus_touch_and_original_control_methods_unchanged':True,
  'native_libraries_resources_manifest_and_other_payloads_unchanged':True,
  'multitouch_enabled':True,'added_original_app_references_verified':refs,

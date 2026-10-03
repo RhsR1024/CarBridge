@@ -74,7 +74,7 @@ internal class CarBridgeRouteManager(
             if (closed) return
             if (peer != null) {
                 if (SystemClock.elapsedRealtime() - lastResponse > 3500) fail("等待 MediaBridge 恢复连接")
-                if (server.isEmpty()) send(HELLO, message().apply { putString("package", context.packageName) })
+                else if (server.isEmpty()) send(HELLO, message().apply { putString("package", context.packageName) })
                 else send(PING)
             }
             main.postDelayed(this, 1000)
@@ -101,6 +101,10 @@ internal class CarBridgeRouteManager(
         if (closed || message.sendingUid != peerUid) return
         val b = message.data
         if (!valid(b) || b.getString("instance") != instance) return
+        // HELLO can be rejected before a server id exists (another CarPlay still owns it).
+        if (message.what == ERROR && server.isEmpty()) {
+            fail(b.getString("reason", "已有其他 CarPlay 协作连接，请先断开")); return
+        }
         if (message.what == POLICY) {
             val incomingServer = b.getString("server", "")
             if (incomingServer.isEmpty()) return

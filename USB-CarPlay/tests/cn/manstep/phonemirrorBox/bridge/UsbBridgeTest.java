@@ -96,6 +96,68 @@ public class UsbBridgeTest {
         t.update(null,"New singer",null,-1); assertEquals("B",t.title); assertEquals(2,t.status);
         t.reset(); assertFalse(t.hasTrack()); assertEquals(-1,t.status);
     }
+    @Test public void recordedUsbFieldSequenceCannotMixTwoSongsOrUseSongAsArtist() {
+        TrackState t=new TrackState(); t.update("如愿","王菲","如愿",1);
+        t.update(null,"如愿",null,null); assertEquals("王菲",t.artist);
+        t.update(null,"任素汐",null,null); assertEquals("",t.title); assertEquals("",t.artist);
+        assertTrue(t.hasTrack()); // Explicit play/pause stays available while identity is pending.
+        t.update(null,"亲爱的你啊",null,null); assertEquals("",t.artist);
+        t.update("亲爱的你啊","任素汐","亲爱的你啊",null);
+        assertEquals("亲爱的你啊",t.title); assertEquals("任素汐",t.artist);
+        t.updateLyrics("此刻的歌词"); t.update(null,"冯沁苑",null,null);
+        assertEquals("",t.lyrics); assertEquals("",t.title);
+        t.update("起风了",null,null,null); assertEquals("",t.artist);
+        t.update(null,"冯沁苑",null,null); assertEquals("冯沁苑",t.artist);
+    }
+    @Test public void timeUnitsRequireRepeatedAdvancingSamplesAndRejectSeekGuesses() {
+        for(int scale:new int[]{1,1000}) {
+            BoxClock clock=new BoxClock();
+            clock.update(180000L/scale,10000L/scale,true,1000); assertEquals(0,clock.duration());
+            clock.update(null,12000L/scale,true,3000); assertEquals(0,clock.duration());
+            clock.update(null,14000L/scale,true,5000);
+            assertEquals(180000,clock.duration()); assertEquals(14000,clock.position());
+            clock.newTrack(); assertEquals(0,clock.duration()); assertEquals(-1,clock.position());
+        }
+        BoxClock jump=new BoxClock(); jump.update(180L,10L,true,1000);
+        jump.update(null,80L,true,3000); jump.update(null,30L,true,5000);
+        assertEquals(0,jump.duration()); assertEquals(-1,jump.position());
+    }
+    @Test public void sameTitleRecordingCanBeEstablishedByACompletePair() {
+        TrackState t=new TrackState(); t.update("如愿","王菲","如愿",1);
+        t.updateLyrics("old line"); long revision=t.revision;
+        t.update("如愿","另一位歌手","翻唱",null);
+        assertEquals("如愿",t.title); assertEquals("另一位歌手",t.artist);
+        assertEquals("",t.lyrics); assertTrue(t.revision>revision);
+        t.update(null,"第三位歌手",null,null); assertFalse(t.complete());
+        t.update("如愿","第三位歌手","另一版本",null); assertTrue(t.complete());
+        assertEquals("第三位歌手",t.artist);
+    }
+    @Test public void nativeLyricsAndCoverReachSessionAndNewTrackDropsOldResources() throws Exception {
+        runtime(); metadata("{\"MediaSongName\":\"Song\",\"MediaArtistName\":\"Artist\",\"MediaLyrics\":\"Live line\",\"MediaPlayStatus\":1}");
+        android.graphics.Bitmap bitmap=android.graphics.Bitmap.createBitmap(64,64,android.graphics.Bitmap.Config.ARGB_8888);
+        java.io.ByteArrayOutputStream bytes=new java.io.ByteArrayOutputStream();
+        bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG,100,bytes);
+        UsbMediaBridge.artwork(bytes.toByteArray()); idle();
+        ((ThreadPoolExecutor)field(runtime,"pictures")).submit(()->{}).get(3,TimeUnit.SECONDS); idle();
+        RecordingSession output=org.robolectric.shadow.api.Shadow.extract(session);
+        assertNotNull(output.metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART));
+        assertEquals("Live line",output.metadata.getString("android.media.metadata.LYRICS"));
+        metadata("{\"MediaSongName\":\"Next\",\"MediaArtistName\":\"Singer\"}");
+        assertNull(output.metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART));
+        assertEquals("",output.metadata.getString("android.media.metadata.LYRICS"));
+        assertTrue(keys.isEmpty());
+    }
+    @Test public void phoneDisconnectReleasesCompanionAndDoesNotReacquireItWhileIdle() throws Exception {
+        runtime(); List<Integer> sent=new ArrayList<>();
+        set(route,"peer",new Messenger(new Handler(Looper.getMainLooper(),m->{sent.add(m.what);return true;})));
+        metadata("{\"MediaSongName\":\"Song\",\"MediaPlayStatus\":2}");
+        cn.manstep.phonemirrorBox.BoxInterface.f.P=false; metadata("{}");
+        assertEquals(Arrays.asList(CLOSE),sent); assertNull(field(route,"peer"));
+        assertEquals("",field(route,"connectionId")); assertFalse(route.ready());
+        route.start(); Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(8));
+        assertNull(field(route,"peer")); assertNull(field(route,"direct"));
+        assertEquals(Arrays.asList(CLOSE),sent); assertTrue(keys.isEmpty());
+    }
     @Test public void pausedSessionRemainsActiveAndPlayPauseUseOriginalCallbacksOnce() throws Exception {
         runtime(); metadata("{\"MediaSongName\":\"Song\",\"MediaArtistName\":\"Artist\",\"MediaPlayStatus\":2}");
         assertTrue(session.isActive());
@@ -196,7 +258,7 @@ public class UsbBridgeTest {
         F25Direct d=new F25Direct(context,keys::add,ok->{}); d.start();
         assertTrue(api.registered.await(3,TimeUnit.SECONDS));
         ((ThreadPoolExecutor)field(d,"io")).submit(()->{}).get(3,TimeUnit.SECONDS);idle();
-        set(route,"direct",d);set(route,"route","DIRECT");
+        set(route,"direct",d);set(route,"route","DIRECT");set(route,"connectionId","phone-1");
         context.getSharedPreferences("usb_media_route_v1",0).edit().putString("mode","BRIDGE").commit();
         call(route,"reconcile",new Class<?>[]{});
         assertTrue(api.released.await(3,TimeUnit.SECONDS));

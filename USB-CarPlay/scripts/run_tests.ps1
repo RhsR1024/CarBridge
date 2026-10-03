@@ -12,5 +12,7 @@ $gradleBin = $env:GRADLE_BIN
 if (-not $gradleBin) { $gradleBin = 'D:\CarSoft\MediaBridgeApp\tooling\gradle\gradle-8.9\bin\gradle.bat' }
 & $gradleBin --no-daemon -p (Join-Path $projectRoot 'test-project') testDebugUnitTest
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-& $gradleBin --no-daemon -p (Join-Path $projectRoot 'mediabridge') testDebugUnitTest lintDebug assembleRelease
+$mediaBridgeRoot = $env:MEDIABRIDGE_ROOT
+if (-not $mediaBridgeRoot) { $mediaBridgeRoot = 'D:\CarSoft\MediaBridgeApp\MediaBridge-src' }
+& $gradleBin --no-daemon -p $mediaBridgeRoot testDebugUnitTest lintDebug assembleRelease
 exit $LASTEXITCODE

@@ -34,7 +34,7 @@
 
 详见 `docs/evidence/slim-verification.json` 和 `history/usb-size/build_slim.py`。
 
-## 4. 自动／直连／MediaBridge 桥接
+## 4. 首版自动／直连／MediaBridge 桥接（历史实现）
 
 新增源码位于 `src/cn/manstep/phonemirrorBox/bridge/`：
 
@@ -66,3 +66,9 @@
 车机媒体资格与 USB 实际播放分开处理。模式交接、让出通道和失败恢复只改变车机侧发布；不会自动暂停手机、门控 PCM 或制造 USB 恢复播放。明确按键立即进入原控制函数，迟到的资格回执只影响车机侧状态，不再产生迟到的手机播放命令。
 
 MediaBridge 快照来自提交 `03d25c8e9e992d8b15c6d1f276ad4b4504b00603` 加工作区当时已有变更，再添加本次适配；原工作目录未改。历史快照信息与差异位于 `history/mediabridge-base*`。
+
+## 6. 封面、歌词、换曲与断连交接修复
+
+当前版本在固定精简基线上保留首版三模式，并增加原 `v0.d.A(byte[])` 封面回调的只读接线。原方法改动总计五处，其中四处尾部追加调用；USB、音视频、方控、焦点及触控原方法仍逐方法校验不变。详细规则与边界见 [本次修复](METADATA_HANDOFF_2026-10-03.md)。
+
+MediaBridge 两种 CarPlay 的适配已经合入其正式仓库 main，此后修复在该仓库源码完成；本目录中的 2.3.9 快照保留历史用途。当前安装和重建入口以 [USAGE](USAGE.md) 和 [BUILDING](BUILDING.md) 为准。

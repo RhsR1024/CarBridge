@@ -1,0 +1,81 @@
+{
+  "baseline": "CarPlay-USBBox-F25-MultiTouch-Slim.apk",
+  "baseline_sha256": "10dc853023f48cf0a11f44f99a6da1dd64cb08010550e0b1a72e8030cf94d796",
+  "target": "CarPlay-USBBox-Slim-MediaModes.apk",
+  "bytes": 7565716,
+  "sha256": "9c7524393e2a894abd6df0bf4779ae9fdade8fa326fec6244036b41af2bf7a3f",
+  "original_method_count": 37724,
+  "original_unchanged_methods": 37719,
+  "changed_original_methods": [
+    "Lcn/manstep/phonemirrorBox/third/ZqUtil;release()V",
+    "Lcn/manstep/phonemirrorBox/v0/d;A([B)V",
+    "Lcn/manstep/phonemirrorBox/v0/d;C(Ljava/lang/String;)V",
+    "Lcn/manstep/phonemirrorBox/y;N0(Landroid/view/LayoutInflater; Landroid/view/ViewGroup; Landroid/os/Bundle;)Landroid/view/View;",
+    "Lcom/zqsdk/OooOo00;OooO00o()V"
+  ],
+  "new_classes": 57,
+  "all_original_class_fields_and_signatures_preserved": true,
+  "four_tail_hooks_preserve_all_original_instructions": true,
+  "usb_transport_audio_focus_touch_and_original_control_methods_unchanged": true,
+  "native_libraries_resources_manifest_and_other_payloads_unchanged": true,
+  "multitouch_enabled": true,
+  "added_original_app_references_verified": [
+    {
+      "caller": "Lcn/manstep/phonemirrorBox/bridge/F25Direct$1;onRewind()Z",
+      "call": "v0, Lcom/zqsdk/OooOo0;->onRewind()Z"
+    },
+    {
+      "caller": "Lcn/manstep/phonemirrorBox/bridge/F25Direct;<init>(Landroid/content/Context; Lcom/zqsdk/callBack/IInputCallback; Lcn/manstep/phonemirrorBox/bridge/F25Direct$Result;)V",
+      "call": "v11, v12, Lcom/zqsdk/OooOo0;-><init>(Lcom/zqsdk/callBack/IInputCallback;)V"
+    },
+    {
+      "caller": "Lcn/manstep/phonemirrorBox/bridge/F25Direct$1;onPause()Z",
+      "call": "v0, Lcom/zqsdk/OooOo0;->onPause()Z"
+    },
+    {
+      "caller": "Lcn/manstep/phonemirrorBox/bridge/F25Direct$1;onPrevious()Z",
+      "call": "v0, Lcom/zqsdk/OooOo0;->onPrevious()Z"
+    },
+    {
+      "caller": "Lcn/manstep/phonemirrorBox/bridge/UsbMediaBridge$Runtime;<init>(Landroid/content/Context; Lcom/zqsdk/callBack/IInputCallback;)V",
+      "call": "v0, v12, Lcom/zqsdk/OooOo0;-><init>(Lcom/zqsdk/callBack/IInputCallback;)V"
+    },
+    {
+      "caller": "Lcn/manstep/phonemirrorBox/bridge/F25Direct$1;onForward()Z",
+      "call": "v0, Lcom/zqsdk/OooOo0;->onForward()Z"
+    },
+    {
+      "caller": "Lcn/manstep/phonemirrorBox/bridge/F25Direct$1;onPlay()Z",
+      "call": "v0, Lcom/zqsdk/OooOo0;->onPlay()Z"
+    },
+    {
+      "caller": "Lcn/manstep/phonemirrorBox/bridge/UsbMediaBridge$Runtime;command(Ljava/lang/String;)V",
+      "call": "v5, Lcom/zqsdk/OooOo0;->onRewind()Z"
+    },
+    {
+      "caller": "Lcn/manstep/phonemirrorBox/bridge/UsbMediaBridge$Runtime;command(Ljava/lang/String;)V",
+      "call": "v5, Lcom/zqsdk/OooOo0;->onForward()Z"
+    },
+    {
+      "caller": "Lcn/manstep/phonemirrorBox/bridge/UsbMediaBridge$Runtime;command(Ljava/lang/String;)V",
+      "call": "v5, Lcom/zqsdk/OooOo0;->onPrevious()Z"
+    },
+    {
+      "caller": "Lcn/manstep/phonemirrorBox/bridge/UsbMediaBridge$Runtime;command(Ljava/lang/String;)V",
+      "call": "v5, Lcom/zqsdk/OooOo0;->onNext()Z"
+    },
+    {
+      "caller": "Lcn/manstep/phonemirrorBox/bridge/UsbMediaBridge$Runtime;command(Ljava/lang/String;)V",
+      "call": "v5, Lcom/zqsdk/OooOo0;->onPause()Z"
+    },
+    {
+      "caller": "Lcn/manstep/phonemirrorBox/bridge/UsbMediaBridge$Runtime;command(Ljava/lang/String;)V",
+      "call": "v5, Lcom/zqsdk/OooOo0;->onPlay()Z"
+    },
+    {
+      "caller": "Lcn/manstep/phonemirrorBox/bridge/F25Direct$1;onNext()Z",
+      "call": "v0, Lcom/zqsdk/OooOo0;->onNext()Z"
+    }
+  ],
+  "scope": "Static DEX/payload/ABI verification; Android tests are separate; no physical vehicle test."
+}

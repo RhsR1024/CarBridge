@@ -1,3 +1,11 @@
+# CarBridge 0.1.7 — 2026-10-03
+
+- 正确显示 MediaBridge 握手阶段的实际占用来源；超时退出后停止本轮空连接发送。
+- USB-CarPlay 从固定精简基线增加原生封面、歌词接入，修复歌曲增量混合与手机断连后协作占位；不改 USB 收发、音视频、双指触控或既有 F25 命令链。
+- 配套 MediaBridge 2.3.11 从独立仓库 main 构建，新增 USB 严格在线补全和简短会话提示。
+
+详见 [0.1.7 说明](docs/RELEASE_0.1.7.md) 和 [USB 修复记录](USB-CarPlay/docs/METADATA_HANDOFF_2026-10-03.md)。
+
 # DiPlay 0.2.10 — 2026-10-03
 
 - Publish CarPlay song metadata, position and artwork to Android media sessions; bound artwork queues and reject stale work across sessions (#82).

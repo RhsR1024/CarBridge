@@ -2,8 +2,9 @@
 
 ## 安装包
 
-- `releases/CarPlay-USBBox-Slim-MediaModes.apk`：精简基线加完整媒体三模式。
-- `releases/MediaBridge-2.3.9-usbbox.apk`：识别 USB CarPlay 包身份的配套 MediaBridge。
+- `releases/CarPlay-USBBox-Slim-MediaModes-MetadataFix.apk`：当前三模式、封面/歌词与断连修复版。
+- `releases/MediaBridge-2.3.11-usb-metadata-26100304.apk`：当前配套 MediaBridge，从正式仓库 main 构建。
+- `releases/CarPlay-USBBox-Slim-MediaModes.apk`、`MediaBridge-2.3.9-usbbox.apk`：历史交付包。
 - `baselines/CarPlay-USBBox-F25-MultiTouch-Slim.apk`：用户指定的纯精简基线，也是回退包。
 
 USB APK 保持原包名 `com.flyme.auto.energy`、版本字段和原签名，方便覆盖安装及回退。通过设置中新增的“媒体接入”入口辨认本版。不要卸载后重装来验证覆盖功能，以免丢失原设置。
@@ -30,7 +31,9 @@ MediaBridge 最低支持 Android 9，三模式也在 Android 9 及以上启用�
 
 切换、授权变化、心跳超时和让出车机媒体通道不主动发送 USB 播放/暂停，也不门控 USB 音频。USB 原有自动播放、音频焦点等策略依旧按基线运行，因此其他车机软件引发的系统行为仍须实车确认。
 
-本版没有确认盒子时间字段的单位及封面数据关联，所以不伪造总时长、进度或封面，不提供拖动定位。歌曲文字与常规播放控制可以桥接；在线封面、歌词查找因缺少可信时长可能不启用。原 APK 内已有的歌词等分发逻辑不受影响。
+当前修复版读取盒子已有封面与 `MediaLyrics` 字段；完整 LRC 或实时歌词行经 MediaBridge 显示。连续进度采样确认秒/毫秒后才发布时长和进度，不增加拖动定位。开启 MediaBridge 在线检索后，缺少时长的 USB 歌曲也可按完整歌名和歌手进行唯一精确匹配；封面使用网易/QQ，歌词使用已启用的网易/QQ/LrcLib。原始数据缺失且没有唯一匹配时保留空白。详见 [修复边界](METADATA_HANDOFF_2026-10-03.md)。
+
+从 USB 切换纯软 CarBridge 时，先断开 USB CarPlay 的手机连接或退出 USB 应用。修复版在观测到断连后会释放协作席位。仅切换前台但两个 CarPlay 都仍连接手机时，不会强制抢走另一个的活跃连接。
 
 ## 回退
 

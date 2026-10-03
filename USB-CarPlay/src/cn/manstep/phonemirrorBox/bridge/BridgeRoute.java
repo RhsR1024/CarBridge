@@ -48,6 +48,7 @@ final class BridgeRoute {
     private final Runnable ticker = new Runnable() {
         @Override public void run() {
             if (closed) return;
+            if (connectionId.isEmpty()) { main.postDelayed(this, 1000); return; }
             long now = SystemClock.elapsedRealtime();
             if (binding != null && now - lastResponse > (peer == null ? 5000 : 3500)) fail("等待 MediaBridge 恢复连接");
             else if (peer != null) {
@@ -58,7 +59,7 @@ final class BridgeRoute {
     };
     void start() { main.post(ticker); }
     private void bind() {
-        if (closed || binding != null || releasePending || releaseUncertain) return;
+        if (closed || connectionId.isEmpty() || binding != null || releasePending || releaseUncertain) return;
         String pkg = installedPeer();
         if (pkg.isEmpty()) { peerPackage = ""; reconcile(); return; }
         peerPackage = pkg;
@@ -149,7 +150,7 @@ final class BridgeRoute {
         suspend(); epoch++; route = ""; target = ""; negotiating = false; listener.changed();
     }
     private void reconcile() {
-        if (closed || releaseUncertain || releasePending) return;
+        if (closed || connectionId.isEmpty() || releaseUncertain || releasePending) return;
         if (!peerPackage.isEmpty() && (peer == null || server.isEmpty())) return;
         String desired = peer == null ? ("BRIDGE".equals(BridgeSettings.mode(context)) ? "WAIT" : "DIRECT")
                 : BridgeSettings.choose(BridgeSettings.mode(context), ignored, enabled, peerReady);
@@ -206,8 +207,20 @@ final class BridgeRoute {
     }
     void update(TrackState track, String connection) {
         snapshot = track;
+        if (connection.isEmpty()) {
+            // Retire only our Android media outlet. Leave box transport and controls alone.
+            if (!connectionId.isEmpty()) {
+                if (peer != null && !server.isEmpty()) io.github.rhsr1024.interop.BridgeProtocol.send(peer, receiver, CLOSE, message());
+                peer = null; server = ""; unbind(); invalidate();
+                connectionId = "";
+                if (direct != null) releaseDirect(ok -> { if (ok && !connectionId.isEmpty()) bind(); });
+            }
+            status = "等待 USB CarPlay 连接手机";
+            return;
+        }
         if (!connectionId.equals(connection)) {
-            invalidate(); connectionId = connection; reconcile();
+            invalidate(); connectionId = connection;
+            if (peer == null) { nextBind = 0; bind(); } else reconcile();
         }
         if (direct != null) direct.update(track);
     }

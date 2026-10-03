@@ -120,6 +120,19 @@ class CarBridgeRouteManagerTest {
         assertFalse(r.manager.isReady)
         r.manager.close()
     }
+    @Test fun busyHandshakeWithoutServerIdExplainsTheRealOwnerAndKeepsAudioClosed() {
+        val r = Rig()
+        val rejected = r.bundle().apply {
+            remove("server"); putString("reason", "USB CarPlay 仍在连接，请先断开其手机连接或退出应用")
+        }
+        val forged = Message.obtain(null, ERROR).apply { data = rejected; sendingUid = android.os.Process.myUid() + 1 }
+        r.manager.javaClass.getDeclaredMethod("receive", Message::class.java).apply { isAccessible = true }.invoke(r.manager, forged)
+        assertFalse(r.manager.status.contains("USB CarPlay"))
+        r.receive(ERROR, rejected)
+        assertTrue(r.manager.status.contains("USB CarPlay")); assertFalse(r.manager.isReady)
+        assertNull(r.field("peer")); assertTrue(r.commands.isEmpty())
+        r.manager.close()
+    }
 
     @Test fun disconnectedListenerIsExplainedWithoutGrantingPlayback() {
         val r = Rig()

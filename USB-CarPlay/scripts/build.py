@@ -12,7 +12,7 @@ JAR = jadx_jar()
 ANDROID = SDK/'platforms/android-34/android.jar'
 CP = str(JAR)+os.pathsep+str(H)
 def run(args): subprocess.run([str(x) for x in args],check=True)
-protocol = R/'mediabridge/app/src/main/java/io/github/rhsr1024/interop/BridgeProtocol.java'
+protocol = Path(os.environ.get('MEDIABRIDGE_ROOT', 'D:/CarSoft/MediaBridgeApp/MediaBridge-src'))/'app/src/main/java/io/github/rhsr1024/interop/BridgeProtocol.java'
 dest = R/'src/io/github/rhsr1024/interop/BridgeProtocol.java'
 assert dest.read_bytes() == protocol.read_bytes(), 'Protocol copies differ'
 classes=WORK/'classes'; classes.mkdir(exist_ok=True)
@@ -59,6 +59,11 @@ def metadata(m):
     assert m.count(anchor)==1
     return m.replace(anchor,'    invoke-static {v0}, Lcn/manstep/phonemirrorBox/bridge/UsbMediaBridge;->metadataObject(Lorg/json/JSONObject;)V\n'+anchor)
 edit('cn/manstep/phonemirrorBox/v0/d.smali','public C(Ljava/lang/String;)V',metadata)
+
+def artwork(m):
+    assert m.count('    return-void') == 1
+    return m.replace('    return-void', '    invoke-static {p1}, Lcn/manstep/phonemirrorBox/bridge/UsbMediaBridge;->artwork([B)V\n    return-void')
+edit('cn/manstep/phonemirrorBox/v0/d.smali','public A([B)V',artwork)
 def close(m):
     assert m.count('    return-void')==1
     return m.replace('    return-void','    invoke-static {}, Lcn/manstep/phonemirrorBox/bridge/UsbMediaBridge;->close()V\n    return-void')

@@ -15,12 +15,15 @@ public final class BridgeProtocol {
         PLAY=7, GRANT=8, PAUSE=9, COMMAND=10, YIELD=11, PING=12, PONG=13, CLOSE=14, ERROR=15;
     public static final String SERVICE="com.geely.auto.music.CarBridgeCompanionService";
     public static final String CARBRIDGE="io.github.rhsr1024.carbridge";
+    public static final String USBBOX="com.flyme.auto.energy";
     public static final String MEDIABRIDGE="com.mediabridge.app";
     // Public certificate fingerprint of the explicitly provisioned release-test signer.
     private static final String RELEASE_TEST_CERT="A539C794675FC8AD7FAC6E78604C066E15C98C3C65F62CC34895FA3FC65A23C7";
+    // Exact original USB application's public signing certificate, scoped to its package.
+    private static final String USBBOX_CERT="C8A2E9BCCF597C2FB6DC66BEE293FC13F2FC47EC77BC6B2B0D52C11F51192AB8";
     private BridgeProtocol() {}
     public static boolean managed(String pkg) {
-        return CARBRIDGE.equals(pkg) || (CARBRIDGE+".debug").equals(pkg);
+        return CARBRIDGE.equals(pkg) || (CARBRIDGE+".debug").equals(pkg) || USBBOX.equals(pkg);
     }
     public static boolean mediaBridge(String pkg) {
         return MEDIABRIDGE.equals(pkg) || (MEDIABRIDGE+".dev").equals(pkg);
@@ -29,11 +32,20 @@ public final class BridgeProtocol {
         try {
             PackageManager pm=context.getPackageManager();
             if (pm.getApplicationInfo(pkg,0).uid!=uid) return false;
+            if (USBBOX.equals(pkg)) return hasCertificate(pm,pkg,USBBOX_CERT);
             if (pm.checkSignatures(context.getPackageName(),pkg)==PackageManager.SIGNATURE_MATCH) return true;
-            byte[] pin=new byte[32];
-            for(int i=0;i<32;i++) pin[i]=(byte)Integer.parseInt(RELEASE_TEST_CERT.substring(i*2,i*2+2),16);
-            return pm.hasSigningCertificate(pkg,pin,PackageManager.CERT_INPUT_SHA256);
+            return hasCertificate(pm,pkg,RELEASE_TEST_CERT);
         } catch (Exception error) { return false; }
+    }
+    private static boolean hasCertificate(PackageManager pm,String pkg,String fingerprint) throws Exception {
+        android.content.pm.PackageInfo info=pm.getPackageInfo(pkg,PackageManager.GET_SIGNING_CERTIFICATES);
+        if(info.signingInfo==null) return false;
+        android.content.pm.Signature[] signers=info.signingInfo.getApkContentsSigners();
+        if(signers==null || signers.length!=1) return false;
+        byte[] digest=MessageDigest.getInstance("SHA-256").digest(signers[0].toByteArray());
+        StringBuilder actual=new StringBuilder(64);
+        for(byte value:digest) actual.append(String.format(java.util.Locale.ROOT,"%02X",value & 255));
+        return fingerprint.equals(actual.toString());
     }
     public static boolean valid(Bundle b) {
         try {
