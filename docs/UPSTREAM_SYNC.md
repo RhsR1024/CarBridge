@@ -11,7 +11,7 @@
 
 保留原始提交历史，不把 fork 变成源码压缩包导入的新仓库。默认 `main` 为 CarBridge 可集成主线，特性用短期分支，upstream 同步使用 `sync/diplay-<已验证标签或短提交>` 分支。远端配置是本地 Git 配置，不会随普通代码提交传播；新克隆按上表设置。
 
-初始化时四个 ref 均为 `f2d06951b4e8114dbb62f551c12a32a845a3042f`（v0.2.8）。2026-10-02 已将上游 main / v0.2.9 的 `18429e737228e8d75d9b6c850af89dcca2f591b6` 合入 CarBridge；本次明细见 [0.2.9 同步报告](UPSTREAM_SYNC_0.2.9.md)。远端 ref 会变化，后续仍需按实际 fetch 结果核对。
+初始化时四个 ref 均为 `f2d06951b4e8114dbb62f551c12a32a845a3042f`（v0.2.8）。2026-10-02 已将上游 main / v0.2.9 的 `18429e737228e8d75d9b6c850af89dcca2f591b6` 合入 CarBridge；本次明细见 [0.2.9 同步报告](UPSTREAM_SYNC_0.2.9.md)。2026-10-03 继续同步 v0.2.10 后的 main `4556313`，见 [0.2.10 同步报告](UPSTREAM_SYNC_0.2.10.md)。远端 ref 会变化，后续仍需按实际 fetch 结果核对。
 
 ## 2. 降低冲突的结构规则
 
@@ -82,7 +82,7 @@ git merge --no-ff --no-commit $syncTarget
 
 CarBridge 使用自己的稳定发布签名，不能期待其 APK 覆盖更新 DiPlay 的签名/包名。首次发布固定包名与签名后不随 upstream 版本更改。调试和正式包使用独立身份时，忽略名单、IPC 配对和授权分别设置。
 
-CarBridge 从 `0.1.0 / 100` 起独立递增，不直接套用上游值。当前同步版本为 **0.1.4 / 104**，`upstreamBase=v0.2.9`，协作协议仍为 1.0；本次未修改 MediaBridge。首次配套交付以及后续车测版本保留在台账和车辆报告中。上游发布状态与 CarBridge 的设备验收状态分别记录。
+CarBridge 从 `0.1.0 / 100` 起独立递增，不直接套用上游值。当前同步版本为 **0.1.5 / 105**，`upstreamBase=4556313 (v0.2.10 + docs)`，协作协议仍为 1.0；本次未修改 MediaBridge。首次配套交付以及后续车测版本保留在台账和车辆报告中。上游发布状态与 CarBridge 的设备验收状态分别记录。
 
 每次发布记录：CarBridge 提交/版本/包名/APK 哈希、上游 tag+提交、协议 major/minor、兼容 MediaBridge 版本、构建依赖、目标车机报告、已知资源/语音限制。SDK/协议 source type 等兼容参数有变化也要记录。
 

@@ -1,8 +1,8 @@
 # CarBridge 开发文档
 
-当前源码为 **CarBridge 0.1.4 / versionCode 104**，上游基线已同步至 **DiPlay v0.2.9**（`18429e737228e8d75d9b6c850af89dcca2f591b6`）。吉利方控、双模式、音乐互斥、导航焦点与音量目标、定制图标继续保留，详情见 [0.2.9 同步与验证](UPSTREAM_SYNC_0.2.9.md)。收藏同步限制见 [能力核对](CARBRIDGE_FAVORITES_FEASIBILITY.md)。
+当前源码为 **CarBridge 0.1.5 / versionCode 105**，上游基线已同步至 **DiPlay v0.2.10**（main `4556313`，包含 v0.2.10 后的诊断说明更新）。吉利方控、双模式、音乐互斥、导航焦点与音量目标、定制图标继续保留，详情见 [0.2.10 同步与验证](UPSTREAM_SYNC_0.2.10.md)。收藏同步限制见 [能力核对](CARBRIDGE_FAVORITES_FEASIBILITY.md)。
 
-更新：2026-10-02。CarBridge 是本 fork，DiPlay 专指原项目。此前 0.1.3 的实车结果见 [车测记录](VEHICLE_VERIFIED_0.1.3.md)；0.1.4 本次执行源码自动化回归，尚未执行新一轮车机验收。下表保留首轮 0.1.0 交付历史，不代表当前版本。
+更新：2026-10-03。CarBridge 是本 fork，DiPlay 专指原项目。此前 0.1.3 的实车结果见 [车测记录](VEHICLE_VERIFIED_0.1.3.md)；0.1.5 本次执行源码自动化回归，尚未执行新一轮车机验收。下表保留首轮 0.1.0 交付历史，不代表当前版本。
 
 ## 首轮交付与基线（0.1.0 历史记录）
 

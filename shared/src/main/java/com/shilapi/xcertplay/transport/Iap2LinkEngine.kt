@@ -7,9 +7,9 @@ import java.util.ArrayDeque
  * The iAP2 link layer, deliberately kept independent from I/O, threads, CSM, and media.
  *
  * The caller supplies a monotonic millisecond clock, writes [takeOutput] to its byte stream, and
- * feeds arbitrary receive fragments back through [feed].  This class exposes control-session
- * (session 10) and file-transfer-session (session 12) bytes. It does not open a Lockdown
- * connection or own a [BlockingDuplexByteStream].
+ * feeds arbitrary receive fragments back through [feed]. It exposes control-session bytes and raw
+ * payloads from other negotiated sessions. It does not open a Lockdown connection or own a
+ * [BlockingDuplexByteStream].
  *
  * An inbound wire frame is limited to the largest u16 length (`65535` bytes total).  Pending
  * outbound and out-of-order packets are additionally capped by [Iap2LinkConfig] (64 by default).
@@ -29,7 +29,7 @@ class Iap2LinkEngine(
 
     sealed class Event {
         data class Control(val bytes: ByteArray) : Event()
-        data class FileTransfer(val bytes: ByteArray) : Event()
+        data class Session(val sessionId: Int, val bytes: ByteArray) : Event()
         data class Writable(val value: Boolean) : Event()
         data class Dead(val reason: String?) : Event()
     }
@@ -247,12 +247,14 @@ class Iap2LinkEngine(
         sendSession(CONTROL_SESSION_ID, bytes, nowMillis)
     }
 
-    /** Queues one complete file-transfer datagram (session id 12). */
+    /** Compatibility entry point for the CarBridge artwork receiver. */
     fun sendFileTransfer(bytes: ByteArray, nowMillis: Long) {
         sendSession(FILE_TRANSFER_SESSION_ID, bytes, nowMillis)
     }
 
-    private fun sendSession(sessionId: Int, bytes: ByteArray, nowMillis: Long) {
+    /** Queues one raw payload on a negotiated iAP2 session. */
+    fun sendSession(sessionId: Int, bytes: ByteArray, nowMillis: Long) {
+        require(sessionId in 0..0xff) { "iAP2 session id must fit in one byte" }
         require(bytes.size <= MAX_PAYLOAD_BYTES) {
             "iAP2 session payload exceeds $MAX_PAYLOAD_BYTES bytes"
         }
@@ -438,9 +440,10 @@ class Iap2LinkEngine(
         while (outOfOrder.isNotEmpty() && sequenceDistance(outOfOrder.first().sequence, lastReceivedInOrder) == 1) {
             val inOrder = outOfOrder.removeAt(0)
             lastReceivedInOrder = inOrder.sequence
-            when (inOrder.sessionId) {
-                CONTROL_SESSION_ID -> enqueueEvent(Event.Control(inOrder.payload))
-                FILE_TRANSFER_SESSION_ID -> enqueueEvent(Event.FileTransfer(inOrder.payload))
+            if (inOrder.sessionId == CONTROL_SESSION_ID) {
+                enqueueEvent(Event.Control(inOrder.payload))
+            } else {
+                enqueueEvent(Event.Session(inOrder.sessionId, inOrder.payload))
             }
         }
 

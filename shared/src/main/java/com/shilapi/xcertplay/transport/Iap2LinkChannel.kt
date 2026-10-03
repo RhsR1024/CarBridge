@@ -12,13 +12,15 @@ import kotlin.math.min
  * for readiness, queue complete session payloads, receive control/file-transfer payloads, or close
  * this channel. This class owns and closes [underlying].
  *
- * It deliberately does not parse CSM or file-transfer payloads, and does not implement EA, media,
- * UI, or any Lockdown setup.
+ * CSM, EA, media, UI and Lockdown remain outside this worker. By default, raw file-transfer
+ * payloads go to CarBridge's separate receiver. An explicit artwork callback instead selects
+ * upstream's bounded receiver on this worker; the two modes never consume the same transfer.
  */
 class Iap2LinkChannel private constructor(
     private val underlying: BlockingDuplexByteStream,
     private val linkConfig: Iap2LinkConfig,
     private val initiateNegotiation: Boolean,
+    private val onArtwork: ((Iap2ArtworkTransfer) -> Unit)?,
 ) : AutoCloseable {
     private data class Command(
         val sessionId: Int,
@@ -32,6 +34,7 @@ class Iap2LinkChannel private constructor(
     private var controlBytes = 0
     private val fileTransfers = ArrayDeque<ByteArray>()
     private var fileTransferBytes = 0
+    private val callbackTransfers = Iap2FileTransferReceiver()
 
     private var ready = false
     private var peerMaxControlPayloadBytes: Int? = null
@@ -265,7 +268,17 @@ class Iap2LinkChannel private constructor(
                     }
                 }
 
-                is Iap2LinkEngine.Event.FileTransfer -> {
+                is Iap2LinkEngine.Event.Session -> {
+                    if (event.sessionId != Iap2LinkEngine.FILE_TRANSFER_SESSION_ID) continue
+                    // A connection has exactly one receiver: CarBridge's generation-aware worker,
+                    // or an explicitly supplied upstream callback. Never acknowledge twice.
+                    val callback = onArtwork
+                    if (callback != null) {
+                        val outcome = callbackTransfers.accept(event.bytes)
+                        outcome.replies.forEach { engine.sendSession(event.sessionId, it, nowMillis()) }
+                        outcome.completed?.let { try { callback(it) } catch (_: Exception) { } }
+                        continue
+                    }
                     val overflow = synchronized(lock) {
                         if (fileTransfers.size >= MAX_PENDING_FILE_TRANSFERS ||
                             event.bytes.size > MAX_PENDING_FILE_TRANSFER_BYTES - fileTransferBytes
@@ -321,6 +334,7 @@ class Iap2LinkChannel private constructor(
         controlBytes = 0
         fileTransfers.clear()
         fileTransferBytes = 0
+        callbackTransfers.clear()
         terminalFailure = combineFailures(terminalFailure, failure)
         lock.notifyAll()
     }
@@ -412,24 +426,33 @@ class Iap2LinkChannel private constructor(
         )
 
         /** Opens and immediately starts a wired iAP2 link, taking ownership of the supplied stream. */
-        fun open(underlying: BlockingDuplexByteStream): Iap2LinkChannel =
-            Iap2LinkChannel(underlying, WIRED_LINK_CONFIG, initiateNegotiation = true)
+        fun open(
+            underlying: BlockingDuplexByteStream,
+            onArtwork: ((Iap2ArtworkTransfer) -> Unit)? = null,
+        ): Iap2LinkChannel =
+            Iap2LinkChannel(underlying, WIRED_LINK_CONFIG, initiateNegotiation = true, onArtwork)
                 .also { it.worker.start() }
 
         /**
          * Opens a wireless RFCOMM link. LIVI sends the iAP2 marker but lets the phone initiate
          * synchronization, and keeps acknowledgements enabled for Bluetooth.
          */
-        fun openWireless(underlying: BlockingDuplexByteStream): Iap2LinkChannel =
-            Iap2LinkChannel(underlying, WIRELESS_LINK_CONFIG, initiateNegotiation = false)
+        fun openWireless(
+            underlying: BlockingDuplexByteStream,
+            onArtwork: ((Iap2ArtworkTransfer) -> Unit)? = null,
+        ): Iap2LinkChannel =
+            Iap2LinkChannel(underlying, WIRELESS_LINK_CONFIG, initiateNegotiation = false, onArtwork)
                 .also { it.worker.start() }
 
         /**
          * Opens the iAP2 link carried by an AirPlay type-130 tunnel. The accessory initiates
          * synchronization and zero-acknowledgement mode matches the Wi-Fi transport.
          */
-        fun openTunnel(underlying: BlockingDuplexByteStream): Iap2LinkChannel =
-            Iap2LinkChannel(underlying, WIRED_LINK_CONFIG, initiateNegotiation = true)
+        fun openTunnel(
+            underlying: BlockingDuplexByteStream,
+            onArtwork: ((Iap2ArtworkTransfer) -> Unit)? = null,
+        ): Iap2LinkChannel =
+            Iap2LinkChannel(underlying, WIRED_LINK_CONFIG, initiateNegotiation = true, onArtwork)
                 .also { it.worker.start() }
 
         private fun nowMillis(): Long = System.nanoTime() / NANOS_PER_MILLISECOND

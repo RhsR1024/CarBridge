@@ -1,5 +1,7 @@
 # CarBridge 0.1 实现与维护边界
 
+0.1.5 修订：同步 DiPlay v0.2.10 及 main 4556313 的诊断说明。保留 CarBridgeMediaRuntime 和按连接／曲目代次处理的原生封面通道；上游可选封面回调与原通道互斥。通话接入平台回声处理，音乐门控及吉利导航音量逻辑保持。详见 [本轮报告](UPSTREAM_SYNC_0.2.10.md)。
+
 0.1.4 修订：同步 DiPlay v0.2.9，保留 0.1.3 吉利音频处理和协作协议。画面与触摸共用按会话协商尺寸计算的 CarPlayVideoLayout；默认旋转不重连，可选旋转稳定后重连与上游摄像头窗口策略并存。新增导航摘要供小组件使用，BYD 仪表歌曲仍按车型隔离。详见 [同步报告](UPSTREAM_SYNC_0.2.9.md)。
 
 0.1.3 修订：下文“导航保留原有覆盖路径”仅对非吉利配置保持。吉利新增 GuidanceActivity 与 AudioFocusCoordinator 导航临时焦点，并经 CarPlayHostActivity 的前台绑定跟随音量目标；不更改音乐 PlaybackPolicy 或协作协议。详细行为和可观测边界见 RELEASE_0.1.3.md。
@@ -57,7 +59,7 @@ MediaBridge 永久识别两个 CarBridge 包名（正式和 debug），进程重
 
 ## 上游与来源
 
-DiPlay 当前基线：`18429e737228e8d75d9b6c850af89dcca2f591b6`（v0.2.9）；原始 fork 基线为 `f2d06951b4e8114dbb62f551c12a32a845a3042f`（v0.2.8）。新增代码集中在独立包及 ecarx 模块，上游大文件只保留必要接线。BYD 功能未删除，入口受车型控制，原固件与接收器校验继续保留。
+DiPlay 当前基线：`4556313`（v0.2.10 后的 main 诊断说明更新，完整提交见本轮报告）；原始 fork 基线为 `f2d06951b4e8114dbb62f551c12a32a845a3042f`（v0.2.8）。新增代码集中在独立包及 ecarx 模块，上游大文件只保留必要接线。BYD 功能未删除，入口受车型控制，原固件与接收器校验继续保留。
 
 文件传输实现参考 `shilapi/xcertplay` 的 `17c92439413638dfd1d7f91d7e1c2e7358398762`：Iap2LinkEngine、Iap2LinkChannel、Iap2CsmChannel、Iap2Session 的 session 12 增量及 FileTransferReceiver。保留 GPL-3.0 来源，并补充资源上限、曲目关联和生命周期约束。
 
