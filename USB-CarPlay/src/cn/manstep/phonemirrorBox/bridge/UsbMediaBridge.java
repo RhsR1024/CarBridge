@@ -48,6 +48,7 @@ public final class UsbMediaBridge {
         MAIN.post(() -> { Runtime r = live; live = null; if (r != null) r.close(); });
     }
     public static void refresh() { MAIN.post(() -> { if (live != null) live.route.refresh(); }); }
+    public static void resourcesChanged() { MAIN.post(() -> { if (live != null) live.refreshDisplay(); }); }
     public static String status() {
         Runtime r = live; return r == null ? "等待 F25 媒体服务初始化" : r.route.status;
     }
@@ -58,6 +59,7 @@ public final class UsbMediaBridge {
         Object field = value.opt(key); return field instanceof Number ? ((Number) field).longValue() : null;
     }
     private static final class Runtime implements BridgeRoute.Listener {
+        final Context context;
         final TrackState track = new TrackState();
         final BoxClock clock = new BoxClock();
         final java.util.concurrent.ThreadPoolExecutor pictures = new java.util.concurrent.ThreadPoolExecutor(1, 1, 30,
@@ -72,6 +74,7 @@ public final class UsbMediaBridge {
         private boolean observed, connected, active;
         private long stamp, claimRevision;
         private String metadataKey = "";
+        private String formatDiagnostic = "";
         private int publishedState = Integer.MIN_VALUE;
         private final Runnable poll = new Runnable() {
             @Override public void run() {
@@ -80,6 +83,7 @@ public final class UsbMediaBridge {
             }
         };
         Runtime(Context c, IInputCallback input) {
+            context = c;
             original = new com.zqsdk.OooOo0(input);
             route = new BridgeRoute(c, input, this);
             session = new MediaSession(c, "USBBox@MediaBridge");
@@ -97,6 +101,7 @@ public final class UsbMediaBridge {
                     MAIN.post(() -> {
                         if (!current(expected)) return;
                         track.reset(); clock.reset(); cover = null; coverRevision++; claimRevision++;
+                        track.titleFormat = BridgeSettings.titleFormat(context);
                         route.update(track, isConnected() ? Long.toString(expected) : ""); publish();
                     });
                 }
@@ -112,9 +117,10 @@ public final class UsbMediaBridge {
                         long previousRevision = track.revision;
                         track.update(text(value, "MediaSongName"), text(value, "MediaArtistName"),
                                 text(value, "MediaAlbumName"), state);
-                        if (previousRevision != track.revision) { cover = null; coverRevision++; clock.newTrack(); }
+                        if (previousRevision != track.revision) { cover = null; coverRevision++; track.artworkUri = ""; clock.newTrack(); }
                         track.updateLyrics(text(value, "MediaLyrics"));
                         clock.update(number(value, "MediaSongDuration"), number(value, "MediaSongPlayTime"), track.playing(), SystemClock.elapsedRealtime());
+                        syncTime();
                         route.update(track, Long.toString(expected)); publish();
                         if (before && !track.playing()) { claimRevision++; route.suspend(); }
                         if (track.playing() && (!before || !hadTrack && track.hasTrack())) claim();
@@ -126,12 +132,20 @@ public final class UsbMediaBridge {
         private boolean isConnected() {
             synchronized (wire) { return connected && cn.manstep.phonemirrorBox.BoxInterface.f.P; }
         }
+        private void syncTime() {
+            track.durationMs = clock.duration(); track.positionMs = clock.position(); track.positionAtMs = clock.observedAt();
+        }
+        private void refreshDisplay() {
+            if (!isConnected()) return;
+            syncTime(); route.update(track, Long.toString(stamp)); publish();
+        }
         private void artwork(byte[] bytes) {
-            if (!isConnected() || !track.complete()) return;
+            if (!isConnected() || track.title.isEmpty()) return;
             final long connection = stamp, song = track.revision;
             final String identity = track.mediaId();
             pictures.execute(() -> {
                 Bitmap decoded = null;
+                String stored = "";
                 try {
                     BitmapFactory.Options options = new BitmapFactory.Options(); options.inJustDecodeBounds = true;
                     BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
@@ -139,11 +153,14 @@ public final class UsbMediaBridge {
                     options.inJustDecodeBounds = false; options.inSampleSize = 1;
                     while (Math.max(options.outWidth, options.outHeight) / options.inSampleSize > 256) options.inSampleSize *= 2;
                     decoded = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+                    if (decoded != null) try { stored = DirectArtworkCache.save(context, decoded); }
+                    catch (Exception error) { Log.w("USBMediaBridge", "Direct cover cache unavailable", error); }
                 } catch (RuntimeException error) { Log.w("USBMediaBridge", "Cover ignored", error); }
                 final Bitmap picture = decoded;
+                final String uri = stored;
                 MAIN.post(() -> {
                     if (!current(connection) || !isConnected() || song != track.revision || !identity.equals(track.mediaId())) return;
-                    if (picture != null) { cover = picture; coverRevision++; publish(); }
+                    if (picture != null) { cover = picture; coverRevision++; track.artworkUri = uri; refreshDisplay(); }
                 });
             });
         }
@@ -164,15 +181,25 @@ public final class UsbMediaBridge {
                 });
             }, attempt == 0 ? 150 : 500);
         }
+        // MediaMetadata permits custom keys; these carry diagnostics and the existing lyrics contract.
+        @android.annotation.SuppressLint("WrongConstant")
         private void publish() {
+            CombinedTitleMetadata display = track.display();
+            String diagnostic = track.mediaId() + "|" + track.titleFormat + "|" + display.reason;
+            if (!diagnostic.equals(formatDiagnostic)) {
+                formatDiagnostic = diagnostic;
+                Log.i("USBMediaBridge", "TitleFormat format=" + track.titleFormat + " reason=" + display.reason);
+            }
             boolean visible = isConnected() && track.hasTrack() && "BRIDGE".equals(route.route());
             String key = visible ? track.mediaId() + "|" + track.lyrics + "|" + clock.duration() + "|" + coverRevision : "";
             if (!key.equals(metadataKey) || publishedState == Integer.MIN_VALUE) {
                 MediaMetadata.Builder m = new MediaMetadata.Builder();
                 if (visible) {
-                    m.putString(MediaMetadata.METADATA_KEY_TITLE, track.title);
-                    m.putString(MediaMetadata.METADATA_KEY_DISPLAY_TITLE, track.title);
-                    m.putString(MediaMetadata.METADATA_KEY_ARTIST, track.artist);
+                    m.putString(MediaMetadata.METADATA_KEY_TITLE, display.title);
+                    m.putString(MediaMetadata.METADATA_KEY_DISPLAY_TITLE, display.title);
+                    m.putString(MediaMetadata.METADATA_KEY_ARTIST, display.artist);
+                    m.putString("usb.media.titleFormat", track.titleFormat);
+                    m.putString("usb.media.titleFormatReason", display.reason);
                     m.putString(MediaMetadata.METADATA_KEY_ALBUM, track.album);
                     m.putString(MediaMetadata.METADATA_KEY_MEDIA_ID, track.mediaId());
                     m.putString("android.media.metadata.LYRICS", track.lyrics);

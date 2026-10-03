@@ -1,6 +1,6 @@
 # 验证记录（2026-10-03）
 
-本页下方为首版三模式历史验证；当前封面/歌词/换曲/交接修复的结果见 [最新验证](VALIDATION_METADATA_FIX.md)，实现说明见 [修复记录](METADATA_HANDOFF_2026-10-03.md)。
+本页下方为首版三模式历史验证；当前媒体选项版见 [最新验证](MEDIA_OPTIONS_2026-10-03.md)。此前封面/歌词/换曲/交接修复结果见 [修复验证](VALIDATION_METADATA_FIX.md)，实现说明见 [修复记录](METADATA_HANDOFF_2026-10-03.md)。
 
 ## 安装包
 

@@ -22,6 +22,8 @@ android {
     }
 }
 dependencies {
+    // Same FileProvider path strategy as the original APK; never packaged in the USB APK.
+    implementation("androidx.core:core:1.6.0")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.robolectric:robolectric:4.14.1")
 }

@@ -5,4 +5,6 @@ public interface IMediaCenterAPI {
  boolean requestPlay(Object token);
  void updateCurrentSourceType(Object token,int source);
  boolean updateMusicPlaybackState(Object token, MusicPlaybackInfo info);
+ void updateCurrentProgress(Object token, long position);
+ void updateCurrentLyric(Object token, String line);
 }

@@ -7,6 +7,7 @@ public class MusicClient {
  public boolean onForward(){return false;}
  public boolean onRewind(){return false;}
  public MusicPlaybackInfo getMusicPlaybackInfo(){return null;}
+ public long getCurrentProgress(){return 0;}
  public int getCurrentSourceType(){return 0;}
  public int[] getMediaSourceTypeList(){return new int[0];}
 }

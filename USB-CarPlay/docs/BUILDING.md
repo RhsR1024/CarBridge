@@ -24,8 +24,8 @@ python -m venv .venv
 
 ```powershell
 .venv\Scripts\python.exe scripts/build.py
-.venv\Scripts\python.exe scripts/sign_usb.py
-.venv\Scripts\python.exe scripts/verify.py _build/CarPlay-USBBox-Slim-MediaModes.apk
+.venv\Scripts\python.exe scripts/sign_usb.py --output _build/CarPlay-USBBox-Slim-MediaOptions.apk
+.venv\Scripts\python.exe scripts/verify.py _build/CarPlay-USBBox-Slim-MediaOptions.apk
 ```
 
 流程：验证基线哈希 → 编译新增类 → 以原 minSdk 16 进行 D8 转换 → 反汇编指定四类并精准接线 → 合并 DEX → 保留其余全部原 ZIP payload → zipalign → 原签名签署 → 最终 APK 全方法/ABI/资源比对。
@@ -41,6 +41,8 @@ powershell -ExecutionPolicy Bypass -File scripts/run_tests.ps1
 ```
 
 USB 测试用独立 Android 测试工程，避免其原厂 SDK 编译替身与 MediaBridge 自有 SDK 实现冲突。测试原控制回调时，以记录输入按键的替身作为边界；实际原链路另由 DEX 全量比对和历史字节码测试验证。
+
+媒体选项新增的 FileProvider 测试使用 AndroidX Core 1.6.0，与原 APK 路径策略一致。该依赖、测试清单和测试资源仅用于这个独立测试工程，不参与 `scripts/build.py` 的 APK 构建；原 APK 的清单、资源和 FileProvider 均不替换。USB 静态检查可额外运行 `gradle -p test-project lintDebug`。
 
 `mediabridge/` 仅保留 2.3.9 历史源码快照，不再参与当前构建。正式源码在 `D:\CarSoft\MediaBridgeApp\MediaBridge-src` 的 `main`；其他机器通过 `MEDIABRIDGE_ROOT` 指向它的克隆。脚本检查正式仓库协议并运行其测试。未提供签名变量时生成未签名 release。使用与当前配套版相同的本机签名，须通过环境变量提供 `MEDIABRIDGE_STORE_FILE`、`MEDIABRIDGE_STORE_PASSWORD`、`MEDIABRIDGE_KEY_ALIAS`、`MEDIABRIDGE_KEY_PASSWORD`。不要把口令或 keystore 写进仓库。
 

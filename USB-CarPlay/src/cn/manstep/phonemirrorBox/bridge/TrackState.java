@@ -5,18 +5,25 @@ public final class TrackState {
     public String title = "", artist = "", album = "", lyrics = "";
     public int status = -1;
     public long revision;
+    String titleFormat = "ORIGINAL", artworkUri = "";
+    long durationMs, positionMs = -1, positionAtMs;
+    private boolean titleFormatEligible = true;
     private String lastTitle = "", lastArtist = "";
     private boolean receivedTrack, awaitingTitle;
 
     public void reset() {
         title = artist = album = lyrics = lastTitle = lastArtist = "";
         receivedTrack = awaitingTitle = false;
+        artworkUri = ""; durationMs = positionAtMs = 0; positionMs = -1; titleFormatEligible = true;
         status = -1;
         revision++;
     }
 
     public void update(String nextTitle, String nextArtist, String nextAlbum, Integer nextStatus) {
-        if (nextTitle != null) nextTitle = bounded(nextTitle);
+        if (nextTitle != null) {
+            titleFormatEligible = nextTitle.length() <= 512 && nextTitle.indexOf('\n') < 0 && nextTitle.indexOf('\r') < 0;
+            nextTitle = bounded(nextTitle);
+        }
         if (nextArtist != null) nextArtist = bounded(nextArtist);
         // A lyrics-over-Bluetooth update can put the song name in the artist slot.
         // Do not invent a reversed mapping, or combine a new artist with the old song.
@@ -61,6 +68,7 @@ public final class TrackState {
     public boolean playing() { return status == 1; }
     public boolean hasTrack() { return receivedTrack; }
     public boolean complete() { return !title.isEmpty() && !artist.isEmpty(); }
+    CombinedTitleMetadata display() { return CombinedTitleMetadata.resolve(title, artist, titleFormat, titleFormatEligible); }
     public String mediaId() { return hasTrack() ? "usb-track:" + revision + ":" + title + "\n" + artist + "\n" + album : ""; }
     private static String bounded(String value) {
         value = value.trim();

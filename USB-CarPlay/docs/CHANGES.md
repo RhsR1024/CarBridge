@@ -72,3 +72,11 @@ MediaBridge 快照来自提交 `03d25c8e9e992d8b15c6d1f276ad4b4504b00603` 加工
 当前版本在固定精简基线上保留首版三模式，并增加原 `v0.d.A(byte[])` 封面回调的只读接线。原方法改动总计五处，其中四处尾部追加调用；USB、音视频、方控、焦点及触控原方法仍逐方法校验不变。详细规则与边界见 [本次修复](METADATA_HANDOFF_2026-10-03.md)。
 
 MediaBridge 两种 CarPlay 的适配已经合入其正式仓库 main，此后修复在该仓库源码完成；本目录中的 2.3.9 快照保留历史用途。当前安装和重建入口以 [USAGE](USAGE.md) 和 [BUILDING](BUILDING.md) 为准。
+
+## 7. 对齐 CarBridge 媒体选项
+
+在“媒体接入 → 媒体选项”增加缺失歌手标题格式和直连在线封面/歌词。前者默认保留原始信息，重新连接生效，仅解析输出副本；后者默认关闭，仅实际直连时生效，使用 CarBridge 同样的 LrcLib/iTunes 服务及完整身份、正时长匹配条件。
+
+`CombinedTitleMetadata`、`SynchronizedLyrics`、`DirectMusicResources` 分别移植标题解析、LRC 时间轴及直连资源逻辑；`DirectSnapshot` 隔离原始状态，`DirectArtworkCache` 复用 APK 已有 FileProvider 提供有界图片缓存和读权限。原生封面、歌词和可信进度也接入 F25 SDK，原生内容优先。
+
+新增资源刷新仅发布元数据；切模式/断连取消在线任务，旧曲结果不得覆盖新曲，不回写盒子原始字段，不合成 USB 命令，不申请恢复播放。与上一修复版相同，原方法仍只有五处接线。详见 [实现与验证](MEDIA_OPTIONS_2026-10-03.md)。

@@ -1,0 +1,55 @@
+{
+  "artifacts": [
+    {
+      "file": "CarBridge-0.1.7.apk",
+      "bytes": 37686521,
+      "sha256": "e5ae73d9a5cfcab5c03a3ffd0871a13e4c9afe264f44730fb61359848e9db763"
+    },
+    {
+      "file": "CarPlay-USBBox-Slim-MediaOptions.apk",
+      "bytes": 7578004,
+      "sha256": "5a7ddcb8130645c6d4a98721b7becb46b3dcc5263f92b3f62cb826e557df01d0"
+    },
+    {
+      "file": "MediaBridge-2.3.11-usb-metadata-26100304.apk",
+      "bytes": 637463,
+      "sha256": "841830637ac720e19bbb93c1aeb951c2eea910b9e319018fdc0a62bb875d08d3"
+    }
+  ],
+  "tests": {
+    "CarBridge-common": {
+      "tests": 160,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "CarBridge-shared": {
+      "tests": 421,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "USB": {
+      "tests": 27,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "MediaBridge": {
+      "tests": 204,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "total_tests": 812,
+  "CarBridge_authorized_runtime_assets_match": true,
+  "protocol_sources_identical": true,
+  "CarBridge_and_MediaBridge_release_lint_pass": true,
+  "physical_vehicle_test": false,
+  "USB_lint": {
+    "errors": 0,
+    "warnings": 8
+  },
+  "unchanged_companion_tests_from": "metadata-fix-release.json"
+}

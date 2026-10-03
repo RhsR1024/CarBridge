@@ -138,7 +138,8 @@ public class UsbBridgeTest {
         java.io.ByteArrayOutputStream bytes=new java.io.ByteArrayOutputStream();
         bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG,100,bytes);
         UsbMediaBridge.artwork(bytes.toByteArray()); idle();
-        ((ThreadPoolExecutor)field(runtime,"pictures")).submit(()->{}).get(3,TimeUnit.SECONDS); idle();
+        long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(3);
+        while(field(runtime,"cover")==null && System.nanoTime()<deadline){Thread.sleep(5);idle();}
         RecordingSession output=org.robolectric.shadow.api.Shadow.extract(session);
         assertNotNull(output.metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART));
         assertEquals("Live line",output.metadata.getString("android.media.metadata.LYRICS"));
@@ -146,6 +147,20 @@ public class UsbBridgeTest {
         assertNull(output.metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART));
         assertEquals("",output.metadata.getString("android.media.metadata.LYRICS"));
         assertTrue(keys.isEmpty());
+    }
+    @Test public void titleFormatAppliesOnReconnectAndBridgeKeepsTheRawTrackId()throws Exception {
+        runtime();assertEquals("ORIGINAL",BridgeSettings.titleFormat(context));assertFalse(BridgeSettings.onlineResources(context));
+        context.getSharedPreferences("usb_media_route_v1",0).edit().putString("combined_title_format","ARTIST_TITLE").putString("mode","BRIDGE").commit();
+        metadata("{\"MediaSongName\":\"Singer - Song\"}");
+        RecordingSession output=org.robolectric.shadow.api.Shadow.extract(session);
+        assertEquals("Singer - Song",output.metadata.getString(MediaMetadata.METADATA_KEY_TITLE));
+        cn.manstep.phonemirrorBox.BoxInterface.f.P=false;metadata("{}");
+        cn.manstep.phonemirrorBox.BoxInterface.f.P=true;metadata("{}");
+        set(route,"route","BRIDGE");metadata("{\"MediaSongName\":\"Singer - Song\"}");
+        assertEquals("Song",output.metadata.getString(MediaMetadata.METADATA_KEY_TITLE));
+        assertEquals("Singer",output.metadata.getString(MediaMetadata.METADATA_KEY_ARTIST));
+        TrackState raw=(TrackState)field(runtime,"track");assertEquals("Singer - Song",raw.title);assertEquals("",raw.artist);
+        assertEquals(raw.mediaId(),output.metadata.getString(MediaMetadata.METADATA_KEY_MEDIA_ID));assertTrue(keys.isEmpty());
     }
     @Test public void phoneDisconnectReleasesCompanionAndDoesNotReacquireItWhileIdle() throws Exception {
         runtime(); List<Integer> sent=new ArrayList<>();
@@ -249,6 +264,26 @@ public class UsbBridgeTest {
         assertEquals(Arrays.asList(126,90,89),keys);
         d.close(ok->{});assertFalse(api.client.onNext());assertTrue(api.released.await(3,TimeUnit.SECONDS));idle();
         assertEquals(Arrays.asList(126,90,89),keys);
+    }
+    @Test public void directPublishesNativeResourcesAndProgressWithoutPhoneControl()throws Exception {
+        FakeApi api=new FakeApi();MediaCenterAPI.fake=api;
+        F25Direct d=new F25Direct(context,keys::add,ok->{});
+        try {
+            TrackState track=new TrackState();track.titleFormat="ARTIST_TITLE";track.update("Singer - Song",null,"Album",1);
+            track.artworkUri="content://native/cover";track.lyrics="[00:01]first\n[00:02]second";
+            track.durationMs=180000;track.positionMs=1500;track.positionAtMs=SystemClock.elapsedRealtime();
+            d.update(track);d.start();assertTrue(api.registered.await(3,TimeUnit.SECONDS));
+            ((ThreadPoolExecutor)field(d,"io")).submit(()->{}).get(3,TimeUnit.SECONDS);idle();
+            MusicPlaybackInfo output=api.client.getMusicPlaybackInfo();assertEquals("Song",output.getTitle());assertEquals("Singer",output.getArtist());
+            assertEquals("content://native/cover",output.getArtwork().toString());assertEquals(180000,output.getDuration());
+            assertEquals("first",output.getCurrentLyricSentence());
+            Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(750));
+            assertEquals("second",output.getCurrentLyricSentence());assertTrue(api.client.getCurrentProgress()>=2250);
+            track.update("Next","Other",null,2);track.artworkUri="";track.lyrics="live line";track.positionMs=-1;
+            d.update(track);assertNull(api.client.getMusicPlaybackInfo().getArtwork());
+            assertEquals("live line",api.client.getMusicPlaybackInfo().getCurrentLyricSentence());
+            assertEquals(0,api.requests);assertTrue(keys.isEmpty());
+        } finally {d.close(ok->{});}
     }
     @Test public void failedDirectUnregisterBlocksNewRoute() throws Exception {
         FakeApi api=new FakeApi();api.unregisterOk=false;MediaCenterAPI.fake=api;
