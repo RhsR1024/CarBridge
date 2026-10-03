@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.network.P2pStartupRecoveryTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:34.066Z" hostname="DESKTOP-IQJOR7V" time="0.029">
+  <properties/>
+  <testcase name="planNeverRequestsDfsSixGhzInvalidOrPhoneUnfriendlyStationFrequencies" classname="com.shilapi.xcertplay.network.P2pStartupRecoveryTest" time="0.009"/>
+  <testcase name="confirmedFrequencyGoesFirstWithoutBeingRetriedLater" classname="com.shilapi.xcertplay.network.P2pStartupRecoveryTest" time="0.0"/>
+  <testcase name="twoGhzOnlyDriverWithoutChannelSelectionRecoversBeforeAnyAutomaticRequest" classname="com.shilapi.xcertplay.network.P2pStartupRecoveryTest" time="0.002"/>
+  <testcase name="rejectedChannelAndCustomGroupFallBackToSystemConfiguration" classname="com.shilapi.xcertplay.network.P2pStartupRecoveryTest" time="0.002"/>
+  <testcase name="workingAlignedChannelNeverUsesFallback" classname="com.shilapi.xcertplay.network.P2pStartupRecoveryTest" time="0.001"/>
+  <testcase name="existingTwoGhzStationUsesItsExactChannelFirst" classname="com.shilapi.xcertplay.network.P2pStartupRecoveryTest" time="0.0"/>
+  <testcase name="firmwareThatBusiesEveryFiveGhzRequestStillReachesTwoGhz" classname="com.shilapi.xcertplay.network.P2pStartupRecoveryTest" time="0.001"/>
+  <testcase name="rejectedChannelSixTriesOtherExplicitTwoGhzChannels" classname="com.shilapi.xcertplay.network.P2pStartupRecoveryTest" time="0.001"/>
+  <testcase name="permissionUnsupportedAndUncertainTimeoutNeverTriggerAnotherCreation" classname="com.shilapi.xcertplay.network.P2pStartupRecoveryTest" time="0.001"/>
+  <testcase name="rejectedRememberedSystemConfigurationFallsBackToExplicitChannels" classname="com.shilapi.xcertplay.network.P2pStartupRecoveryTest" time="0.001"/>
+  <testcase name="unconnectedStationStartsWithFiveGhzAndBusyRetriesEachChannelOnce" classname="com.shilapi.xcertplay.network.P2pStartupRecoveryTest" time="0.002"/>
+  <testcase name="unsafeRememberedFrequenciesDoNotBypassTheChannelPolicy" classname="com.shilapi.xcertplay.network.P2pStartupRecoveryTest" time="0.001"/>
+  <testcase name="everyConfigurationRejectedStopsAfterBoundedAttempts" classname="com.shilapi.xcertplay.network.P2pStartupRecoveryTest" time="0.002"/>
+  <testcase name="groupAppearingDuringRecoveryPreventsASecondCreation" classname="com.shilapi.xcertplay.network.P2pStartupRecoveryTest" time="0.005"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

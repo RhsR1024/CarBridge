@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.CarBridgeResourcesTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:56:13.896Z" hostname="DESKTOP-IQJOR7V" time="3.117">
+  <properties/>
+  <testcase name="matchingPreservesEditionAndArtistIdentity" classname="com.shilapi.xcertplay.CarBridgeResourcesTest" time="2.627"/>
+  <testcase name="geelyDisablesBydFeaturesWithoutErasingTheirPreferences" classname="com.shilapi.xcertplay.CarBridgeResourcesTest" time="0.209"/>
+  <testcase name="artworkProviderRejectsWritesTraversalAndOversizedImages" classname="com.shilapi.xcertplay.CarBridgeResourcesTest" time="0.063"/>
+  <testcase name="lyricsUseOrderedIdentityDurationAndBracketFallback" classname="com.shilapi.xcertplay.CarBridgeResourcesTest" time="0.056"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

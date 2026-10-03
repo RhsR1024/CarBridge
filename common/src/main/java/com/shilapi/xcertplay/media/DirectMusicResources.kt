@@ -32,13 +32,13 @@ internal class DirectMusicResources(private val context: Context, private val re
         val request = "${value.trackKey}|${value.title}|${value.artist}|${value.album}|${value.durationMs}|$online"
         if (request == lastKey) return
         lastKey = request; val expected = ++generation
-        if (value.title.isNullOrBlank() || value.artist.isNullOrBlank() || (value.durationMs ?: 0) <= 0) {
+        if (value.title.isNullOrBlank() || value.artist.isNullOrBlank()) {
             log("request=$expected track=${value.trackGeneration} skipped=incomplete_metadata titlePresent=${!value.title.isNullOrBlank()} artistPresent=${!value.artist.isNullOrBlank()} duration=${value.durationMs}")
             return
         }
         log("request=$expected track=${value.trackGeneration} direct=true online=$online nativeArtwork=${value.artworkSource == "native"}")
         worker.execute {
-            val identity = "${value.title}\n${value.artist}\n${value.album}\n${value.durationMs}"
+            val identity = "lyrics-v2\n${value.title}\n${value.artist}\n${value.album}\n${value.durationMs}"
             val hash = MessageDigest.getInstance("SHA-256").digest(identity.toByteArray()).joinToString("") { "%02x".format(it) }
             val cache = File(directory, "$hash.json")
             val saved = runCatching { if (cache.length() in 1..100000) JSONObject(cache.readText()) else null }.getOrNull()
@@ -49,7 +49,7 @@ internal class DirectMusicResources(private val context: Context, private val re
                 val lyrics = runCatching { findLyrics(value) }.onFailure {
                     log("request=$expected lyricsFailure=${it.javaClass.simpleName} detail=${it.message.orEmpty().take(100)}")
                 }.getOrNull()
-                val art = if (value.artworkSource != "native") runCatching { findArtwork(value) }.onFailure {
+                val art = if (value.artworkSource != "native" && (value.durationMs ?: 0) > 0) runCatching { findArtwork(value) }.onFailure {
                     log("request=$expected artworkFailure=${it.javaClass.simpleName}")
                 }.getOrNull() else null
                 if (lyrics != null) found.put("lyrics", lyrics)
@@ -74,16 +74,23 @@ internal class DirectMusicResources(private val context: Context, private val re
     }
     private fun query(value: String) = URLEncoder.encode(value, "UTF-8")
     private fun findLyrics(v: NowPlayingSnapshot): String? {
-        val url = "https://lrclib.net/api/get?track_name=${query(v.title.orEmpty())}&artist_name=${query(v.artist.orEmpty())}" +
-            "&album_name=${query(v.album.orEmpty())}&duration=${(v.durationMs ?: 0) / 1000}"
-        val json = JSONObject(String(download(url, 100000), Charsets.UTF_8))
-        if (!matches(v.title, json.optString("trackName")) || !matches(v.artist, json.optString("artistName")) ||
-            abs(json.optDouble("duration", -100.0) * 1000 - (v.durationMs ?: 0)) > 3000) {
-            log("lyrics rejected=metadata_mismatch track=${v.trackGeneration}")
-            return null
+        for ((title, duration) in lyricsQueries(v.title.orEmpty(), v.durationMs ?: 0)) {
+            check(!Thread.currentThread().isInterrupted)
+            try {
+                val params = "?track_name=${query(title)}&artist_name=${query(v.artist.orEmpty())}"
+                val songs = if (duration > 0) JSONArray().put(JSONObject(String(download(
+                    "https://lrclib.net/api/get$params&duration=${duration / 1000}", 100000), Charsets.UTF_8)))
+                else JSONArray(String(download("https://lrclib.net/api/search$params", 512000), Charsets.UTF_8))
+                selectLyrics(songs, title, v.artist.orEmpty(), duration)?.let {
+                    log("lyrics matched strippedTitle=${title != v.title} durationRequired=${duration > 0}")
+                    return it
+                }
+            } catch (error: Exception) {
+                if (Thread.currentThread().isInterrupted) throw error
+                log("lyrics query unavailable=${error.javaClass.simpleName} durationRequired=${duration > 0}")
+            }
         }
-        return json.optString("syncedLyrics").takeIf { it.isNotBlank() && it != "null" && it.length <= 65536 }
-            ?: json.optString("plainLyrics").takeIf { it.isNotBlank() && it != "null" && it.length <= 65536 }
+        return null
     }
     private fun findArtwork(v: NowPlayingSnapshot): String? {
         val url = "https://itunes.apple.com/search?entity=song&limit=10&term=${query(v.title.orEmpty() + " " + v.artist.orEmpty())}"
@@ -118,10 +125,36 @@ internal class DirectMusicResources(private val context: Context, private val re
     fun close() { generation++; worker.shutdownNow(); main.removeCallbacksAndMessages(null) }
     private fun log(message: String) = com.shilapi.xcertplay.CarBridgeDiagnostics.record("Resources", message)
     companion object {
+        internal fun lyricsQueries(title: String, duration: Long): List<Pair<String, Long>> {
+            var clean = title
+            repeat(8) { clean = clean.replace(Regex("\\([^()]*\\)|（[^（）]*）"), "").replace(Regex("\\s+"), " ").trim() }
+            if (clean.isEmpty()) clean = title
+            return buildList {
+                add(title to duration)
+                if (clean != title) add(clean to duration)
+                if (duration > 0) add(clean to 0L)
+            }
+        }
+        private fun lyricText(json: JSONObject): String? =
+            json.optString("syncedLyrics").takeIf { it.isNotBlank() && it != "null" && it.length <= 65536 }
+                ?: json.optString("plainLyrics").takeIf { it.isNotBlank() && it != "null" && it.length <= 65536 }
+
+        internal fun selectLyrics(songs: JSONArray, title: String, artist: String, duration: Long): String? {
+            var fallback: String? = null
+            for (i in 0 until songs.length()) {
+                val song = songs.getJSONObject(i)
+                if (!matches(title, song.optString("trackName")) || !matches(artist, song.optString("artistName"))) continue
+                val text = lyricText(song) ?: continue
+                if (duration > 0 && abs(song.optDouble("duration", -100.0) * 1000 - duration) <= 3000) return text
+                if (fallback == null) fallback = text
+            }
+            return if (duration > 0) null else fallback
+        }
+
         internal fun matches(expected: String?, actual: String): Boolean {
             fun normalize(s: String) = Normalizer.normalize(s, Normalizer.Form.NFKC).lowercase(java.util.Locale.ROOT)
                 .filter { it.isLetterOrDigit() }
-            return !expected.isNullOrBlank() && normalize(expected) == normalize(actual)
+            return !expected.isNullOrBlank() && normalize(expected).isNotEmpty() && normalize(expected) == normalize(actual)
         }
     }
 }

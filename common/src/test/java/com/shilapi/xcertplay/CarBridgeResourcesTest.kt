@@ -16,6 +16,15 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [30], manifest = Config.NONE)
 class CarBridgeResourcesTest {
+    @Test fun lyricsUseOrderedIdentityDurationAndBracketFallback() {
+        assertEquals(listOf("Song（Live） (Remastered)" to 60000L, "Song" to 60000L, "Song" to 0L),
+            DirectMusicResources.lyricsQueries("Song（Live） (Remastered)", 60000))
+        val songs = org.json.JSONArray().put(org.json.JSONObject().put("trackName", "Song").put("artistName", "Artist")
+            .put("duration", 180).put("syncedLyrics", "[00:01]line"))
+        assertNull(DirectMusicResources.selectLyrics(songs, "Song", "Artist", 60000))
+        assertEquals("[00:01]line", DirectMusicResources.selectLyrics(songs, "Song", "Artist", 0))
+        assertNull(DirectMusicResources.selectLyrics(songs, "Song", "Other artist", 0))
+    }
     @Test fun matchingPreservesEditionAndArtistIdentity() {
         assertTrue(DirectMusicResources.matches("Ｆｏｏ!", "Foo"))
         assertFalse(DirectMusicResources.matches("Foo (Live)", "Foo"))

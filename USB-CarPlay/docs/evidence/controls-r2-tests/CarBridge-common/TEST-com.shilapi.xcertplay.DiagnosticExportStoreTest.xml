@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.DiagnosticExportStoreTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:56:23.665Z" hostname="DESKTOP-IQJOR7V" time="0.197">
+  <properties/>
+  <testcase name="selectedDocumentIsWrittenButNeverDeletedOnFailure" classname="com.shilapi.xcertplay.DiagnosticExportStoreTest" time="0.042"/>
+  <testcase name="android10SavesUtf8ReportToDownloadsAndPublishesAfterClosingIt" classname="com.shilapi.xcertplay.DiagnosticExportStoreTest" time="0.071"/>
+  <testcase name="unavailableDownloadsDoesNotReturnFalseSuccess" classname="com.shilapi.xcertplay.DiagnosticExportStoreTest" time="0.022"/>
+  <testcase name="deniedWriteRemovesOnlyTheNewPendingEntry" classname="com.shilapi.xcertplay.DiagnosticExportStoreTest" time="0.026"/>
+  <testcase name="failedPublishDoesNotLeaveAnInvisibleReport" classname="com.shilapi.xcertplay.DiagnosticExportStoreTest" time="0.03"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.transport.CarBridgeFileTransferRoutingTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:34.264Z" hostname="DESKTOP-IQJOR7V" time="0.32">
+  <properties/>
+  <testcase name="defaultConnectionLeavesArtworkAndAcknowledgementToCarBridge" classname="com.shilapi.xcertplay.transport.CarBridgeFileTransferRoutingTest" time="0.215"/>
+  <testcase name="explicitUpstreamCallbackDoesNotAlsoQueueRawArtwork" classname="com.shilapi.xcertplay.transport.CarBridgeFileTransferRoutingTest" time="0.105"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

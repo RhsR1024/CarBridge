@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" tests="16" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:56:20.468Z" hostname="DESKTOP-IQJOR7V" time="1.357">
+  <properties/>
+  <testcase name="textureTransformFitsTheNegotiatedCanvas" classname="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" time="0.251"/>
+  <testcase name="resizeWithoutASessionKeepsTheExistingRestartPath" classname="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" time="0.268"/>
+  <testcase name="adoptingABackgroundSessionPreservesItsCanvasOnResize" classname="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" time="0.348"/>
+  <testcase name="touchesStartingInABarStaySuppressedUntilRelease" classname="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" time="0.069"/>
+  <testcase name="surroundViewOpenAndCloseKeepsTheNegotiatedCanvas" classname="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" time="0.044"/>
+  <testcase name="aScaledDownCanvasKeepsTheSessionWhenTheOriginalWindowReturns" classname="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" time="0.04"/>
+  <testcase name="connectingInANarrowWindowRebuildsWhenTheCameraCloses" classname="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" time="0.031"/>
+  <testcase name="aNarrowWindowIsNotTreatedAsScreenRotation" classname="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" time="0.032"/>
+  <testcase name="quickOpenAndCloseCancelsThePendingShrink" classname="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" time="0.025"/>
+  <testcase name="initialSizeDetectionKeepsTheNormalStartupPath" classname="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" time="0.029"/>
+  <testcase name="actualScreenRotationPreservesTheSessionByDefault" classname="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" time="0.037"/>
+  <testcase name="anOngoingHandshakeResetOnlyRecordsTheNewSize" classname="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" time="0.031"/>
+  <testcase name="halfTurnWithUnchangedSizeDoesNotReconnect" classname="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" time="0.028"/>
+  <testcase name="aScaledUpCanvasStillRebuildsWhenTheStartupWindowGrows" classname="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" time="0.035"/>
+  <testcase name="connectingInAReducedHeightWindowRebuildsWhenTheCameraCloses" classname="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" time="0.035"/>
+  <testcase name="anExplicitBarLayoutChangeStillRebuildsTheSession" classname="com.shilapi.xcertplay.CarPlayHostDisplaySizeTest" time="0.034"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

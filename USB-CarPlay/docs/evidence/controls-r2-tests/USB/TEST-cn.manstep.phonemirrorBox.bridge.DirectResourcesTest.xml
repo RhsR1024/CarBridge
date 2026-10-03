@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="cn.manstep.phonemirrorBox.bridge.DirectResourcesTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-03T13:01:33" hostname="DESKTOP-IQJOR7V" time="3.32">
+  <properties/>
+  <testcase name="cacheRejectsForeignAndTraversalUris" classname="cn.manstep.phonemirrorBox.bridge.DirectResourcesTest" time="2.702"/>
+  <testcase name="nativeContentWinsAndMismatchesOrUnapprovedArtworkHostsAreRejected" classname="cn.manstep.phonemirrorBox.bridge.DirectResourcesTest" time="0.102"/>
+  <testcase name="verifiedOnlineResourcesCacheAndOriginalFileProviderCanServeCover" classname="cn.manstep.phonemirrorBox.bridge.DirectResourcesTest" time="0.409"/>
+  <testcase name="defaultOffDoesNotUseNetworkAndUnknownTimeLooksUpLyricsOnly" classname="cn.manstep.phonemirrorBox.bridge.DirectResourcesTest" time="0.043"/>
+  <testcase name="lateResultsAfterNewTrackOrCloseNeverReachTheClient" classname="cn.manstep.phonemirrorBox.bridge.DirectResourcesTest" time="0.034"/>
+  <testcase name="lyricsQueryOrderUsesOriginalThenStrippedThenNoDuration" classname="cn.manstep.phonemirrorBox.bridge.DirectResourcesTest" time="0.03"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

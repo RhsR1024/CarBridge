@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.geely.auto.music.InputEndedTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-10-03T13:04:35" hostname="DESKTOP-IQJOR7V" time="0.393">
+  <properties/>
+  <testcase name="foreignOrUnknownOwnerNeverReceivesOldPause" classname="com.geely.auto.music.InputEndedTest" time="0.043"/>
+  <testcase name="managedDisconnectPausesBeforeReleaseCompletes" classname="com.geely.auto.music.InputEndedTest" time="0.058"/>
+  <testcase name="newPlaybackReplacesRetainedSongButPausedFallbackDoesNot" classname="com.geely.auto.music.InputEndedTest" time="0.031"/>
+  <testcase name="explicitNativeYieldNeverPublishesEvenIfOwnerQueryWouldBeStale" classname="com.geely.auto.music.InputEndedTest" time="0.029"/>
+  <testcase name="missingSessionInInstalledAppDoesNotClaimAppWasUninstalled" classname="com.geely.auto.music.InputEndedTest" time="0.049"/>
+  <testcase name="normalPauseKeepsLiveSessionAndDoesNotRetireControls" classname="com.geely.auto.music.InputEndedTest" time="0.031"/>
+  <testcase name="preparedButUnpublishedTrackCannotReplaceLastPublishedTrackOnDisconnect" classname="com.geely.auto.music.InputEndedTest" time="0.027"/>
+  <testcase name="installedCarBridgeWithoutPhoneConnectionShowsConnectionPrompt" classname="com.geely.auto.music.InputEndedTest" time="0.031"/>
+  <testcase name="lostSessionPublishesOnePauseFreezesProgressAndRejectsOldControls" classname="com.geely.auto.music.InputEndedTest" time="0.027"/>
+  <testcase name="emptyFieldsStayEmptyIncludingLegacyPlaceholderPreferences" classname="com.geely.auto.music.InputEndedTest" time="0.028"/>
+  <testcase name="focusChangeDuringQueryInvalidatesPendingPause" classname="com.geely.auto.music.InputEndedTest" time="0.039"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

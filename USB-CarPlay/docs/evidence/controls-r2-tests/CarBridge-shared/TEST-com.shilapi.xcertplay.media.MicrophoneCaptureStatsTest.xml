@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.media.MicrophoneCaptureStatsTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:32.743Z" hostname="DESKTOP-IQJOR7V" time="0.063">
+  <properties/>
+  <testcase name="aggregatesFiveSecondWindowsAndKeepsFinalPartialWindow" classname="com.shilapi.xcertplay.media.MicrophoneCaptureStatsTest" time="0.02"/>
+  <testcase name="callbackAndRouteFailuresDoNotEscapeOrPreventCounterReset" classname="com.shilapi.xcertplay.media.MicrophoneCaptureStatsTest" time="0.002"/>
+  <testcase name="reportingIsBoundedAndRouteQueriesRunOnlyWhenDue" classname="com.shilapi.xcertplay.media.MicrophoneCaptureStatsTest" time="0.019"/>
+  <testcase name="outputContainsOnlyAllowlistedMetadataAndNeverExceptionMessagesOrEndpoints" classname="com.shilapi.xcertplay.media.MicrophoneCaptureStatsTest" time="0.022"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

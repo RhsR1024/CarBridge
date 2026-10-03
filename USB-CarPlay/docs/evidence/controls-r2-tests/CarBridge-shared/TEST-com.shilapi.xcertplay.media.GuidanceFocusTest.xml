@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.media.GuidanceFocusTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:30.304Z" hostname="DESKTOP-IQJOR7V" time="2.417">
+  <properties/>
+  <testcase name="navigationUsesTransientDuckAndReleasesWithoutRequestingMusic" classname="com.shilapi.xcertplay.media.GuidanceFocusTest" time="2.189"/>
+  <testcase name="rejectedFocusDoesNotRetryUntilNextAudibleBurstOrPinVolume" classname="com.shilapi.xcertplay.media.GuidanceFocusTest" time="0.051"/>
+  <testcase name="disabledSettingAndOtherProfilesDoNotAcquireNavigationFocus" classname="com.shilapi.xcertplay.media.GuidanceFocusTest" time="0.031"/>
+  <testcase name="overlappingGuidanceTracksReleaseOnlyAfterLastTrackEnds" classname="com.shilapi.xcertplay.media.GuidanceFocusTest" time="0.023"/>
+  <testcase name="phoneRemainsPrimaryAndClosedSinkCannotReacquire" classname="com.shilapi.xcertplay.media.GuidanceFocusTest" time="0.023"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

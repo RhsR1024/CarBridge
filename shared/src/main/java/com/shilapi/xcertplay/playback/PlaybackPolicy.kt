@@ -52,6 +52,10 @@ class PlaybackPolicy {
         if (!ready) vehicleGranted = false
     }
 
+    /** Called only after an explicit NEXT/PREVIOUS was submitted successfully. */
+    fun userSkip(): PlaybackAction =
+        if (phoneState != Playback.PLAYING || !wantsPlayback) userPlay() else PlaybackAction.NONE
+
     fun userPlay(): PlaybackAction {
         if (!connected) return PlaybackAction.NONE
         intent++

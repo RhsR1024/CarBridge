@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.nowplaying.CombinedTitleMetadataTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:34.111Z" hostname="DESKTOP-IQJOR7V" time="0.014">
+  <properties/>
+  <testcase name="confirmedArtistTitleFormatPreservesPlaybackIdentityAndArtwork" classname="com.shilapi.xcertplay.nowplaying.CombinedTitleMetadataTest" time="0.006"/>
+  <testcase name="diagnosticsExplainWhyCombinedTitleWasNotSplit" classname="com.shilapi.xcertplay.nowplaying.CombinedTitleMetadataTest" time="0.004"/>
+  <testcase name="ambiguousAndMultilineTitlesRemainUntouched" classname="com.shilapi.xcertplay.nowplaying.CombinedTitleMetadataTest" time="0.001"/>
+  <testcase name="incrementalProgressDoesNotLoseSplitOrChangeRawStore" classname="com.shilapi.xcertplay.nowplaying.CombinedTitleMetadataTest" time="0.003"/>
+  <testcase name="reverseFormatIsExplicitAndOriginalIsUnchangedByDefault" classname="com.shilapi.xcertplay.nowplaying.CombinedTitleMetadataTest" time="0.0"/>
+  <testcase name="nativeArtistAlwaysWins" classname="com.shilapi.xcertplay.nowplaying.CombinedTitleMetadataTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

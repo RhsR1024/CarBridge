@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.geely.auto.music.FavoriteActionPolicyTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-03T13:04:35" hostname="DESKTOP-IQJOR7V" time="0.001">
+  <properties/>
+  <testcase name="selectsTheActionMatchingTheRequestedFavoriteState" classname="com.geely.auto.music.FavoriteActionPolicyTest" time="0.0"/>
+  <testcase name="unverifiedToggleDislikeAndOppositeActionsStayUnsupported" classname="com.geely.auto.music.FavoriteActionPolicyTest" time="0.0"/>
+  <testcase name="substringCollisionDoesNotAdvertiseFavorite" classname="com.geely.auto.music.FavoriteActionPolicyTest" time="0.0"/>
+  <testcase name="bareLikeIsNeverUsedToUnlike" classname="com.geely.auto.music.FavoriteActionPolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

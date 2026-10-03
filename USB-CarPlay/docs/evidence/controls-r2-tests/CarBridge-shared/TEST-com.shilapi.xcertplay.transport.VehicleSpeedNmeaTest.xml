@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.transport.VehicleSpeedNmeaTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:37.401Z" hostname="DESKTOP-IQJOR7V" time="0.008">
+  <properties/>
+  <testcase name="addsSpeedOnlyWhenTheIphoneAsksForIt" classname="com.shilapi.xcertplay.transport.VehicleSpeedNmeaTest" time="0.004"/>
+  <testcase name="keepsSendingSpeedWithoutAPositionFix" classname="com.shilapi.xcertplay.transport.VehicleSpeedNmeaTest" time="0.001"/>
+  <testcase name="identificationOffersSpeedOnlyWhenEnabled" classname="com.shilapi.xcertplay.transport.VehicleSpeedNmeaTest" time="0.001"/>
+  <testcase name="encodesSpeedGearAndChecksum" classname="com.shilapi.xcertplay.transport.VehicleSpeedNmeaTest" time="0.0"/>
+  <testcase name="readsTheRequestedSentenceTypes" classname="com.shilapi.xcertplay.transport.VehicleSpeedNmeaTest" time="0.0"/>
+  <testcase name="encodesLikeARealHeadUnit" classname="com.shilapi.xcertplay.transport.VehicleSpeedNmeaTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.playback.PlaybackPolicyTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:34.261Z" hostname="DESKTOP-IQJOR7V" time="0.001">
+  <properties/>
+  <testcase name="bothGrantsAreRequiredAndPermanentLossInvalidatesDelayedGain" classname="com.shilapi.xcertplay.playback.PlaybackPolicyTest" time="0.001"/>
+  <testcase name="disabledMutualExclusionIsExplicitAndReenablingDoesNotSteal" classname="com.shilapi.xcertplay.playback.PlaybackPolicyTest" time="0.0"/>
+  <testcase name="userPauseIsNotReversedByRepeatingPlayingOrMetadata" classname="com.shilapi.xcertplay.playback.PlaybackPolicyTest" time="0.0"/>
+  <testcase name="transientResumeCannotOverrideLaterSourceOrUserPause" classname="com.shilapi.xcertplay.playback.PlaybackPolicyTest" time="0.0"/>
+  <testcase name="disconnectOrRejectedGrantCannotLeakAudio" classname="com.shilapi.xcertplay.playback.PlaybackPolicyTest" time="0.0"/>
+  <testcase name="explicitSkipWhilePausedCreatesCancellablePlaybackIntent" classname="com.shilapi.xcertplay.playback.PlaybackPolicyTest" time="0.0"/>
+  <testcase name="handoverPreservesIntentButNotVehicleGrant" classname="com.shilapi.xcertplay.playback.PlaybackPolicyTest" time="0.0"/>
+  <testcase name="connectionAndInitialPlayingDoNotStealMusic" classname="com.shilapi.xcertplay.playback.PlaybackPolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

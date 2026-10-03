@@ -49,6 +49,12 @@ public final class UsbMediaBridge {
     }
     public static void refresh() { MAIN.post(() -> { if (live != null) live.route.refresh(); }); }
     public static void resourcesChanged() { MAIN.post(() -> { if (live != null) live.refreshDisplay(); }); }
+    public static void titleFormatChanged() { MAIN.post(() -> {
+        if (live != null) {
+            live.track.titleFormat = BridgeSettings.titleFormat(live.context);
+            live.refreshDisplay();
+        }
+    }); }
     public static String status() {
         Runtime r = live; return r == null ? "等待 F25 媒体服务初始化" : r.route.status;
     }
@@ -173,7 +179,7 @@ public final class UsbMediaBridge {
         }
         private void requestClaim(long revision, int attempt) {
             MAIN.postDelayed(() -> {
-                if (live != this || revision != claimRevision || !isConnected() || !route.ready() || !track.hasTrack()) return;
+                if (live != this || revision != claimRevision || !isConnected() || !route.ready()) return;
                 route.requestPlay(ok -> {
                     // Registration/grant can race the Android session notification.
                     // Retry only car-side selection; NEVER synthesize a USB PLAY.
@@ -190,11 +196,14 @@ public final class UsbMediaBridge {
                 formatDiagnostic = diagnostic;
                 Log.i("USBMediaBridge", "TitleFormat format=" + track.titleFormat + " reason=" + display.reason);
             }
-            boolean visible = isConnected() && track.hasTrack() && "BRIDGE".equals(route.route());
-            String key = visible ? track.mediaId() + "|" + track.lyrics + "|" + clock.duration() + "|" + coverRevision : "";
+            boolean visible = isConnected() && "BRIDGE".equals(route.route());
+            String key = visible ? stamp + "|" + track.mediaId() + "|" + display.title + "|" + display.artist
+                    + "|" + track.lyrics + "|" + clock.duration() + "|" + coverRevision : "";
             if (!key.equals(metadataKey) || publishedState == Integer.MIN_VALUE) {
                 MediaMetadata.Builder m = new MediaMetadata.Builder();
                 if (visible) {
+                    m.putString("usb.media.connection", Long.toString(stamp));
+                    m.putString("usb.media.build", BridgeSettings.BUILD);
                     m.putString(MediaMetadata.METADATA_KEY_TITLE, display.title);
                     m.putString(MediaMetadata.METADATA_KEY_DISPLAY_TITLE, display.title);
                     m.putString(MediaMetadata.METADATA_KEY_ARTIST, display.artist);
@@ -209,7 +218,7 @@ public final class UsbMediaBridge {
                 // Time is published only after measured unit confirmation. No seek capability.
                 session.setMetadata(m.build()); metadataKey = key;
             }
-            int state = !visible || track.status == -1 ? PlaybackState.STATE_NONE
+            int state = !visible ? PlaybackState.STATE_NONE
                     : track.playing() ? PlaybackState.STATE_PLAYING : PlaybackState.STATE_PAUSED;
             long position = visible ? clock.position() : -1;
             if (state != publishedState || position != publishedPosition) {
@@ -233,8 +242,12 @@ public final class UsbMediaBridge {
                     // never produce a delayed phone PLAY after the user has paused.
                     case "PLAY": original.onPlay(); claim(); break;
                     case "PAUSE": case "STOP": claimRevision++; route.suspend(); original.onPause(); break;
-                    case "NEXT": original.onNext(); break;
-                    case "PREVIOUS": original.onPrevious(); break;
+                    case "NEXT":
+                        if (original.onNext() && !track.playing()) { original.onPlay(); claim(); }
+                        break;
+                    case "PREVIOUS":
+                        if (original.onPrevious() && !track.playing()) { original.onPlay(); claim(); }
+                        break;
                     case "FAST_FORWARD": original.onForward(); break;
                     case "REWIND": original.onRewind(); break;
                     default: break;

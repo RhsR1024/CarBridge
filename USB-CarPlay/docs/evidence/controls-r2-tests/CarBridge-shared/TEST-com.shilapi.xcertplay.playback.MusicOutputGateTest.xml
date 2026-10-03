@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.playback.MusicOutputGateTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:34.256Z" hostname="DESKTOP-IQJOR7V" time="0.002">
+  <properties/>
+  <testcase name="noStartOrTailRestartAfterLossAndObserverCanBeRemoved" classname="com.shilapi.xcertplay.playback.MusicOutputGateTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

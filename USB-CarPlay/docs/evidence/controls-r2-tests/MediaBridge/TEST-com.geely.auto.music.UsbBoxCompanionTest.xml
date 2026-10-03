@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.geely.auto.music.UsbBoxCompanionTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-03T13:04:37" hostname="DESKTOP-IQJOR7V" time="0.37">
+  <properties/>
+  <testcase name="directExcludesUsbInputAndDrainKeepsUsbIdentity" classname="com.geely.auto.music.UsbBoxCompanionTest" time="0.042"/>
+  <testcase name="originalUsbSignatureIsScopedToExactPackageAndUid" classname="com.geely.auto.music.UsbBoxCompanionTest" time="0.032"/>
+  <testcase name="usbConnectionFeedbackKeepsTheActualSourceAndBlocksDisconnectedControls" classname="com.geely.auto.music.UsbBoxCompanionTest" time="0.028"/>
+  <testcase name="usbUnknownDurationAllowsStrictSearchButNeverAnEmptyOrShiftedIdentity" classname="com.geely.auto.music.UsbBoxCompanionTest" time="0.027"/>
+  <testcase name="usbCloseAllowsCarBridgeToNegotiateWithoutAnyPhoneCommand" classname="com.geely.auto.music.UsbBoxCompanionTest" time="0.029"/>
+  <testcase name="bridgeHandoverAllowsOnlyUsbCommandsAndCloseRevokesIt" classname="com.geely.auto.music.UsbBoxCompanionTest" time="0.025"/>
+  <testcase name="uncertainPreviousOutputDoesNotGrantUsbDirectOwnership" classname="com.geely.auto.music.UsbBoxCompanionTest" time="0.022"/>
+  <testcase name="routeChangesAndDisconnectNeverSynthesizeUsbTransportCommands" classname="com.geely.auto.music.UsbBoxCompanionTest" time="0.164"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

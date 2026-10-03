@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.orchestration.ManualHotspotConfigTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:34.228Z" hostname="DESKTOP-IQJOR7V" time="0.008">
+  <properties/>
+  <testcase name="wirelessSessionAcceptsACompleteManualHotspot" classname="com.shilapi.xcertplay.orchestration.ManualHotspotConfigTest" time="0.005"/>
+  <testcase name="wiredSessionIgnoresAnUnfinishedManualHotspot" classname="com.shilapi.xcertplay.orchestration.ManualHotspotConfigTest" time="0.0"/>
+  <testcase name="wirelessSessionStillRequiresTheManualHotspotName" classname="com.shilapi.xcertplay.orchestration.ManualHotspotConfigTest" time="0.0"/>
+  <testcase name="explicitBandRejectsChannelsFromTheOtherBand" classname="com.shilapi.xcertplay.orchestration.ManualHotspotConfigTest" time="0.001"/>
+  <testcase name="autoBandAcceptsBoth2GhzAnd5GhzChannels" classname="com.shilapi.xcertplay.orchestration.ManualHotspotConfigTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

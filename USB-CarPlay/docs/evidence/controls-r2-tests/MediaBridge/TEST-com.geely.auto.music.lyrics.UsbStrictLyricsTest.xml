@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.geely.auto.music.lyrics.UsbStrictLyricsTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-03T13:04:40" hostname="DESKTOP-IQJOR7V" time="0.036">
+  <properties/>
+  <testcase name="lyricsWithoutDurationAllowSameIdentityVersionsButNeverAnotherSong" classname="com.geely.auto.music.lyrics.UsbStrictLyricsTest" time="0.019"/>
+  <testcase name="unknownTimeRequiresUniqueExactSongAndArtistAndPreservesVersionNames" classname="com.geely.auto.music.lyrics.UsbStrictLyricsTest" time="0.017"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

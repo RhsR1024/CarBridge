@@ -1,5 +1,7 @@
+8b8234e13295bcfae52adb5d5c22590bf5a5251a5911160df84784bade162b3b  CarPlay-USBBox-Slim-Controls-R2.apk
 9c7524393e2a894abd6df0bf4779ae9fdade8fa326fec6244036b41af2bf7a3f  CarPlay-USBBox-Slim-MediaModes-MetadataFix.apk
 fcfed40a8934f67c5ec8d694b805aad9cafc88b9080f4690edf67a8726de3c6a  CarPlay-USBBox-Slim-MediaModes.apk
 5a7ddcb8130645c6d4a98721b7becb46b3dcc5263f92b3f62cb826e557df01d0  CarPlay-USBBox-Slim-MediaOptions.apk
 841830637ac720e19bbb93c1aeb951c2eea910b9e319018fdc0a62bb875d08d3  MediaBridge-2.3.11-usb-metadata-26100304.apk
+46e5b1a049a25eefcd71583c755548cef28d8468dc4566d32e6b14957f84bac9  MediaBridge-2.3.12-carplay-controls-26100305.apk
 78653d8271b45505997e0eae4588ce9b743c21caebc08a641ffba02a185e34c7  MediaBridge-2.3.9-usbbox.apk

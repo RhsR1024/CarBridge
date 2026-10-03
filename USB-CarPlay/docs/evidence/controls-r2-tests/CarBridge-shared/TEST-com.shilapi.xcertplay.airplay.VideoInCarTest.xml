@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.airplay.VideoInCarTest" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:28.354Z" hostname="DESKTOP-IQJOR7V" time="0.012">
+  <properties/>
+  <testcase name="seekTargetIsACmTime" classname="com.shilapi.xcertplay.airplay.VideoInCarTest" time="0.0"/>
+  <testcase name="teardownOfAVideoDataStreamKeepsTheIapTunnel" classname="com.shilapi.xcertplay.airplay.VideoInCarTest" time="0.002"/>
+  <testcase name="appSchemesOnlyWhenTheIphoneLoadsThem" classname="com.shilapi.xcertplay.airplay.VideoInCarTest" time="0.001"/>
+  <testcase name="setupEnablesVideoOnlyWhenConfiguredAndProposed" classname="com.shilapi.xcertplay.airplay.VideoInCarTest" time="0.0"/>
+  <testcase name="parsesSafariAndAppleTvItems" classname="com.shilapi.xcertplay.airplay.VideoInCarTest" time="0.001"/>
+  <testcase name="wheelPauseIsAPlaybackStateNotification" classname="com.shilapi.xcertplay.airplay.VideoInCarTest" time="0.0"/>
+  <testcase name="everyReplyEncodesAsABinaryPlist" classname="com.shilapi.xcertplay.airplay.VideoInCarTest" time="0.003"/>
+  <testcase name="playbackInfoAnswersInTheWebAppFormat" classname="com.shilapi.xcertplay.airplay.VideoInCarTest" time="0.001"/>
+  <testcase name="anItemThatCannotPlayIsReportedAsAppleReceiversDo" classname="com.shilapi.xcertplay.airplay.VideoInCarTest" time="0.0"/>
+  <testcase name="featuresExAddsTheWebAppBitsToTheLegacyFeatures" classname="com.shilapi.xcertplay.airplay.VideoInCarTest" time="0.001"/>
+  <testcase name="videoPlaybackInfoIsDeclaredOnlyWhenEnabled" classname="com.shilapi.xcertplay.airplay.VideoInCarTest" time="0.001"/>
+  <testcase name="propertiesThePlayerCannotReportAreNull" classname="com.shilapi.xcertplay.airplay.VideoInCarTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

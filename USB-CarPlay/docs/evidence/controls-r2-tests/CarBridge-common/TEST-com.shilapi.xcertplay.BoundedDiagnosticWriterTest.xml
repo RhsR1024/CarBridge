@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.BoundedDiagnosticWriterTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:56:12.706Z" hostname="DESKTOP-IQJOR7V" time="0.244">
+  <properties/>
+  <testcase name="aBlockedWriterCannotBlockEnqueueAndOnlyTheLatest64PendingEntriesSurvive" classname="com.shilapi.xcertplay.BoundedDiagnosticWriterTest" time="0.24"/>
+  <testcase name="aCallbackFailureDoesNotStopDrainingAndCloseNeverWaitsForDisk" classname="com.shilapi.xcertplay.BoundedDiagnosticWriterTest" time="0.004"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

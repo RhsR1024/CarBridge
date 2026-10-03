@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 /** Separate preferences and a settings-only entry; never changes original USB settings. */
 public final class BridgeSettings {
+    static final String BUILD = "2026.10.03-r2";
     private static final String[] MODES = {"AUTO", "DIRECT", "BRIDGE"};
     private static final String[] LABELS = {"自动", "F25 直连", "MediaBridge 桥接"};
     private BridgeSettings() {}
@@ -31,25 +32,67 @@ public final class BridgeSettings {
     static boolean onlineResources(Context c) {
         return c.getSharedPreferences("usb_media_route_v1", 0).getBoolean("online_resources", false);
     }
+    // Resource ID is verified against the fixed original APK, absent from the isolated test R class.
+    @android.annotation.SuppressLint("ResourceType")
     public static View wrap(View original) {
-        if (original == null || original.getParent() != null || android.os.Build.VERSION.SDK_INT < 28) return original;
+        if (original == null || android.os.Build.VERSION.SDK_INT < 28) return original;
         try {
             Context c = original.getContext();
-            LinearLayout root = new LinearLayout(c);
-            root.setOrientation(LinearLayout.VERTICAL);
-            TextView entry = new TextView(c);
-            entry.setTextColor(Color.WHITE); entry.setBackgroundColor(0xff263544);
-            entry.setTextSize(16); entry.setGravity(Gravity.CENTER_VERTICAL);
-            int padding = (int)(16 * c.getResources().getDisplayMetrics().density + .5f);
-            entry.setPadding(padding, 0, padding, 0);
-            Runnable refresh = () -> entry.setText("媒体接入：" + label(mode(c)) + "  ›");
+            // Fixed baseline's actual settings ScrollView. Preserve its toolbar, root and bindings.
+            View scroll = original.findViewById(0x7f090204);
+            if (!(scroll instanceof android.widget.ScrollView)) return original;
+            View list = ((android.widget.ScrollView)scroll).getChildAt(0);
+            if (!(list instanceof LinearLayout) || list.findViewWithTag("usb-media-options-v2") != null) return original;
+            LinearLayout entries = new LinearLayout(c); entries.setOrientation(LinearLayout.VERTICAL);
+            entries.setTag("usb-media-options-v2");
+            TextView mode = row(entries, "媒体接入");
+            TextView format = row(entries, "缺失歌手时的标题格式");
+            TextView online = row(entries, "直连在线封面与歌词");
+            Runnable refresh = () -> {
+                mode.setText(label(mode(c)) + "  ›");
+                format.setText(CombinedTitleMetadata.LABELS[CombinedTitleMetadata.index(titleFormat(c))] + "  ›");
+                online.setText((onlineResources(c) ? "已开启" : "已关闭") + "  ›");
+            };
             refresh.run();
-            entry.setOnClickListener(v -> show(c, refresh));
-            root.addView(entry, new LinearLayout.LayoutParams(-1,
-                    (int)(52 * c.getResources().getDisplayMetrics().density + .5f)));
-            root.addView(original, new LinearLayout.LayoutParams(-1, 0, 1));
-            return root;
+            ((View)mode.getParent()).setOnClickListener(v -> show(c, refresh));
+            ((View)format.getParent()).setOnClickListener(v -> showTitleFormat(c, refresh));
+            ((View)online.getParent()).setOnClickListener(v -> new AlertDialog.Builder(c)
+                    .setTitle("直连在线封面与歌词")
+                    .setSingleChoiceItems(new String[]{"关闭（仍使用原生内容和缓存）", "开启（需要车机联网）"}, onlineResources(c) ? 1 : 0, (dialog, which) -> {
+                        c.getSharedPreferences("usb_media_route_v1", 0).edit().putBoolean("online_resources", which == 1).apply();
+                        UsbMediaBridge.resourcesChanged(); refresh.run(); dialog.dismiss();
+                    }).setPositiveButton("关闭", null).show());
+            ((LinearLayout)list).addView(entries, 0, new LinearLayout.LayoutParams(-1, -2));
+            return original;
         } catch (RuntimeException error) { return original; }
+    }
+    private static int style(Context c, int id) {
+        try { c.getResources().getResourceTypeName(id); return id; }
+        catch (android.content.res.Resources.NotFoundException missing) { return 0; }
+    }
+    private static TextView row(LinearLayout entries, String title) {
+        Context c = entries.getContext();
+        LinearLayout line = new LinearLayout(c, null, 0, style(c, 0x7f100166));
+        line.setOrientation(LinearLayout.HORIZONTAL); line.setGravity(Gravity.CENTER_VERTICAL);
+        int height = (int)(50 * c.getResources().getDisplayMetrics().density + .5f);
+        android.content.res.TypedArray attrs = c.obtainStyledAttributes(style(c, 0x7f100166), new int[]{android.R.attr.layout_height});
+        line.setMinimumHeight(attrs.getLayoutDimension(0, height)); attrs.recycle();
+        TextView label = new TextView(c, null, 0, style(c, 0x7f10016c));
+        label.setBackground(null); label.setText(title); label.setGravity(Gravity.CENTER_VERTICAL);
+        TextView value = new TextView(c, null, 0, style(c, 0x7f10016d));
+        value.setBackground(null); value.setGravity(Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+        value.setMaxLines(2);
+        line.addView(label, new LinearLayout.LayoutParams(0, -2, 1.1f));
+        line.addView(value, new LinearLayout.LayoutParams(0, -2, 1f));
+        entries.addView(line, new LinearLayout.LayoutParams(-1, -2));
+        return value;
+    }
+    private static void showTitleFormat(Context c, Runnable refresh) {
+        new AlertDialog.Builder(c).setTitle("缺失歌手时的标题格式")
+                .setSingleChoiceItems(CombinedTitleMetadata.LABELS, CombinedTitleMetadata.index(titleFormat(c)), (dialog, which) -> {
+                    c.getSharedPreferences("usb_media_route_v1", 0).edit().putString("combined_title_format", CombinedTitleMetadata.FORMATS[which]).apply();
+                    UsbMediaBridge.titleFormatChanged(); refresh.run(); dialog.dismiss();
+                }).setPositiveButton("关闭", null).show();
     }
     private static String label(String value) {
         for (int i=0; i<MODES.length; i++) if (MODES[i].equals(value)) return LABELS[i];
@@ -64,9 +107,8 @@ public final class BridgeSettings {
                 UsbMediaBridge.refresh(); refresh.run(); dialog.dismiss();
             })
             .setPositiveButton("关闭", null)
-            .setNegativeButton("媒体选项", (dialog, which) -> showMediaOptions(c))
             .setNeutralButton("接入状态", (d, w) -> new AlertDialog.Builder(c)
-                .setTitle("媒体接入状态").setMessage(UsbMediaBridge.status()
+                .setTitle("媒体接入状态").setMessage("USB 媒体增强版 " + BUILD + "\n" + UsbMediaBridge.status()
                     + "\n\n自动：未安装 MediaBridge、关闭桥接或忽略 CarPlay 时使用 F25 直连；桥接已启用时等待 MediaBridge 就绪。"
                     + "\n\n切换只调整车机媒体通道。歌曲信息来自手机经 USB 盒子上报。")
                 .setPositiveButton("关闭", null)
@@ -75,36 +117,5 @@ public final class BridgeSettings {
                     if (launch == null) launch = c.getPackageManager().getLaunchIntentForPackage("com.mediabridge.app.dev");
                     if (launch != null) c.startActivity(launch);
                 }).show()).show();
-    }
-    private static void showMediaOptions(Context c) {
-        LinearLayout body = new LinearLayout(c); body.setOrientation(LinearLayout.VERTICAL);
-        int pad = (int)(16 * c.getResources().getDisplayMetrics().density + .5f);
-        body.setPadding(pad, pad, pad, pad);
-        android.widget.Button format = new android.widget.Button(c);
-        Runnable label = () -> format.setText("缺失歌手时的标题格式\n" + CombinedTitleMetadata.LABELS[CombinedTitleMetadata.index(titleFormat(c))]);
-        label.run();
-        format.setOnClickListener(view -> new AlertDialog.Builder(c).setTitle("缺失歌手时的标题格式")
-                .setSingleChoiceItems(CombinedTitleMetadata.LABELS, CombinedTitleMetadata.index(titleFormat(c)), (dialog, which) -> {
-                    c.getSharedPreferences("usb_media_route_v1", 0).edit().putString("combined_title_format", CombinedTitleMetadata.FORMATS[which]).apply();
-                    label.run(); dialog.dismiss();
-                    android.widget.Toast.makeText(c, "重新连接手机后生效", android.widget.Toast.LENGTH_SHORT).show();
-                }).setPositiveButton("关闭", null).show());
-        body.addView(format, new LinearLayout.LayoutParams(-1, -2));
-        TextView hint = new TextView(c);
-        hint.setText("仅歌手为空且标题使用带空格的横线分为两段时拆分。已有歌手保持原样；例如“周铁男 - 三国杀”选“歌手 - 歌曲名”。重新连接手机后生效。");
-        body.addView(hint, new LinearLayout.LayoutParams(-1, -2));
-        android.widget.Switch online = new android.widget.Switch(c);
-        online.setText("直连在线封面与歌词"); online.setPadding(0, pad, 0, pad);
-        online.setChecked(onlineResources(c));
-        online.setOnCheckedChangeListener((button, enabled) -> {
-            c.getSharedPreferences("usb_media_route_v1", 0).edit().putBoolean("online_resources", enabled).apply();
-            UsbMediaBridge.resourcesChanged();
-        });
-        body.addView(online, new LinearLayout.LayoutParams(-1, -2));
-        TextView help = new TextView(c);
-        help.setText("开启后，直连时向资源服务发送歌名、歌手和时长查找封面与歌词，需要车机联网。关闭后仍可用原生内容和缓存。桥接使用 MediaBridge 的资源设置。");
-        body.addView(help, new LinearLayout.LayoutParams(-1, -2));
-        android.widget.ScrollView scroll = new android.widget.ScrollView(c); scroll.addView(body);
-        new AlertDialog.Builder(c).setTitle("媒体选项").setView(scroll).setPositiveButton("关闭", null).show();
     }
 }

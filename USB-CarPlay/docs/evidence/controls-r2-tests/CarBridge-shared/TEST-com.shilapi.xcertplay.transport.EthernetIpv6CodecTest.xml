@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.transport.EthernetIpv6CodecTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:34.609Z" hostname="DESKTOP-IQJOR7V" time="0.002">
+  <properties/>
+  <testcase name="maps IPv6 multicast destination to Ethernet multicast" classname="com.shilapi.xcertplay.transport.EthernetIpv6CodecTest" time="0.001"/>
+  <testcase name="does not map IPv6 unicast destination" classname="com.shilapi.xcertplay.transport.EthernetIpv6CodecTest" time="0.0"/>
+  <testcase name="adds target link layer option to tun neighbor advertisement" classname="com.shilapi.xcertplay.transport.EthernetIpv6CodecTest" time="0.001"/>
+  <testcase name="rejects truncated or non IPv6 packets" classname="com.shilapi.xcertplay.transport.EthernetIpv6CodecTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

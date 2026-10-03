@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.media.VideoDecodeQueueTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:33.377Z" hostname="DESKTOP-IQJOR7V" time="0.009">
+  <properties/>
+  <testcase name="byteBudgetAlsoTriggersRecoveryAndRejectsOversizedFrame" classname="com.shilapi.xcertplay.media.VideoDecodeQueueTest" time="0.003"/>
+  <testcase name="stalledDecoderHasFiniteWaitAndShutdownCancelsImmediately" classname="com.shilapi.xcertplay.media.VideoDecodeQueueTest" time="0.003"/>
+  <testcase name="overflowPreservesConfigurationAndResetsBeforeNewReferenceChain" classname="com.shilapi.xcertplay.media.VideoDecodeQueueTest" time="0.001"/>
+  <testcase name="lostReferenceChainWaitsForSuccessfullyQueuedKeyframe" classname="com.shilapi.xcertplay.media.VideoDecodeQueueTest" time="0.001"/>
+  <testcase name="fullOutputMustBeDrainedWhileRetryingTheSameInput" classname="com.shilapi.xcertplay.media.VideoDecodeQueueTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.hud.BydClusterSongTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:29.884Z" hostname="DESKTOP-IQJOR7V" time="0.014">
+  <properties/>
+  <testcase name="clearedTitlesForgetThePreviousSongUntilANewTitleArrives" classname="com.shilapi.xcertplay.hud.BydClusterSongTest" time="0.002"/>
+  <testcase name="followsTitleArtistAndPlaybackStatus" classname="com.shilapi.xcertplay.hud.BydClusterSongTest" time="0.003"/>
+  <testcase name="nothingWithoutATitleOrForOtherMessages" classname="com.shilapi.xcertplay.hud.BydClusterSongTest" time="0.002"/>
+  <testcase name="textFitsTheDashboard" classname="com.shilapi.xcertplay.hud.BydClusterSongTest" time="0.007"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.hud.BydStandaloneSessionTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:29.977Z" hostname="DESKTOP-IQJOR7V" time="0.013">
+  <properties/>
+  <testcase name="failedGuidanceAfterStartSendsEndAndNextUpdateStartsAgain" classname="com.shilapi.xcertplay.hud.BydStandaloneSessionTest" time="0.004"/>
+  <testcase name="startsOnceUpdatesTurnAndClearsOnRouteEnd" classname="com.shilapi.xcertplay.hud.BydStandaloneSessionTest" time="0.002"/>
+  <testcase name="fixedWireVectorsAndRoundaboutMapping" classname="com.shilapi.xcertplay.hud.BydStandaloneSessionTest" time="0.001"/>
+  <testcase name="failedEndIsRetriedBeforeAnyNewGuidance" classname="com.shilapi.xcertplay.hud.BydStandaloneSessionTest" time="0.001"/>
+  <testcase name="unchangedGuidanceIsRateLimitedButKeptAlive" classname="com.shilapi.xcertplay.hud.BydStandaloneSessionTest" time="0.002"/>
+  <testcase name="invalidDistanceEndsGuidance" classname="com.shilapi.xcertplay.hud.BydStandaloneSessionTest" time="0.001"/>
+  <testcase name="interruptedSessionClearsBeforeItStartsAnotherRoute" classname="com.shilapi.xcertplay.hud.BydStandaloneSessionTest" time="0.0"/>
+  <testcase name="unknownManeuverEndsGuidanceInsteadOfInventingStraight" classname="com.shilapi.xcertplay.hud.BydStandaloneSessionTest" time="0.0"/>
+  <testcase name="cannotStartIfRecoveryJournalCannotBeSaved" classname="com.shilapi.xcertplay.hud.BydStandaloneSessionTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

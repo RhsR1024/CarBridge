@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.hud.BydBatteryTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:28.691Z" hostname="DESKTOP-IQJOR7V" time="0.013">
+  <properties/>
+  <testcase name="noAdbAccessGivesNoReading" classname="com.shilapi.xcertplay.hud.BydBatteryTest" time="0.002"/>
+  <testcase name="aMissingOrRejectedValueGivesNoReading" classname="com.shilapi.xcertplay.hud.BydBatteryTest" time="0.004"/>
+  <testcase name="readsVerifiedCanCommandsWithoutProbingUnverifiedEnergy" classname="com.shilapi.xcertplay.hud.BydBatteryTest" time="0.002"/>
+  <testcase name="invalidCanValuesGiveNoReading" classname="com.shilapi.xcertplay.hud.BydBatteryTest" time="0.001"/>
+  <testcase name="detectsProtocolBeforeEveryCanfdSample" classname="com.shilapi.xcertplay.hud.BydBatteryTest" time="0.001"/>
+  <testcase name="readsTheCarsReplies" classname="com.shilapi.xcertplay.hud.BydBatteryTest" time="0.001"/>
+  <testcase name="theIphoneGetsWattHoursAndAWarningAtTheThreshold" classname="com.shilapi.xcertplay.hud.BydBatteryTest" time="0.0"/>
+  <testcase name="missingOrUnknownProtocolNeverFallsBackToCanfd" classname="com.shilapi.xcertplay.hud.BydBatteryTest" time="0.001"/>
+  <testcase name="aLowChargeKeepsTheEarlierFullChargeEstimate" classname="com.shilapi.xcertplay.hud.BydBatteryTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

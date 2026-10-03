@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.geely.auto.music.AndroidRegressionTest" tests="50" skipped="0" failures="0" errors="0" timestamp="2026-10-03T13:04:27" hostname="DESKTOP-IQJOR7V" time="5.404">
+  <properties/>
+  <testcase name="v3PreservesSmallPlayerArtworkWithoutUpscaling" classname="com.geely.auto.music.AndroidRegressionTest" time="2.665"/>
+  <testcase name="vehicleControlsReachAPlayerWithNoAdvertisedActions" classname="com.geely.auto.music.AndroidRegressionTest" time="0.295"/>
+  <testcase name="sodaKeepsItsOriginalArtworkWhenSmartAdaptationIsEnabled" classname="com.geely.auto.music.AndroidRegressionTest" time="0.085"/>
+  <testcase name="sameTrackDoesNotDowngradeToASmallerArtworkCandidate" classname="com.geely.auto.music.AndroidRegressionTest" time="0.048"/>
+  <testcase name="legacyPlaybackDedupIgnoresProgressButTracksVisibleState" classname="com.geely.auto.music.AndroidRegressionTest" time="0.038"/>
+  <testcase name="diagnosticsCanExportToPublicDownloadsWithoutPickerOnApi28" classname="com.geely.auto.music.AndroidRegressionTest" time="0.043"/>
+  <testcase name="embeddedArtworkIsPresentInTheFirstPublishedSnapshot" classname="com.geely.auto.music.AndroidRegressionTest" time="0.047"/>
+  <testcase name="refreshPreservesVehicleRomListenerWakeup" classname="com.geely.auto.music.AndroidRegressionTest" time="0.046"/>
+  <testcase name="onlineUpgradeRestoresOriginalDefaultButPreservesAnExplicitOptOut" classname="com.geely.auto.music.AndroidRegressionTest" time="0.067"/>
+  <testcase name="embeddedTrackArtworkIsUsedWhenPlayerHasNoUri" classname="com.geely.auto.music.AndroidRegressionTest" time="0.053"/>
+  <testcase name="nonBitmapNotificationArtworkCanBeRendered" classname="com.geely.auto.music.AndroidRegressionTest" time="0.085"/>
+  <testcase name="vehicleFavoriteControlRemainsVisibleWhileStatusIsUnknownOrPending" classname="com.geely.auto.music.AndroidRegressionTest" time="0.045"/>
+  <testcase name="unreadablePlayerArtworkUriIsPreservedDuringTransitionLikeV3" classname="com.geely.auto.music.AndroidRegressionTest" time="0.046"/>
+  <testcase name="compatibilityControlsStillRejectStaleAndUnauthenticatedRequests" classname="com.geely.auto.music.AndroidRegressionTest" time="0.05"/>
+  <testcase name="artworkSaveRejectsARepositoryGenerationInvalidatedByClearCache" classname="com.geely.auto.music.AndroidRegressionTest" time="0.032"/>
+  <testcase name="diagnosticsExportReadsPreviousProcessFilesAndExceptions" classname="com.geely.auto.music.AndroidRegressionTest" time="0.051"/>
+  <testcase name="listenerDisconnectInvalidatesSourceController" classname="com.geely.auto.music.AndroidRegressionTest" time="0.036"/>
+  <testcase name="favoriteOldTrackRequestAndPendingTargetDoNotAffectNextSong" classname="com.geely.auto.music.AndroidRegressionTest" time="0.047"/>
+  <testcase name="artworkProviderRejectsTraversal" classname="com.geely.auto.music.AndroidRegressionTest" time="0.062"/>
+  <testcase name="localArtworkIsReadyForTheFirstVehicleSnapshotAndTracksSourceChanges" classname="com.geely.auto.music.AndroidRegressionTest" time="0.059"/>
+  <testcase name="favoriteCanConfirmAfterSameSongMetadataIdentityChanges" classname="com.geely.auto.music.AndroidRegressionTest" time="0.057"/>
+  <testcase name="trackArtWinsOverAlbumArtLikeFlymeV3" classname="com.geely.auto.music.AndroidRegressionTest" time="0.044"/>
+  <testcase name="controlsDoNotStartNotificationListenerBeforeSystemBind" classname="com.geely.auto.music.AndroidRegressionTest" time="0.052"/>
+  <testcase name="artworkFileNameMatchesTheKnownGood18Format" classname="com.geely.auto.music.AndroidRegressionTest" time="0.045"/>
+  <testcase name="repeatingDesiredFavoriteAndUnknownCapabilitiesDoNotWrite" classname="com.geely.auto.music.AndroidRegressionTest" time="0.047"/>
+  <testcase name="roundArtworkAdaptationDefaultsOnAndCanBeDisabled" classname="com.geely.auto.music.AndroidRegressionTest" time="0.035"/>
+  <testcase name="kugouAndKuwoKeepAlbumUriAndBitmapAsOneCompleteCoverCandidate" classname="com.geely.auto.music.AndroidRegressionTest" time="0.032"/>
+  <testcase name="yandexAndZvukUseOnlyVerifiedStateAndDirectionalOrKnownToggleActions" classname="com.geely.auto.music.AndroidRegressionTest" time="0.03"/>
+  <testcase name="connectedCallbackWinsOverLaggingSecureSettingsState" classname="com.geely.auto.music.AndroidRegressionTest" time="0.039"/>
+  <testcase name="iouProbeIntentRequiresInternalAuthentication" classname="com.geely.auto.music.AndroidRegressionTest" time="0.034"/>
+  <testcase name="smartArtworkOnlyAdaptsKugouAndOnlyLooksUpItsEmbeddedOnlyCover" classname="com.geely.auto.music.AndroidRegressionTest" time="0.029"/>
+  <testcase name="usableEmbeddedBitmapIsCachedBeforePassingThroughRemoteUri" classname="com.geely.auto.music.AndroidRegressionTest" time="0.044"/>
+  <testcase name="phoneDebugMaterializesRemoteArtworkThatImageViewCannotRenderDirectly" classname="com.geely.auto.music.AndroidRegressionTest" time="0.089"/>
+  <testcase name="fixedPlayerSelectionRemainsStableAcrossOneHundredSessionOrderChanges" classname="com.geely.auto.music.AndroidRegressionTest" time="0.04"/>
+  <testcase name="favoriteWaitsForSourceFeedbackAndReportsNoConfirmation" classname="com.geely.auto.music.AndroidRegressionTest" time="0.059"/>
+  <testcase name="settingsMigrationPreservesSeparateChannelTunesAndOldKeys" classname="com.geely.auto.music.AndroidRegressionTest" time="0.043"/>
+  <testcase name="lowResolutionBitmapDoesNotReplaceAFullSizeRemoteCover" classname="com.geely.auto.music.AndroidRegressionTest" time="0.032"/>
+  <testcase name="legacyClientKeepsTheV3PlaybackObjectIdentity" classname="com.geely.auto.music.AndroidRegressionTest" time="0.034"/>
+  <testcase name="completeRemoteCoverBeatsKugouEmbeddedThumbnail" classname="com.geely.auto.music.AndroidRegressionTest" time="0.036"/>
+  <testcase name="artworkUriAndProviderMatchTheKnownGood18Contract" classname="com.geely.auto.music.AndroidRegressionTest" time="0.037"/>
+  <testcase name="lowResolutionBitmapIsStillUsedWhenNoRemoteCoverExists" classname="com.geely.auto.music.AndroidRegressionTest" time="0.033"/>
+  <testcase name="roundArtworkSafeAreaPreservesSizeAndUsesAnOpaqueSoftenedBorder" classname="com.geely.auto.music.AndroidRegressionTest" time="0.077"/>
+  <testcase name="stoppedBridgeDoesNotStartOutputOnEverySnapshot" classname="com.geely.auto.music.AndroidRegressionTest" time="0.079"/>
+  <testcase name="favoriteIgnoreListDefaultsEmptyPersistsAndDoesNotBlockThePlayer" classname="com.geely.auto.music.AndroidRegressionTest" time="0.069"/>
+  <testcase name="embeddedLyricsIgnoreNetworkAndDiscardPostedCallbacksForPreviousTrack" classname="com.geely.auto.music.AndroidRegressionTest" time="0.064"/>
+  <testcase name="v3ArtworkProviderIsExportedForTheFinalVehicleRenderer" classname="com.geely.auto.music.AndroidRegressionTest" time="0.043"/>
+  <testcase name="unadvertisedRatingCanBeTriedButIgnoredPlayersCannotBeRated" classname="com.geely.auto.music.AndroidRegressionTest" time="0.093"/>
+  <testcase name="labelCacheChangesWithVersionAndNeverSurvivesUninstall" classname="com.geely.auto.music.AndroidRegressionTest" time="0.08"/>
+  <testcase name="bootRestoreAndStandardModeAreAlwaysEnabledAfterUpgrade" classname="com.geely.auto.music.AndroidRegressionTest" time="0.048"/>
+  <testcase name="kuwoWaitsBrieflyForItsRemoteOriginalInsteadOfPublishingAThumbnail" classname="com.geely.auto.music.AndroidRegressionTest" time="0.052"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+]]></system-err>
+</testsuite>

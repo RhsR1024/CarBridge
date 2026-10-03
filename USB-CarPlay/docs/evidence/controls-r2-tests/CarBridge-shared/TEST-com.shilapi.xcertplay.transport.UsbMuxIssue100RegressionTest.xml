@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.transport.UsbMuxIssue100RegressionTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:34.797Z" hostname="DESKTOP-IQJOR7V" time="2.602">
+  <properties/>
+  <testcase name="fragmentedAndCoalescedValidFramesRemainIntact" classname="com.shilapi.xcertplay.transport.UsbMuxIssue100RegressionTest" time="2.277"/>
+  <testcase name="paddingWithoutANextFrameTimesOutWithoutDiscardingOrSpinning" classname="com.shilapi.xcertplay.transport.UsbMuxIssue100RegressionTest" time="0.055"/>
+  <testcase name="fullHostHandshakeAndReaderAcceptBothCapturedPaddingReplies" classname="com.shilapi.xcertplay.transport.UsbMuxIssue100RegressionTest" time="0.084"/>
+  <testcase name="capturedVersionAndSynAckPaddingDoNotDesynchronizeTheNextFrame" classname="com.shilapi.xcertplay.transport.UsbMuxIssue100RegressionTest" time="0.014"/>
+  <testcase name="fragmentedPaddedSynAckRetainsOnlyTheObservedExtraBytes" classname="com.shilapi.xcertplay.transport.UsbMuxIssue100RegressionTest" time="0.016"/>
+  <testcase name="ordinaryVersionAndTcpFramesArePreserved" classname="com.shilapi.xcertplay.transport.UsbMuxIssue100RegressionTest" time="0.018"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

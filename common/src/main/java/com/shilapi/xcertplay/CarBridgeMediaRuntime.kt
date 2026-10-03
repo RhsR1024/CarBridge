@@ -119,7 +119,9 @@ internal class CarBridgeMediaRuntime(
         when (actual) {
             Button.PLAY -> act(policy.userPlay())
             Button.PAUSE -> act(policy.pause())
-            Button.NEXT, Button.PREVIOUS -> send(actual)
+            Button.NEXT, Button.PREVIOUS -> {
+                if (send(actual)) act(policy.userSkip())
+            }
         }
     }
 

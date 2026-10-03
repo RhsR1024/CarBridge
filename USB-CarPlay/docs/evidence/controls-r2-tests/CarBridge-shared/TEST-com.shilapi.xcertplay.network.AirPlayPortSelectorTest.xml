@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.network.AirPlayPortSelectorTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:33.998Z" hostname="DESKTOP-IQJOR7V" time="0.014">
+  <properties/>
+  <testcase name="fallsBackWhenAnotherListenerOwnsTheWildcardPort" classname="com.shilapi.xcertplay.network.AirPlayPortSelectorTest" time="0.004"/>
+  <testcase name="fallsBackWhenAnotherListenerOwnsTheSameAddress" classname="com.shilapi.xcertplay.network.AirPlayPortSelectorTest" time="0.001"/>
+  <testcase name="closesFallbackListenerWhenNotificationThrows" classname="com.shilapi.xcertplay.network.AirPlayPortSelectorTest" time="0.003"/>
+  <testcase name="usesEphemeralPortWhenAllCandidatesAreBusy" classname="com.shilapi.xcertplay.network.AirPlayPortSelectorTest" time="0.004"/>
+  <testcase name="bindsPreferredPortWhenFree" classname="com.shilapi.xcertplay.network.AirPlayPortSelectorTest" time="0.001"/>
+  <testcase name="closesEphemeralListenerWhenNotificationThrows" classname="com.shilapi.xcertplay.network.AirPlayPortSelectorTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

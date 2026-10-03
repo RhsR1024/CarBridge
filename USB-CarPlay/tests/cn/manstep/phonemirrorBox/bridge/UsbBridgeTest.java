@@ -182,9 +182,9 @@ public class UsbBridgeTest {
         assertFalse(output.metadata.containsKey(MediaMetadata.METADATA_KEY_DURATION));
         assertEquals(0,output.state.getActions() & PlaybackState.ACTION_SEEK_TO);
         command("PLAY"); command("PAUSE"); command("NEXT"); command("PREVIOUS");
-        assertEquals(Arrays.asList(126,127,87,88),keys);
+        assertEquals(Arrays.asList(126,127,87,126,88,126),keys);
         Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(700));
-        assertEquals(Arrays.asList(126,127,87,88),keys); // no delayed resume from an old grant
+        assertEquals(Arrays.asList(126,127,87,126,88,126),keys); // only the user's skips add PLAY; no delayed grant does
     }
     @Test public void metadataModeChangeYieldAndHeartbeatFailureNeverSendUsbCommands() throws Exception {
         runtime(); metadata("{\"MediaSongName\":\"Song\",\"MediaPlayStatus\":1}");
@@ -201,9 +201,9 @@ public class UsbBridgeTest {
         Bundle b=envelopeForRoute(); b.putString("id","one"); b.putString("command","NEXT");
         receive(COMMAND,b,12002); assertTrue(keys.isEmpty());
         Bundle stale=new Bundle(b); stale.putLong("epoch",-1); receive(COMMAND,stale,12001); assertTrue(keys.isEmpty());
-        receive(COMMAND,b,12001); receive(COMMAND,b,12001); assertEquals(Arrays.asList(87),keys);
+        receive(COMMAND,b,12001); receive(COMMAND,b,12001); assertEquals(Arrays.asList(87,126),keys);
         Bundle oldConnection=new Bundle(b);oldConnection.putString("connection","old");oldConnection.putString("id","two");
-        receive(COMMAND,oldConnection,12001); assertEquals(Arrays.asList(87),keys);
+        receive(COMMAND,oldConnection,12001); assertEquals(Arrays.asList(87,126),keys);
     }
     @Test public void disconnectedMetadataIsDroppedAndReconnectStartsEmpty() throws Exception {
         runtime(); metadata("{\"MediaSongName\":\"Old\",\"MediaPlayStatus\":1}");
@@ -234,10 +234,34 @@ public class UsbBridgeTest {
         receive(PREPARED,rejected,12001);assertFalse(route.ready());assertNull(field(route,"direct"));assertTrue(keys.isEmpty());
     }
     @Test public void settingsRetainsTheExactOriginalViewAndItsChildren() {
-        LinearLayout original=new LinearLayout(context); View child=new View(context); child.setId(7823); original.addView(child);
+        LinearLayout original=new LinearLayout(context); View toolbar=new View(context);original.addView(toolbar);
+        android.widget.ScrollView scroll=new android.widget.ScrollView(context);scroll.setId(0x7f090204);
+        LinearLayout list=new LinearLayout(context);list.setOrientation(LinearLayout.VERTICAL);
+        View child=new View(context); child.setId(7823);list.addView(child);scroll.addView(list);original.addView(scroll);
         View wrapped=BridgeSettings.wrap(original);
-        assertNotSame(original,wrapped); assertSame(child,wrapped.findViewById(7823));
-        assertSame(original,((LinearLayout)wrapped).getChildAt(1));
+        assertSame(original,wrapped); assertSame(child,wrapped.findViewById(7823));
+        assertSame(toolbar,original.getChildAt(0));assertSame(scroll,original.getChildAt(1));
+        assertEquals(2,list.getChildCount());assertEquals(3,((LinearLayout)list.getChildAt(0)).getChildCount());
+        BridgeSettings.wrap(original);assertEquals(2,list.getChildCount());
+    }
+    @Test public void connectionWithoutTrackPublishesControlsButNeverStartsPlayback() throws Exception {
+        runtime(); call(runtime,"publish",new Class<?>[]{});
+        RecordingSession output=org.robolectric.shadow.api.Shadow.extract(session);
+        assertTrue(session.isActive());assertEquals(PlaybackState.STATE_PAUSED,output.state.getState());
+        assertEquals("",output.metadata.getString(MediaMetadata.METADATA_KEY_TITLE));
+        assertEquals("1",output.metadata.getString("usb.media.connection"));assertTrue(keys.isEmpty());
+        command("NEXT");assertEquals(Arrays.asList(87,126),keys);
+        cn.manstep.phonemirrorBox.BoxInterface.f.P=false;command("NEXT");assertEquals(Arrays.asList(87,126),keys);
+    }
+    @Test public void titleFormatChangesDisplayImmediatelyWithoutChangingRawIdentityOrSendingKeys() throws Exception {
+        runtime();metadata("{\"MediaSongName\":\"雷佳 - 人世间\",\"MediaPlayStatus\":2}");
+        TrackState track=(TrackState)field(runtime,"track");String identity=track.mediaId();
+        context.getSharedPreferences("usb_media_route_v1",0).edit().putString("combined_title_format","ARTIST_TITLE").commit();
+        UsbMediaBridge.titleFormatChanged();idle();
+        RecordingSession output=org.robolectric.shadow.api.Shadow.extract(session);
+        assertEquals("人世间",output.metadata.getString(MediaMetadata.METADATA_KEY_TITLE));
+        assertEquals("雷佳",output.metadata.getString(MediaMetadata.METADATA_KEY_ARTIST));
+        assertEquals(identity,track.mediaId());assertEquals("",track.artist);assertTrue(keys.isEmpty());
     }
     private static class FakeApi extends MediaCenterAPI {
         final CountDownLatch registered=new CountDownLatch(1), released=new CountDownLatch(1);

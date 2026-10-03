@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.ClusterMapPresentationTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:56:23.539Z" hostname="DESKTOP-IQJOR7V" time="0.105">
+  <properties/>
+  <testcase name="baseDisplayStillWorksWhenNoSharedLayerExists" classname="com.shilapi.xcertplay.ClusterMapPresentationTest" time="0.046"/>
+  <testcase name="legacyFirmwareKeepsOriginalBaseDisplayPreference" classname="com.shilapi.xcertplay.ClusterMapPresentationTest" time="0.025"/>
+  <testcase name="unrelatedPresentationDisplayIsNotUsedForTheCluster" classname="com.shilapi.xcertplay.ClusterMapPresentationTest" time="0.029"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

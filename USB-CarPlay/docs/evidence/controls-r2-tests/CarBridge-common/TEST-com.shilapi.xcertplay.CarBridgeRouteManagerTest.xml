@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.CarBridgeRouteManagerTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:56:17.221Z" hostname="DESKTOP-IQJOR7V" time="0.466">
+  <properties/>
+  <testcase name="duplicateCommandIdsAreIgnoredButTwoRealPressesSurvive" classname="com.shilapi.xcertplay.CarBridgeRouteManagerTest" time="0.078"/>
+  <testcase name="disconnectedListenerIsExplainedWithoutGrantingPlayback" classname="com.shilapi.xcertplay.CarBridgeRouteManagerTest" time="0.045"/>
+  <testcase name="unknownInstanceAndConnectionCannotCommitRoute" classname="com.shilapi.xcertplay.CarBridgeRouteManagerTest" time="0.046"/>
+  <testcase name="ordinaryPhoneCanUseAndroidAudioWithoutVehicleServices" classname="com.shilapi.xcertplay.CarBridgeRouteManagerTest" time="0.053"/>
+  <testcase name="debugPeerIsDiscoveredAndOldManualConfirmationCannotBypassPairing" classname="com.shilapi.xcertplay.CarBridgeRouteManagerTest" time="0.097"/>
+  <testcase name="handoverWaitsForFenceAndCommitAndRejectsOldReady" classname="com.shilapi.xcertplay.CarBridgeRouteManagerTest" time="0.057"/>
+  <testcase name="olderCompanionWithoutDiagnosticFieldStillWaitsSafely" classname="com.shilapi.xcertplay.CarBridgeRouteManagerTest" time="0.039"/>
+  <testcase name="busyHandshakeWithoutServerIdExplainsTheRealOwnerAndKeepsAudioClosed" classname="com.shilapi.xcertplay.CarBridgeRouteManagerTest" time="0.042"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

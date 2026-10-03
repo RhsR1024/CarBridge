@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.airplay.SafeAreaTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:28.320Z" hostname="DESKTOP-IQJOR7V" time="0.002">
+  <properties/>
+  <testcase name="activityMappingIsScaledIntoNegotiatedDisplaySpace" classname="com.shilapi.xcertplay.airplay.SafeAreaTest" time="0.001"/>
+  <testcase name="alreadyEvenSafeAreaDimensionsAreUnchanged" classname="com.shilapi.xcertplay.airplay.SafeAreaTest" time="0.0"/>
+  <testcase name="defaultEditorUsesQuarterInsetsFromEveryEdge" classname="com.shilapi.xcertplay.airplay.SafeAreaTest" time="0.0"/>
+  <testcase name="editorCanScaleBetweenActivitySizesWithoutChangingRatios" classname="com.shilapi.xcertplay.airplay.SafeAreaTest" time="0.0"/>
+  <testcase name="codecRoundTripsAndRejectsInvalidData" classname="com.shilapi.xcertplay.airplay.SafeAreaTest" time="0.001"/>
+  <testcase name="activity978MapsThroughEvenAlignedDisplayDimensions" classname="com.shilapi.xcertplay.airplay.SafeAreaTest" time="0.0"/>
+  <testcase name="safeAreaDimensionsAreAlignedToEvenPixelsAfterActivityMapping" classname="com.shilapi.xcertplay.airplay.SafeAreaTest" time="0.0"/>
+  <testcase name="missingMappingResolvesToFullDisplay" classname="com.shilapi.xcertplay.airplay.SafeAreaTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

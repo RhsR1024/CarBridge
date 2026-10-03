@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.CarBridgeRotationRestartTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:56:17.031Z" hostname="DESKTOP-IQJOR7V" time="0.182">
+  <properties/>
+  <testcase name="returningToOriginalDirectionCancelsPendingReconnect" classname="com.shilapi.xcertplay.CarBridgeRotationRestartTest" time="0.043"/>
+  <testcase name="disabledSettingOrBackgroundTransitionCannotRestartLater" classname="com.shilapi.xcertplay.CarBridgeRotationRestartTest" time="0.036"/>
+  <testcase name="stableRotationReconnectsOnceAndSameOrientationResizesDoNot" classname="com.shilapi.xcertplay.CarBridgeRotationRestartTest" time="0.034"/>
+  <testcase name="changingSizeRestartsDebounceAndRechecksCurrentCanvas" classname="com.shilapi.xcertplay.CarBridgeRotationRestartTest" time="0.029"/>
+  <testcase name="invalidOrSquareViewportCancelsInsteadOfReconnecting" classname="com.shilapi.xcertplay.CarBridgeRotationRestartTest" time="0.027"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

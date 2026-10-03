@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.DiLink51ClusterLayoutTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:56:23.650Z" hostname="DESKTOP-IQJOR7V" time="0.007">
+  <properties/>
+  <testcase name="fullMapKeepsSpeedAndGearBandsOutsideTheVideoViewport" classname="com.shilapi.xcertplay.DiLink51ClusterLayoutTest" time="0.005"/>
+  <testcase name="mapUsesFullLayerWhileBothOtherThemesUseSideLayer" classname="com.shilapi.xcertplay.DiLink51ClusterLayoutTest" time="0.0"/>
+  <testcase name="oneContinuousStreamSupportsBothViewportsWithoutStretching" classname="com.shilapi.xcertplay.DiLink51ClusterLayoutTest" time="0.0"/>
+  <testcase name="diLink5AndUnknownFirmwareRetainThePrDisplaySelection" classname="com.shilapi.xcertplay.DiLink51ClusterLayoutTest" time="0.001"/>
+  <testcase name="unmeasuredPanelSizesAreNotGivenTheWrongReadoutMask" classname="com.shilapi.xcertplay.DiLink51ClusterLayoutTest" time="0.0"/>
+  <testcase name="missingSideLayerCannotCoverScenarioWithAFullMap" classname="com.shilapi.xcertplay.DiLink51ClusterLayoutTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

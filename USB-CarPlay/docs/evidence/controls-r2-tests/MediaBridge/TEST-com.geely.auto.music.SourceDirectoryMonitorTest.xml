@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.geely.auto.music.SourceDirectoryMonitorTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-03T13:04:36" hostname="DESKTOP-IQJOR7V" time="0.211">
+  <properties/>
+  <testcase name="hungCallNeverOverlapsRetryAndLateSuccessCannotOverwriteTimeout" classname="com.geely.auto.music.SourceDirectoryMonitorTest" time="0.034"/>
+  <testcase name="repairsEntryLostAfterBootAndPreservesNewlyAddedNativeSources" classname="com.geely.auto.music.SourceDirectoryMonitorTest" time="0.023"/>
+  <testcase name="stoppingDuringDirectoryReadPreventsOldConnectionWriting" classname="com.geely.auto.music.SourceDirectoryMonitorTest" time="0.017"/>
+  <testcase name="executorBusyDoesNotStopFutureRegistration" classname="com.geely.auto.music.SourceDirectoryMonitorTest" time="0.017"/>
+  <testcase name="queuedTimeoutCannotWriteLaterAndFreshAttemptRecovers" classname="com.geely.auto.music.SourceDirectoryMonitorTest" time="0.029"/>
+  <testcase name="verifiesAtFifteenSixtyAndThreeHundredSecondsThenEveryFiveMinutesWithoutRewriting" classname="com.geely.auto.music.SourceDirectoryMonitorTest" time="0.019"/>
+  <testcase name="unconfirmedUnavailableAndExceptionAllRetryWithBoundedBackoff" classname="com.geely.auto.music.SourceDirectoryMonitorTest" time="0.021"/>
+  <testcase name="emptyBootDirectoryRecoversAfterMoreThanThreeAttemptsAndNeverOverwritesFactory" classname="com.geely.auto.music.SourceDirectoryMonitorTest" time="0.027"/>
+  <testcase name="stopBeforeStartOrWithQueuedWorkNeverRegistersOrRestarts" classname="com.geely.auto.music.SourceDirectoryMonitorTest" time="0.024"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

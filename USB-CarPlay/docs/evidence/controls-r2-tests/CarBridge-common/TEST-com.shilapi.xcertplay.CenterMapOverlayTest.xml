@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.CenterMapOverlayTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:56:22.078Z" hostname="DESKTOP-IQJOR7V" time="1.45">
+  <properties/>
+  <testcase name="placingSecondFingerWaitsForStableCoordinatesBeforeResizing" classname="com.shilapi.xcertplay.CenterMapOverlayTest" time="0.991"/>
+  <testcase name="squeezingImmediatelyShrinksFromMaximumWithoutLiftingFingers" classname="com.shilapi.xcertplay.CenterMapOverlayTest" time="0.053"/>
+  <testcase name="tapAndSingleFingerDragStillWork" classname="com.shilapi.xcertplay.CenterMapOverlayTest" time="0.056"/>
+  <testcase name="extraFingerDoesNotChangeScaleAndReplacingAFingerStartsFromTheCurrentSize" classname="com.shilapi.xcertplay.CenterMapOverlayTest" time="0.071"/>
+  <testcase name="remainingFingerAfterPinchCannotDragOrTap" classname="com.shilapi.xcertplay.CenterMapOverlayTest" time="0.061"/>
+  <testcase name="aSavedMinimumSizeCanBeEnlargedWithAFreshSmallPinch" classname="com.shilapi.xcertplay.CenterMapOverlayTest" time="0.059"/>
+  <testcase name="smallPinchResizesBelowTheHeadUnitMinimumSpanAndPersistsWithoutOpeningCarPlay" classname="com.shilapi.xcertplay.CenterMapOverlayTest" time="0.041"/>
+  <testcase name="spreadingImmediatelyGrowsFromMinimumWithoutLiftingFingers" classname="com.shilapi.xcertplay.CenterMapOverlayTest" time="0.038"/>
+  <testcase name="pinchRespectsSizeLimitsAndKeepsCardOnScreen" classname="com.shilapi.xcertplay.CenterMapOverlayTest" time="0.036"/>
+  <testcase name="fingerJitterDoesNotResizeOrOpenCarPlay" classname="com.shilapi.xcertplay.CenterMapOverlayTest" time="0.032"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

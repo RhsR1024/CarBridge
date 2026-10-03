@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.media.TelephonyMicrophoneTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:32.821Z" hostname="DESKTOP-IQJOR7V" time="0.553">
+  <properties/>
+  <testcase name="failedRecorderInitializationRestoresThePreviousMode" classname="com.shilapi.xcertplay.media.TelephonyMicrophoneTest" time="0.101"/>
+  <testcase name="diagnosticCallbackFailureDoesNotStopCallCaptureOrChangeModeRestoration" classname="com.shilapi.xcertplay.media.TelephonyMicrophoneTest" time="0.117"/>
+  <testcase name="enableFailureReleasesRejectedEffectsAndContinuesRecording" classname="com.shilapi.xcertplay.media.TelephonyMicrophoneTest" time="0.023"/>
+  <testcase name="speechRecognitionDoesNotChangeModeOrEnableTelephonyEffects" classname="com.shilapi.xcertplay.media.TelephonyMicrophoneTest" time="0.02"/>
+  <testcase name="stoppingAnotherStreamDoesNotRestoreTheCallMode" classname="com.shilapi.xcertplay.media.TelephonyMicrophoneTest" time="0.022"/>
+  <testcase name="microphoneMetadataAndFinalCountersReachTheAudioDiagnosticCallback" classname="com.shilapi.xcertplay.media.TelephonyMicrophoneTest" time="0.04"/>
+  <testcase name="diagnosticCallbackFailureDoesNotStopSpeechRecognitionCapture" classname="com.shilapi.xcertplay.media.TelephonyMicrophoneTest" time="0.022"/>
+  <testcase name="modeFailureDoesNotEscapeTheDownlinkCallback" classname="com.shilapi.xcertplay.media.TelephonyMicrophoneTest" time="0.017"/>
+  <testcase name="duplicateStartDoesNotOverwriteTheOriginalModeOrCreateMoreEffects" classname="com.shilapi.xcertplay.media.TelephonyMicrophoneTest" time="0.026"/>
+  <testcase name="closingTheSinkReleasesEffectsAndRestoresMode" classname="com.shilapi.xcertplay.media.TelephonyMicrophoneTest" time="0.024"/>
+  <testcase name="echoCancelerCreationFailureStillAllowsNoiseSuppressionAndRecording" classname="com.shilapi.xcertplay.media.TelephonyMicrophoneTest" time="0.056"/>
+  <testcase name="unavailableEffectsDoNotPreventRecording" classname="com.shilapi.xcertplay.media.TelephonyMicrophoneTest" time="0.031"/>
+  <testcase name="telephonyEnablesEffectsOnItsRecorderAndRestoresThePreviousMode" classname="com.shilapi.xcertplay.media.TelephonyMicrophoneTest" time="0.025"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

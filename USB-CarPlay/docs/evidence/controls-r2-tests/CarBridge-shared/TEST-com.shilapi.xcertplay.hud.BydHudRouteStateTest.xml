@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.hud.BydHudRouteStateTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:29.912Z" hostname="DESKTOP-IQJOR7V" time="0.058">
+  <properties/>
+  <testcase name="route end clears guidance" classname="com.shilapi.xcertplay.hud.BydHudRouteStateTest" time="0.054"/>
+  <testcase name="silent route expires and fresh update restores cached maneuver" classname="com.shilapi.xcertplay.hud.BydHudRouteStateTest" time="0.001"/>
+  <testcase name="carries after-maneuver road and arrival time" classname="com.shilapi.xcertplay.hud.BydHudRouteStateTest" time="0.001"/>
+  <testcase name="roundabout exit has blank arrow and exit icon" classname="com.shilapi.xcertplay.hud.BydHudRouteStateTest" time="0.0"/>
+  <testcase name="falls back to current road" classname="com.shilapi.xcertplay.hud.BydHudRouteStateTest" time="0.001"/>
+  <testcase name="maps right-hand u-turn" classname="com.shilapi.xcertplay.hud.BydHudRouteStateTest" time="0.0"/>
+  <testcase name="malformed frame does not alter active guidance" classname="com.shilapi.xcertplay.hud.BydHudRouteStateTest" time="0.0"/>
+  <testcase name="clear prevents a keepalive from restoring guidance" classname="com.shilapi.xcertplay.hud.BydHudRouteStateTest" time="0.0"/>
+  <testcase name="brief empty maneuver list keeps guidance and a lasting one hides it without losing maneuvers" classname="com.shilapi.xcertplay.hud.BydHudRouteStateTest" time="0.001"/>
+  <testcase name="combines maneuver and route updates" classname="com.shilapi.xcertplay.hud.BydHudRouteStateTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

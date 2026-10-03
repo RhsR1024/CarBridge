@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.airplay.AirPlayIapTunnelStreamTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:22.902Z" hostname="DESKTOP-IQJOR7V" time="0.408">
+  <properties/>
+  <testcase name="inputConnectionCloseKeepsEventChannelAvailableForOutboundIap" classname="com.shilapi.xcertplay.airplay.AirPlayIapTunnelStreamTest" time="0.402"/>
+  <testcase name="ipv6ListenerAcceptsIpv6Loopback" classname="com.shilapi.xcertplay.airplay.AirPlayIapTunnelStreamTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -24,8 +24,8 @@ python -m venv .venv
 
 ```powershell
 .venv\Scripts\python.exe scripts/build.py
-.venv\Scripts\python.exe scripts/sign_usb.py --output _build/CarPlay-USBBox-Slim-MediaOptions.apk
-.venv\Scripts\python.exe scripts/verify.py _build/CarPlay-USBBox-Slim-MediaOptions.apk
+.venv\Scripts\python.exe scripts/sign_usb.py --output _build/CarPlay-USBBox-Slim-Controls-R2.apk
+.venv\Scripts\python.exe scripts/verify.py _build/CarPlay-USBBox-Slim-Controls-R2.apk
 ```
 
 流程：验证基线哈希 → 编译新增类 → 以原 minSdk 16 进行 D8 转换 → 反汇编指定四类并精准接线 → 合并 DEX → 保留其余全部原 ZIP payload → zipalign → 原签名签署 → 最终 APK 全方法/ABI/资源比对。

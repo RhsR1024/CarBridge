@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.geely.auto.music.CarBridgeMetadataTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-10-03T13:04:34" hostname="DESKTOP-IQJOR7V" time="0.245">
+  <properties/>
+  <testcase name="lyricOnlyUpdatesNeverStartArtworkOrLyricsLookup" classname="com.geely.auto.music.CarBridgeMetadataTest" time="0.033"/>
+  <testcase name="incompleteMetadataStillAllowsNativeArtworkAndTimedLyrics" classname="com.geely.auto.music.CarBridgeMetadataTest" time="0.03"/>
+  <testcase name="coverMatchRejectsWrongFirstResultSingerAndVersion" classname="com.geely.auto.music.CarBridgeMetadataTest" time="0.03"/>
+  <testcase name="carBridgeNotificationCannotBecomeArtistButRealTrackChangesArePublished" classname="com.geely.auto.music.CarBridgeMetadataTest" time="0.049"/>
+  <testcase name="guardedLookupRequiresSongIdentityAndDoesNotChangeOtherPlayers" classname="com.geely.auto.music.CarBridgeMetadataTest" time="0.032"/>
+  <testcase name="unsupportedFavoriteDoesNotReportSuccessOrChangeState" classname="com.geely.auto.music.CarBridgeMetadataTest" time="0.036"/>
+  <testcase name="metadataProbeDoesNotExposeTitlesInRedactedExports" classname="com.geely.auto.music.CarBridgeMetadataTest" time="0.034"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+Intent = Intent { act=com.mediabridge.app.dev.STATE_CHANGED pkg=com.mediabridge.app.dev }; Matching wrappers: []
+]]></system-err>
+</testsuite>

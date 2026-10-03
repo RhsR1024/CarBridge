@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.transport.Ch341I2cStreamEncoderTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:34.589Z" hostname="DESKTOP-IQJOR7V" time="0.018">
+  <properties/>
+  <testcase name="encodesWriteReadWithRepeatedStartAndFinalReadNack" classname="com.shilapi.xcertplay.transport.Ch341I2cStreamEncoderTest" time="0.001"/>
+  <testcase name="encodesMaximumPureReadWithOnlyFinalNackAndStop" classname="com.shilapi.xcertplay.transport.Ch341I2cStreamEncoderTest" time="0.017"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

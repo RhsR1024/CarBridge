@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.CarPlayConnectionDiagnosticLogTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:56:17.725Z" hostname="DESKTOP-IQJOR7V" time="2.73">
+  <properties/>
+  <testcase name="theDiagnosticPrefixDoesNotBypassCredentialRedaction" classname="com.shilapi.xcertplay.CarPlayConnectionDiagnosticLogTest" time="2.514"/>
+  <testcase name="oldTeardownEvidenceSurvivesWithoutAcceptingOtherOldControllerLogs" classname="com.shilapi.xcertplay.CarPlayConnectionDiagnosticLogTest" time="0.064"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

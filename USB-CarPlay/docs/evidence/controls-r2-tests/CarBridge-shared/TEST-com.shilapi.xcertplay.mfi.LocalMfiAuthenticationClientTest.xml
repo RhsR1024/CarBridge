@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.mfi.LocalMfiAuthenticationClientTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:33.391Z" hostname="DESKTOP-IQJOR7V" time="0.301">
+  <properties/>
+  <testcase name="rejectsDifferentPrivateKey" classname="com.shilapi.xcertplay.mfi.LocalMfiAuthenticationClientTest" time="0.187"/>
+  <testcase name="certificateIsReturnedAsIndependentCopyAndSurvivesReload" classname="com.shilapi.xcertplay.mfi.LocalMfiAuthenticationClientTest" time="0.044"/>
+  <testcase name="freshDigestsVerifyWithoutDoubleHashingAndRejectReplay" classname="com.shilapi.xcertplay.mfi.LocalMfiAuthenticationClientTest" time="0.036"/>
+  <testcase name="rejectsIncompleteIdentityAndWrongChallengeLength" classname="com.shilapi.xcertplay.mfi.LocalMfiAuthenticationClientTest" time="0.032"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

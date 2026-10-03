@@ -40,12 +40,12 @@ final class DirectMusicResources {
                 + "|" + online + "|" + !value.artwork.isEmpty() + "|" + !value.lyrics.isEmpty();
         if (key.equals(lastKey)) return;
         cancel(); lastKey = key; final long expected = generation;
-        if (value.id.isEmpty() || value.title.isEmpty() || value.artist.isEmpty() || value.duration <= 0) {
+        if (value.id.isEmpty() || value.title.isEmpty() || value.artist.isEmpty()) {
             Log.i("USBMediaBridge", "Resources skipped=incomplete_metadata online=" + online + " duration=" + value.duration); return;
         }
         task = worker.submit(() -> {
             try {
-                String identity = value.title + "\n" + value.artist + "\n" + value.album + "\n" + value.duration;
+                String identity = "lyrics-v2\n" + value.title + "\n" + value.artist + "\n" + value.album + "\n" + value.duration;
                 String hash = DirectArtworkCache.hash(identity.getBytes(StandardCharsets.UTF_8));
                 File file = new File(directory, hash + ".json"); JSONObject saved = null;
                 if (file.isFile() && file.length() > 0 && file.length() <= 100000) {
@@ -59,7 +59,7 @@ final class DirectMusicResources {
                     if (value.lyrics.isEmpty()) try { lyrics = findLyrics(value); }
                     catch (Exception error) { Log.i("USBMediaBridge", "Resources lyrics unavailable=" + error.getClass().getSimpleName()); }
                     check(expected);
-                    if (value.artwork.isEmpty()) try { artwork = findArtwork(value); }
+                    if (value.artwork.isEmpty() && value.duration > 0) try { artwork = findArtwork(value); }
                     catch (Exception error) { Log.i("USBMediaBridge", "Resources artwork unavailable=" + error.getClass().getSimpleName()); }
                     check(expected);
                     data.put("lyrics", lyrics).put("art", artwork).put("found", !lyrics.isEmpty() || !artwork.isEmpty());
@@ -91,11 +91,39 @@ final class DirectMusicResources {
     }
     private static String bounded(String text) { return text == null || text.equals("null") || text.length() > 65536 ? "" : text; }
     private String findLyrics(DirectSnapshot v) throws Exception {
-        String url = "https://lrclib.net/api/get?track_name=" + query(v.title) + "&artist_name=" + query(v.artist)
-                + "&album_name=" + query(v.album) + "&duration=" + v.duration / 1000;
-        JSONObject json = new JSONObject(new String(downloader.get(url, 100000), StandardCharsets.UTF_8));
-        if (!matches(v.title, json.optString("trackName")) || !matches(v.artist, json.optString("artistName"))
-                || Math.abs(json.optDouble("duration", -100) * 1000 - v.duration) > 3000) return "";
+        for (LyricQuery attempt : LyricQuery.steps(v.title, v.duration)) {
+            if (Thread.currentThread().isInterrupted()) throw new InterruptedIOException();
+            try {
+                String params = "?track_name=" + query(attempt.title) + "&artist_name=" + query(v.artist);
+                JSONArray songs;
+                if (attempt.duration > 0) {
+                    String response = new String(downloader.get("https://lrclib.net/api/get" + params
+                            + "&duration=" + attempt.duration / 1000, 100000), StandardCharsets.UTF_8);
+                    songs = new JSONArray().put(new JSONObject(response));
+                } else songs = new JSONArray(new String(downloader.get("https://lrclib.net/api/search" + params, 512000), StandardCharsets.UTF_8));
+                String content = selectLyrics(songs, attempt.title, v.artist, attempt.duration);
+                if (!content.isEmpty()) {
+                    Log.i("USBMediaBridge", "Lyrics match=" + attempt.stage); return content;
+                }
+            } catch (Exception error) {
+                if (Thread.currentThread().isInterrupted()) throw error;
+                Log.i("USBMediaBridge", "Lyrics stage=" + attempt.stage + " unavailable=" + error.getClass().getSimpleName());
+            }
+        }
+        return "";
+    }
+    static String selectLyrics(JSONArray songs, String title, String artist, long duration) throws Exception {
+        String fallback = "";
+        for (int i = 0; i < songs.length(); i++) {
+            JSONObject song = songs.getJSONObject(i);
+            if (!matches(title, song.optString("trackName")) || !matches(artist, song.optString("artistName"))) continue;
+            String text = lyricText(song); if (text.isEmpty()) continue;
+            if (duration > 0 && Math.abs(song.optDouble("duration", -100) * 1000 - duration) <= 3000) return text;
+            if (fallback.isEmpty()) fallback = text;
+        }
+        return duration > 0 ? "" : fallback;
+    }
+    private static String lyricText(JSONObject json) {
         String synced = bounded(json.optString("syncedLyrics", ""));
         return synced.trim().isEmpty() ? bounded(json.optString("plainLyrics", "")) : synced;
     }

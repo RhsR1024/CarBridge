@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.iap2.Iap2ProtocolTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:30.070Z" hostname="DESKTOP-IQJOR7V" time="0.025">
+  <properties/>
+  <testcase name="wirelessCarPlayAvailabilityUsesBooleanReferenceSemantics" classname="com.shilapi.xcertplay.iap2.Iap2ProtocolTest" time="0.006"/>
+  <testcase name="carPlayStartSessionSupportsReferenceOptionalFields" classname="com.shilapi.xcertplay.iap2.Iap2ProtocolTest" time="0.005"/>
+  <testcase name="catalogRegistersEveryReferenceEndpointOnce" classname="com.shilapi.xcertplay.iap2.Iap2ProtocolTest" time="0.0"/>
+  <testcase name="formatterShowsEndpointNamesFieldsAndNestedGroups" classname="com.shilapi.xcertplay.iap2.Iap2ProtocolTest" time="0.007"/>
+  <testcase name="accessoryWifiConfigurationOmitsOrIncludesOptionalBssid" classname="com.shilapi.xcertplay.iap2.Iap2ProtocolTest" time="0.001"/>
+  <testcase name="orderedParameterListPreservesRepeatedAndUnknownIds" classname="com.shilapi.xcertplay.iap2.Iap2ProtocolTest" time="0.0"/>
+  <testcase name="genericBuilderCanConstructNestedUnmodeledEndpointBody" classname="com.shilapi.xcertplay.iap2.Iap2ProtocolTest" time="0.001"/>
+  <testcase name="framerAcceptsFragmentedAndConcatenatedFrames" classname="com.shilapi.xcertplay.iap2.Iap2ProtocolTest" time="0.002"/>
+  <testcase name="formatterEscapesLineBreaksInNmeaStrings" classname="com.shilapi.xcertplay.iap2.Iap2ProtocolTest" time="0.001"/>
+  <testcase name="formatterFallsBackForMalformedBodies" classname="com.shilapi.xcertplay.iap2.Iap2ProtocolTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

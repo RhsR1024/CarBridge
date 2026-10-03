@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.media.CarPlayVideoLayoutTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:30.290Z" hostname="DESKTOP-IQJOR7V" time="0.002">
+  <properties/>
+  <testcase name="reducedHeightAddsSideBarsWithoutDistortion" classname="com.shilapi.xcertplay.media.CarPlayVideoLayoutTest" time="0.001"/>
+  <testcase name="narrowSurroundViewWindowAddsTopAndBottomBars" classname="com.shilapi.xcertplay.media.CarPlayVideoLayoutTest" time="0.001"/>
+  <testcase name="sameAspectRatioFillsTheWindow" classname="com.shilapi.xcertplay.media.CarPlayVideoLayoutTest" time="0.0"/>
+  <testcase name="returningToTheOriginalWindowRemovesTheBars" classname="com.shilapi.xcertplay.media.CarPlayVideoLayoutTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

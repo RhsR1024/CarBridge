@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.LocalOnlyHotspotManagerTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:56:25.478Z" hostname="DESKTOP-IQJOR7V" time="0.902">
+  <properties/>
+  <testcase name="firmwarePermissionDenialFallsBackWithoutRequestingPrivilege" classname="com.shilapi.xcertplay.LocalOnlyHotspotManagerTest" time="0.388"/>
+  <testcase name="android13RequestsFiveGhzAndClosesLateCustomReservation" classname="com.shilapi.xcertplay.LocalOnlyHotspotManagerTest" time="0.037"/>
+  <testcase name="timedOutStartupStillClosesALateSystemReservation" classname="com.shilapi.xcertplay.LocalOnlyHotspotManagerTest" time="0.419"/>
+  <testcase name="cancelledStartupStillClosesALateSystemReservation" classname="com.shilapi.xcertplay.LocalOnlyHotspotManagerTest" time="0.029"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

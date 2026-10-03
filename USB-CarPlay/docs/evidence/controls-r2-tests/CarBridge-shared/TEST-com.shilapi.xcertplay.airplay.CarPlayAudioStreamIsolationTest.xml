@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.airplay.CarPlayAudioStreamIsolationTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:23.701Z" hostname="DESKTOP-IQJOR7V" time="4.466">
+  <properties/>
+  <testcase name="typeTeardownClosesEveryVariantButKeepsOtherTypes" classname="com.shilapi.xcertplay.airplay.CarPlayAudioStreamIsolationTest" time="3.273"/>
+  <testcase name="guidanceSetupAndMediaReplacementKeepTheOtherAudioStreamAlive" classname="com.shilapi.xcertplay.airplay.CarPlayAudioStreamIsolationTest" time="0.05"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

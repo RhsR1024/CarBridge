@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.NowPlayingArtworkQueueTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:56:26.778Z" hostname="DESKTOP-IQJOR7V" time="0.016">
+  <properties/>
+  <testcase name="teardownDropsQueuedBytesAndUnpublishedImages" classname="com.shilapi.xcertplay.NowPlayingArtworkQueueTest" time="0.008"/>
+  <testcase name="sustainedTransfersKeepOnlyFourPendingPayloadsAndOneWorkerTask" classname="com.shilapi.xcertplay.NowPlayingArtworkQueueTest" time="0.004"/>
+  <testcase name="oversizedPayloadsAreRejectedBeforeDecode" classname="com.shilapi.xcertplay.NowPlayingArtworkQueueTest" time="0.001"/>
+  <testcase name="aNewSessionRejectsOldCallbacksAndInFlightDecodeResults" classname="com.shilapi.xcertplay.NowPlayingArtworkQueueTest" time="0.001"/>
+  <testcase name="transfersArrivingDuringDecodeAlsoKeepOnlyTheLastFour" classname="com.shilapi.xcertplay.NowPlayingArtworkQueueTest" time="0.0"/>
+  <testcase name="repeatedTransferIdsCoalesceBeforeDecodeAndBeforePublication" classname="com.shilapi.xcertplay.NowPlayingArtworkQueueTest" time="0.0"/>
+  <testcase name="aBlockedMainThreadRetainsOnlyFourImagesAndOneDeliveryTask" classname="com.shilapi.xcertplay.NowPlayingArtworkQueueTest" time="0.001"/>
+  <testcase name="emptyArtworkCanClearThePublishedImage" classname="com.shilapi.xcertplay.NowPlayingArtworkQueueTest" time="0.001"/>
+  <testcase name="supersededDecodedImageIsNotPublishedWhileItsReplacementIsQueued" classname="com.shilapi.xcertplay.NowPlayingArtworkQueueTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

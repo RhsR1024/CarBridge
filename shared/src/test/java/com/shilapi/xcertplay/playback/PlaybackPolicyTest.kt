@@ -5,6 +5,20 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class PlaybackPolicyTest {
+    @Test fun explicitSkipWhilePausedCreatesCancellablePlaybackIntent() {
+        val p = ready(); p.phone(Playback.PAUSED)
+        assertEquals(PlaybackAction.REQUEST_PLAYBACK, p.userSkip())
+        val token = p.intent
+        assertFalse(p.canOutput); p.pause()
+        p.vehicleGrant(token, true); p.focusGrant(token)
+        assertFalse(p.canOutput)
+        assertEquals(PlaybackAction.REQUEST_PLAYBACK, p.userSkip())
+        grant(p); p.phone(Playback.PLAYING)
+        assertTrue(p.canOutput)
+        val playingIntent = p.intent
+        assertEquals(PlaybackAction.NONE, p.userSkip()); assertEquals(playingIntent, p.intent)
+        p.disconnect(); assertEquals(PlaybackAction.NONE, p.userSkip())
+    }
     private fun ready() = PlaybackPolicy().apply { connect(true); route(true) }
     private fun grant(p: PlaybackPolicy) {
         p.vehicleGrant(p.intent, true); p.focusGrant(p.intent)

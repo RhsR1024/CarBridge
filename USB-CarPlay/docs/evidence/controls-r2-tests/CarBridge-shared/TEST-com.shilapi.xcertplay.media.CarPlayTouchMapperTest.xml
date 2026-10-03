@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.media.CarPlayTouchMapperTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:30.152Z" hostname="DESKTOP-IQJOR7V" time="0.137">
+  <properties/>
+  <testcase name="cancelInABarReleasesTheContact" classname="com.shilapi.xcertplay.media.CarPlayTouchMapperTest" time="0.061"/>
+  <testcase name="contentCornersMapToCanvasCorners" classname="com.shilapi.xcertplay.media.CarPlayTouchMapperTest" time="0.017"/>
+  <testcase name="centreRemainsCentred" classname="com.shilapi.xcertplay.media.CarPlayTouchMapperTest" time="0.02"/>
+  <testcase name="dragIntoABarClampsToTheCanvasEdge" classname="com.shilapi.xcertplay.media.CarPlayTouchMapperTest" time="0.017"/>
+  <testcase name="fullViewOverloadKeepsExistingCoordinates" classname="com.shilapi.xcertplay.media.CarPlayTouchMapperTest" time="0.015"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

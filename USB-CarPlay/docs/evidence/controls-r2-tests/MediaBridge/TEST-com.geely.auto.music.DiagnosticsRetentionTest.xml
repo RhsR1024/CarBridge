@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.geely.auto.music.DiagnosticsRetentionTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-03T13:04:34" hostname="DESKTOP-IQJOR7V" time="1.069">
+  <properties/>
+  <testcase name="fourthFullLogEvictsOldestAndExportCombinesThreeBoundedFiles" classname="com.geely.auto.music.DiagnosticsRetentionTest" time="1.069"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

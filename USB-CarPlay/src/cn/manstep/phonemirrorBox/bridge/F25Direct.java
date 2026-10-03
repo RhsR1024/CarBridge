@@ -43,8 +43,16 @@ final class F25Direct {
             private boolean active() { return registered && !closed && !failed; }
             @Override public boolean onPlay() { return active() && original.onPlay(); }
             @Override public boolean onPause() { return active() && original.onPause(); }
-            @Override public boolean onNext() { return active() && original.onNext(); }
-            @Override public boolean onPrevious() { return active() && original.onPrevious(); }
+            private boolean skip(boolean next) {
+                if (!active()) return false;
+                DirectSnapshot before = snapshot;
+                boolean accepted = next ? original.onNext() : original.onPrevious();
+                // This PLAY belongs to the user's skip press, never to a metadata update or timer.
+                if (accepted && before != null && !before.playing && active()) original.onPlay();
+                return accepted;
+            }
+            @Override public boolean onNext() { return skip(true); }
+            @Override public boolean onPrevious() { return skip(false); }
             @Override public boolean onForward() { return active() && original.onForward(); }
             @Override public boolean onRewind() { return active() && original.onRewind(); }
             @Override public MusicPlaybackInfo getMusicPlaybackInfo() { return info; }
@@ -101,7 +109,8 @@ final class F25Direct {
     }
     void update(TrackState track) {
         DirectSnapshot next = new DirectSnapshot(track);
-        if (snapshot == null || !snapshot.id.equals(next.id) || snapshot.duration != next.duration) {
+        if (snapshot == null || !snapshot.id.equals(next.id) || snapshot.duration != next.duration
+                || !snapshot.title.equals(next.title) || !snapshot.artist.equals(next.artist)) {
             onlineArtwork = onlineLyrics = "";
         }
         snapshot = next;

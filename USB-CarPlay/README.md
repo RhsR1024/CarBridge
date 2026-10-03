@@ -20,7 +20,7 @@
 
 2026-10-03 修复封面/歌词接入、增量歌曲混合和断连占用，见 [本次修复](docs/METADATA_HANDOFF_2026-10-03.md)。MediaBridge 正式源码在 `D:\CarSoft\MediaBridgeApp\MediaBridge-src` 的 `main`，可设置 `MEDIABRIDGE_ROOT` 指向其他克隆；构建和测试脚本直接检查该仓库。
 
-已对齐 CarBridge 的“缺失歌手时的标题格式”和“直连在线封面与歌词”，默认分别为“保留原始信息”和关闭。入口：媒体接入 → 媒体选项。当前 USB 安装包为 `releases/CarPlay-USBBox-Slim-MediaOptions.apk`；实现与验证见 [媒体选项](docs/MEDIA_OPTIONS_2026-10-03.md)，场景分析见 [配置适用性分析](docs/CARBRIDGE_SETTINGS_APPLICABILITY.md)。
+已对齐 CarBridge 的“缺失歌手时的标题格式”和“直连在线封面与歌词”，默认分别为“保留原始信息”和关闭。入口：原设置列表中的三项媒体设置。当前 USB 安装包为 `releases/CarPlay-USBBox-Slim-Controls-R2.apk`，配套 MediaBridge 2.3.12；实现与验证见 [本轮控制和歌词修复](docs/CONTROLS_R2_2026-10-03.md)，场景分析见 [配置适用性分析](docs/CARBRIDGE_SETTINGS_APPLICABILITY.md)。
 
 三模式只接管车机侧的媒体注册与发布。盒子协议、USB 收发、音视频、触控编码及现有命令发送函数保持基线实现。新媒体按键调用原有 F25 控制链。
 

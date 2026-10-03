@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.media.CarPlayPlaybackStatusTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:30.137Z" hostname="DESKTOP-IQJOR7V" time="0.011">
+  <properties/>
+  <testcase name="emptyStringsClearFieldsAndArtworkIdIsRetained" classname="com.shilapi.xcertplay.media.CarPlayPlaybackStatusTest" time="0.004"/>
+  <testcase name="retainsIncrementalNowPlayingMetadata" classname="com.shilapi.xcertplay.media.CarPlayPlaybackStatusTest" time="0.002"/>
+  <testcase name="reportsOnlyChangesOfThePlaybackStatus" classname="com.shilapi.xcertplay.media.CarPlayPlaybackStatusTest" time="0.003"/>
+  <testcase name="otherMessagesAndSessionEnd" classname="com.shilapi.xcertplay.media.CarPlayPlaybackStatusTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

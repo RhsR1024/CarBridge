@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" tests="20" skipped="0" failures="0" errors="0" timestamp="2026-10-03T13:01:36" hostname="DESKTOP-IQJOR7V" time="1.318">
+  <properties/>
+  <testcase name="oldCompanionWithoutUsbCapabilityCannotAuthorizeRoute" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.173"/>
+  <testcase name="failedDirectUnregisterBlocksNewRoute" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.061"/>
+  <testcase name="metadataModeChangeYieldAndHeartbeatFailureNeverSendUsbCommands" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.046"/>
+  <testcase name="modeSelectionCoversAllPolicyCombinations" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.036"/>
+  <testcase name="nativeLyricsAndCoverReachSessionAndNewTrackDropsOldResources" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.057"/>
+  <testcase name="phoneDisconnectReleasesCompanionAndDoesNotReacquireItWhileIdle" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.027"/>
+  <testcase name="connectionWithoutTrackPublishesControlsButNeverStartsPlayback" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.03"/>
+  <testcase name="titleFormatChangesDisplayImmediatelyWithoutChangingRawIdentityOrSendingKeys" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.027"/>
+  <testcase name="sameTitleRecordingCanBeEstablishedByACompletePair" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.024"/>
+  <testcase name="pausedSessionRemainsActiveAndPlayPauseUseOriginalCallbacksOnce" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.037"/>
+  <testcase name="bridgeRequiresPreparedAndReadyAndNeitherHandoverSendsPhoneControl" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.032"/>
+  <testcase name="directPublishesNativeResourcesAndProgressWithoutPhoneControl" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.027"/>
+  <testcase name="disconnectedMetadataIsDroppedAndReconnectStartsEmpty" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.028"/>
+  <testcase name="incrementalMetadataAndNewSongNeverRetainOldArtist" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.023"/>
+  <testcase name="recordedUsbFieldSequenceCannotMixTwoSongsOrUseSongAsArtist" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.024"/>
+  <testcase name="timeUnitsRequireRepeatedAdvancingSamplesAndRejectSeekGuesses" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.03"/>
+  <testcase name="settingsRetainsTheExactOriginalViewAndItsChildren" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.516"/>
+  <testcase name="staleAndRepeatedCommandsCannotReachPhone" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.034"/>
+  <testcase name="titleFormatAppliesOnReconnectAndBridgeKeepsTheRawTrackId" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.052"/>
+  <testcase name="directRegistrationAndMetadataDoNotAutoplayAndClosedCallbacksAreFenced" classname="cn.manstep.phonemirrorBox.bridge.UsbBridgeTest" time="0.031"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

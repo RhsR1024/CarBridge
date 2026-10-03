@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.media.AndroidMediaSinkStateTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:30.113Z" hostname="DESKTOP-IQJOR7V" time="0.01">
+  <properties/>
+  <testcase name="recreatingTheScreenRestoresItsActiveVideoState" classname="com.shilapi.xcertplay.media.AndroidMediaSinkStateTest" time="0.01"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

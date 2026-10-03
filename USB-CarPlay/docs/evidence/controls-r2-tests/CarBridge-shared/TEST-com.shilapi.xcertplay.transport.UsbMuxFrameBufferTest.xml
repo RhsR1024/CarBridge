@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" tests="26" skipped="0" failures="0" errors="0" timestamp="2026-10-03T12:55:34.752Z" hostname="DESKTOP-IQJOR7V" time="0.035">
+  <properties/>
+  <testcase name="eightPaddingBytesAreNotScannedForANextFrame" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.004"/>
+  <testcase name="paddingDiagnosticsAreCappedAndContainOnlyFramingMetadata" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.019"/>
+  <testcase name="paddingAfterAPayloadFreeAckIsNotDiscarded" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="tcpOptionsInTheFollowingFrameArePreserved" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="unpaddedFramesAndUnknownNormalProtocolsArePreserved" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="invalidTcpPortsDoNotQualifyAsARecoveryTarget" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.001"/>
+  <testcase name="arbitraryLeadingJunkDoesNotTriggerResynchronization" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="synAckPaddingWorksAcrossEveryTransferSplit" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.002"/>
+  <testcase name="unknownProtocolIsNotAcceptedAsAPaddingRecoveryTarget" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="invalidLengthWithoutAnEligibleReplyStillFails" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="overlargeNextFrameIsNotAcceptedAsAPaddingRecoveryTarget" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="aMaximumSizeDataFrameRemainsIntact" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.002"/>
+  <testcase name="paddingAfterAMediaOrLockdownDataFrameIsNotDiscarded" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="paddingWithoutFurtherDataDoesNotDisappear" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="synAckWithDataDoesNotEnablePaddingRecovery" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="aDiagnosticCallbackFailureDoesNotBreakFraming" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="nonVersionTwoReplyDoesNotEnablePaddingRecovery" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="tooShortTcpHeaderIsNotAcceptedAsAPaddingRecoveryTarget" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="versionPaddingWorksAcrossEveryTransferSplit" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.001"/>
+  <testcase name="incompleteNextMuxAndTcpHeadersRemainBuffered" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="unrecognizedSynAckMagicDoesNotEnableRecovery" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.001"/>
+  <testcase name="coalescedPaddedAndUnpaddedRepliesKeepAllFollowingPayloads" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="validPayloadContainingHeaderLikeBytesIsNeverResynchronized" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="invalidNormalTcpLengthStillFailsImmediately" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <testcase name="incorrectMagicIsNotAcceptedAsAPaddingRecoveryTarget" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.001"/>
+  <testcase name="tcpHeaderBeyondDeclaredLengthIsNotAcceptedAsAPaddingRecoveryTarget" classname="com.shilapi.xcertplay.transport.UsbMuxFrameBufferTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,58 @@
+{
+  "versions": {
+    "CarBridge": "0.1.8",
+    "MediaBridge": "2.3.12-carplay-controls-26100305",
+    "USB": "2026.10.03-r2"
+  },
+  "tests": {
+    "USB": {
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "CarBridge-common": {
+      "tests": 161,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "CarBridge-shared": {
+      "tests": 422,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "MediaBridge": {
+      "tests": 209,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "apks": {
+    "CarBridge-0.1.8.apk": {
+      "bytes": 37686521,
+      "sha256": "7d34ef0091b8566055309fbc648ed0d223dbacfaccab14e8aeabc6383fb4e352"
+    },
+    "CarPlay-USBBox-Slim-Controls-R2.apk": {
+      "bytes": 7578004,
+      "sha256": "8b8234e13295bcfae52adb5d5c22590bf5a5251a5911160df84784bade162b3b"
+    },
+    "MediaBridge-2.3.12-carplay-controls-26100305.apk": {
+      "bytes": 641791,
+      "sha256": "46e5b1a049a25eefcd71583c755548cef28d8468dc4566d32e6b14957f84bac9"
+    }
+  },
+  "vehicle_verified": false,
+  "unsupported": [
+    "vehicle absolute-time seek"
+  ],
+  "checks": [
+    "USB lintDebug",
+    "CarBridge mobile lintRelease and verifyStandaloneAuthentication",
+    "MediaBridge lintRelease",
+    "APK signature verification",
+    "USB full method and payload comparison"
+  ]
+}
