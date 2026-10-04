@@ -1,6 +1,6 @@
 # CarBridge
 
-CarBridge 是面向吉利 ECARX 车机的 DiPlay fork。当前 **0.1.6** 已同步上游 **v0.2.10**，保留吉利方控、直连／MediaBridge 双模式、媒体与导航音量处理和定制图标。详情见 [CarBridge 文档](docs/CARBRIDGE_README.md) 和 [0.2.10 同步报告](docs/UPSTREAM_SYNC_0.2.10.md)。
+CarBridge 是面向吉利 ECARX 车机的 DiPlay fork。当前 **0.1.9** 已同步上游 **v0.2.11**，保留吉利方控、直连／MediaBridge 双模式、媒体与导航音量处理和定制图标。详情见 [CarBridge 文档](docs/CARBRIDGE_README.md) 和 [0.2.11 同步报告](docs/UPSTREAM_SYNC_0.2.11.md)。
 
 以下保留上游 DiPlay 说明、链接和 BYD 支持范围；CarBridge 使用自己的包名和版本。
 

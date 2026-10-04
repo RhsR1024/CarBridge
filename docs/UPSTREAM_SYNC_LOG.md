@@ -100,3 +100,26 @@ APK 包名/版本/签名摘要/哈希（如构建发布）：
 | 状态 | 源码同步验证通过；集成主线，远端推送状态以 Git refs 为准 |
 | 报告 | [UPSTREAM_SYNC_0.2.10.md](UPSTREAM_SYNC_0.2.10.md) |
 | 回退 | 对上述合并提交按第一父创建 revert，保留共享历史 |
+
+
+## 2026-10-04 — 同步 DiPlay v0.2.11 后 main，CarBridge 0.1.9
+
+| 字段 | 记录 |
+| --- | --- |
+| 同步前 CarBridge | bd9bef0cef9cad949fa2fe24d793bf37fda73d42（0.1.8） |
+| 原上游基线 | v0.2.10 / 45563135a3d05a17315a84f57434fdb5dfa43a5f |
+| 目标标签 | v0.2.11 / 6014025c653c4dae88d319ce446e0bf1ddb658ea；比标签多网站与发布文档提交 |
+| 目标 main | abe750f79dfb7ee4be613e36f2952a43778b3a04 |
+| 分支 / 双亲合并提交 | sync/diplay-0.2.11 / ef446e305406acddae43bf0f1d9044cf710e08b7 |
+| 版本 | mobile / automotive 0.1.9 / 109；包名保持 |
+| 主要变化 | Wi-Fi Direct 首选信道、可移动自定义转向卡片、设置手势指数量、旧版车辆数据只读探测与并发修正、无线位置／车辆数据移至运行时 Wi-Fi 链路、可选车机热点自动开启、Android TV 遥控、元数据变更发布、Android 9 音频修正、稳定尺寸重连、本应用 VPN 范围与有界诊断 |
+| 冲突 | 十五个文件，按行为处理；CarPlayMediaKeys 保持 CarBridgeMediaRuntime 委托，DiPlayActivity 采用上游滚动恢复，AndroidMediaSink／CarPlayController 保留音乐门控、导航音量目标与陈旧运行守卫 |
+| 定制 | 吉利方控与语音键门控、ECARX／MB 双模式、歌曲与音乐互斥、导航音量目标、图标、旋转保留策略保持；582 个受保护文件中仅版本与同步文档为簿记性修改 |
+| 上游测试适配 | 五个 BYD 测试类按 BYD 档位运行；CarPlayHostDisplaySizeTest 使用 GENERIC 档位避开厂商绑定，并适配同尺寸旋转用例与 mock 存根 |
+| 协作 | 未改 MediaBridge；协议 1.0 |
+| 自动化 | shared 537 + common 291 + home 4 = 832 项通过，无失败／错误／跳过；四项 lint 零错误；四模块 debug 构建成功 |
+| 构建 | BUILD SUCCESSFUL in 4m 3s；411 个任务；home 以 --rerun 复跑通过；源码 APK 无运行时认证资产 |
+| 设备范围 | 未安装车机、连接 iPhone 或发布签名正式包；需要方控、音量、连接与旋转实车回归 |
+| 状态 | 源码同步验证通过；集成主线，远端推送状态以 Git refs 为准 |
+| 报告 | [UPSTREAM_SYNC_0.2.11.md](UPSTREAM_SYNC_0.2.11.md) |
+| 回退 | 对上述合并提交按第一父创建 revert，保留共享历史 |

@@ -1,6 +1,6 @@
 # CarBridge
 
-CarBridge is a DiPlay fork for Geely ECARX head units. Version **0.1.6** integrates upstream **v0.2.10** while retaining Geely steering-wheel controls, direct/MediaBridge modes, media/navigation volume handling and custom icons. See the [CarBridge documentation](docs/CARBRIDGE_README.md) and [0.2.10 synchronization report](docs/UPSTREAM_SYNC_0.2.10.md).
+CarBridge is a DiPlay fork for Geely ECARX head units. Version **0.1.9** integrates upstream **v0.2.11** while retaining Geely steering-wheel controls, direct/MediaBridge modes, media/navigation volume handling and custom icons. See the [CarBridge documentation](docs/CARBRIDGE_README.md) and [0.2.11 synchronization report](docs/UPSTREAM_SYNC_0.2.11.md).
 
 The upstream description, links and BYD support scope below refer to DiPlay. CarBridge uses its own application IDs and version numbers.
 
