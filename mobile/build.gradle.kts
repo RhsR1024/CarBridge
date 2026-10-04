@@ -17,8 +17,8 @@ android {
         applicationId = "io.github.rhsr1024.carbridge"
         minSdk = 28
         targetSdk = 37
-        versionCode = 108
-        versionName = "0.1.8"
+        versionCode = 109
+        versionName = "0.1.9"
 
     }
 

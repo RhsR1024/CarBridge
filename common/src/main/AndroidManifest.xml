@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Optional, user-authorized startup of the car's own hotspot. -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
@@ -18,6 +20,7 @@
         <package android:name="ecarx.xsf.mediacenter" />
         <package android:name="com.ecarx.sdk.openapi" />
         <package android:name="com.ecarx.mediacenter" />
+        <package android:name="com.byd.carsettings" />
         <!-- Include the default launcher for the optional centre map. -->
         <intent>
             <action android:name="android.intent.action.MAIN" />

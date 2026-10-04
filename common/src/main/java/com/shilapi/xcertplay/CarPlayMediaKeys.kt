@@ -5,9 +5,10 @@ import android.content.Intent
 import android.media.session.MediaSession
 import android.view.KeyEvent
 import com.shilapi.xcertplay.airplay.CarPlayMediaButton
+import com.shilapi.xcertplay.media.CarPlayNowPlaying
+import com.shilapi.xcertplay.nowplaying.NowPlayingSnapshot
 import com.shilapi.xcertplay.orchestration.CarPlayController
 import com.shilapi.xcertplay.playback.MusicOutputGate
-import com.shilapi.xcertplay.nowplaying.NowPlayingSnapshot
 
 /** Activity-independent session owner; one runtime follows one CarPlay controller. */
 internal object CarPlayMediaKeys {
@@ -37,6 +38,13 @@ internal object CarPlayMediaKeys {
     fun onMediaAudioChanged(active: Boolean) { android.util.Log.d("CarBridge-Media", "musicStream=$active") }
     fun command(index: Int) { runtime?.command(index, "user-interface", null) }
     fun settingsChanged() { runtime?.settingsChanged() }
+
+    /**
+     * Whether [next] changes what the media session's metadata shows; position and play state do
+     * not. The runtime applies the same policy when it publishes its metadata key.
+     */
+    internal fun metadataChanged(previous: CarPlayNowPlaying, next: CarPlayNowPlaying): Boolean =
+        previous.copy(elapsedMillis = null, playing = false) != next.copy(elapsedMillis = null, playing = false)
 }
 
 /** Explicit commands retain their meaning. Vehicle-specific hardware mapping is injected. */
