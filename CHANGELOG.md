@@ -1,3 +1,13 @@
+# CarBridge 0.1.10 — DiPlay 0.2.12 同步 — 2026-10-05
+
+- 同步上游稳定标签 v0.2.12（`22d2aac`）：同一局域网无线连接、热点恢复、分屏与画面尺寸、昼夜模式、画面调整和诊断导出等增强。
+- 保留吉利／ECARX 方控、明确播放与暂停、MediaBridge 双模式及音乐互斥；媒体／导航音道、导航音量目标与结束恢复不变。
+- 保留 Geely 默认图标、用户自定义图标及旋转策略；BYD 新功能按车型隔离，新增方控缩放／摇杆默认关闭。
+- 继续按连接和曲目代次处理原生封面，不采用上游跨曲目沿用旧封面的策略。
+- mobile／automotive 独立版本递增为 0.1.10 / 110；本轮不推送、不发布、不宣称完成实车验收。
+
+详见 [同步与验证报告](docs/UPSTREAM_SYNC_0.2.12.md)。下方 DiPlay 条目保留上游说明，涉及封面的差异以上述 CarBridge 策略为准。
+
 # CarBridge 0.1.8 — 设置页滚动位置修复 — 2026-10-03
 
 - 修复设置页在修改“屏幕方向”“车机适配”“媒体接入方式”“刷新接入状态”等新配置后跳回顶部的问题：这些回调会调用 `render()` 重建整页，现已记录并在重建后恢复滚动偏移；切换到其他页面仍从顶部开始。
@@ -10,6 +20,28 @@
 - 配套 MediaBridge 2.3.11 从独立仓库 main 构建，新增 USB 严格在线补全和简短会话提示。
 
 详见 [0.1.7 说明](docs/RELEASE_0.1.7.md) 和 [USB 修复记录](USB-CarPlay/docs/METADATA_HANDOFF_2026-10-03.md)。
+# Unreleased
+
+Add changes after 0.2.12 here.
+
+# DiPlay 0.2.12 — 2026-10-04
+
+- Add Existing Wi-Fi / Same LAN wireless CarPlay with scoped IPv4/IPv6 discovery and network-change cleanup (#223).
+- Wait for a stable car-hotspot interface and recover bounded wireless attempts when no AirPlay TCP follows StartSession (#229); add observed-state, authorized-ADB hotspot fallback on firmware exposing supported commands (#235).
+- Improve Apple USB attach matching and narrowly scoped optional USB-prompt assistance (#170, #224).
+- Pause Android 10 station scans during eligible hotspot/P2P sessions, preserving Same LAN, with controller leases and durable retryable restoration (#225).
+- Improve split-screen, launcher cards, short-screen preparation and virtual cluster/floating-map geometry (#171, #172, #181).
+- Add independent system-bar controls and correct in-session save/cancel and Local/USB-CH341 authentication selection (#191, #194).
+- Add system, light-sensor, day and night CarPlay appearance modes, richer custom turn cards, and live main-video picture controls (#178, #193, #211).
+- Offer custom integer resolution from 30% to 160%, with shared limits, correct 30%/160% labels and decoder/canvas capability fallback; refresh connection settings on resume (#179, #230, #196).
+- Reconcile opt-in DiLink 4 cluster routing/calibration into one decoder owner, retain verified HUD gates, and journal exact stock-map holds and recovery (#213, #187).
+- Add DiLink 3 guidance text and projection-display support with committed recovery before mutation, partial-setup compensation and retryable stock restoration (#182).
+- Add opt-in wheel map zoom and main-screen joystick while preserving press/release and call behavior; reject stale queued work across phone/screen changes (#214, #231).
+- Switch supported dashboard contents live using actual delivery and safely retained paused choices; preserve selection across stream/phone replacement (#232).
+- Add a five-second dashboard-song-on-change window with timer invalidation, and retain album art while the next transfer is pending (#215, #228).
+- Export reports through Downloads, document picker, app-external or private fallback storage, with explicit View/Share actions (#185, #219).
+
+See [0.2.12 release notes](docs/RELEASE-NOTES-0.2.12.md) for the complete corrections, hardware evidence and issue-reporting steps. This remains a public preview; no fresh end-to-end vehicle test of the complete repaired release is claimed.
 
 # DiPlay 0.2.11 — 2026-10-03
 

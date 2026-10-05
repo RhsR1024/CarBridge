@@ -28,11 +28,21 @@
         </intent>
     </queries>
     <application>
+        <provider
+            android:name="com.shilapi.xcertplay.DiagnosticReportProvider"
+            android:authorities="${applicationId}.diagnostic-reports"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/diagnostic_report_paths" />
+        </provider>
         <provider android:name="com.shilapi.xcertplay.media.CarBridgeArtworkProvider"
             android:authorities="${applicationId}.artwork" android:exported="false" android:grantUriPermissions="true" />
         <activity android:name="com.shilapi.xcertplay.DiPlayActivity"
             android:exported="true" android:launchMode="singleTop"
             android:screenOrientation="behind"
+            android:resizeableActivity="true"
             android:configChanges="density|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:theme="@style/Theme.Xcertplay">
             <intent-filter>
@@ -45,6 +55,7 @@
 
         <activity
             android:name="com.shilapi.xcertplay.CarPlayHostActivity"
+            android:taskAffinity="${applicationId}.carplay"
             android:configChanges="density|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:exported="true"
             android:launchMode="singleTask"
@@ -61,6 +72,19 @@
         </activity>
 
         <activity
+            android:name="com.shilapi.xcertplay.AdbClusterActivity"
+            android:label="@string/adb_cluster_activity_label"
+            android:icon="@drawable/ic_dp_navigation"
+            android:taskAffinity="${applicationId}.cluster"
+            android:excludeFromRecents="true"
+            android:resizeableActivity="true"
+            android:allowEmbedded="true"
+            android:exported="true"
+            android:configChanges="density|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
+            android:theme="@style/Theme.AdbCluster">
+        </activity>
+
+        <activity
             android:name="com.shilapi.xcertplay.CarPlayVideoActivity"
             android:configChanges="density|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"
             android:exported="false"
@@ -69,11 +93,13 @@
         <activity
             android:name="com.shilapi.xcertplay.MainActivity"
             android:exported="false"
+            android:resizeableActivity="true"
             android:theme="@style/Theme.Xcertplay" />
 
         <activity
             android:name="com.shilapi.xcertplay.ImageCropActivity"
             android:exported="false"
+            android:resizeableActivity="true"
             android:screenOrientation="fullSensor"
             android:theme="@style/Theme.Xcertplay" />
 
@@ -100,6 +126,20 @@
             </intent-filter>
         </service>
 
+        <!-- Optional: steering-wheel keys for the dashboard map zoom (docs/BYD_NAVIGATION.md). -->
+        <service
+            android:name="com.shilapi.xcertplay.WheelKeyService"
+            android:exported="true"
+            android:label="@string/wheel_key_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/wheel_key_service" />
+        </service>
+
         <receiver
             android:name="com.shilapi.xcertplay.BootReceiver"
             android:enabled="true"
@@ -108,6 +148,18 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name="com.shilapi.xcertplay.UsbAutoConfirmService"
+            android:exported="true"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/usb_auto_confirm_service_config" />
+        </service>
     </application>
 
 </manifest>
