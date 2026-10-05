@@ -1,7 +1,12 @@
 package cn.manstep.phonemirrorBox.bridge;
 
+import java.util.regex.Pattern;
+
 /** Incremental box metadata, independent of Android focus and UI state. */
 public final class TrackState {
+    private static final String[] CREDIT_MARKERS =
+            {"作词", "作曲", "编曲", "制作人", "未经著作权人许可", "不得翻唱", "翻录"};
+    private static final Pattern TITLE_SEPARATOR = Pattern.compile("[ \\t][-–—][ \\t]");
     public String title = "", artist = "", album = "", lyrics = "";
     public int status = -1;
     public long revision;
@@ -36,6 +41,13 @@ public final class TrackState {
                 && !nextArtist.isEmpty() && !nextTitle.equals(nextArtist);
         boolean newTitle = nextTitle != null && (!nextTitle.equals(lastTitle)
                 || completePair && (artistChanged || awaitingTitle));
+        if (newTitle && nextTitle != null && isLyricOrCredit(nextTitle, nextArtist)
+                && !title.isEmpty() && !artist.isEmpty()) {
+            // The box can report the on-screen lyric or credit line as the song name while the
+            // same track keeps playing. Keep the last plausible identity instead of following it.
+            newTitle = false;
+            nextTitle = null;
+        }
         if (!newTitle && shiftedArtist) nextArtist = null;
         else if (!newTitle && artistChanged) {
             if (!awaitingTitle) { revision++; lyrics = ""; }
@@ -70,6 +82,14 @@ public final class TrackState {
     public boolean complete() { return !title.isEmpty() && !artist.isEmpty(); }
     CombinedTitleMetadata display() { return CombinedTitleMetadata.resolve(title, artist, titleFormat, titleFormatEligible); }
     public String mediaId() { return hasTrack() ? "usb-track:" + revision + ":" + title + "\n" + artist + "\n" + album : ""; }
+    private static boolean isLyricOrCredit(String value, String incomingArtist) {
+        for (String marker : CREDIT_MARKERS) if (value.contains(marker)) return true;
+        // A spaced line with no artist and no explicit "artist - title" separator is the shape
+        // the phone uses for the current lyric while the track keeps playing.
+        return (incomingArtist == null || incomingArtist.isEmpty())
+                && value.indexOf(' ') >= 0 && !TITLE_SEPARATOR.matcher(value).find();
+    }
+
     private static String bounded(String value) {
         value = value.trim();
         return value.length() <= 512 ? value : value.substring(0, 512);

@@ -253,7 +253,10 @@ internal class CarBridgeRouteManager(
         activeIntent = ""; playCallback = null; direct?.pause()
     }
     fun acceptMediaController(caller: String?): Boolean =
-        !mediaBridge(caller)
+        !mediaBridge(caller) || !bridgeOwnsCommands
+
+    /** True while the authenticated MediaBridge companion already owns command delivery. */
+    val bridgeOwnsCommands: Boolean get() = route == "BRIDGE"
     fun refreshSettings() {
         suspendPlayback(); onYield("媒体设置已改变")
         route = ""; negotiating = false

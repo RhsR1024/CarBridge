@@ -80,6 +80,7 @@ public final class UsbMediaBridge {
         private boolean observed, connected, active;
         private long stamp, claimRevision;
         private String metadataKey = "";
+        private String lastCommand = "-", lastCommandResult = "-";
         private String formatDiagnostic = "";
         private int publishedState = Integer.MIN_VALUE;
         private final Runnable poll = new Runnable() {
@@ -138,6 +139,16 @@ public final class UsbMediaBridge {
         private boolean isConnected() {
             synchronized (wire) { return connected && cn.manstep.phonemirrorBox.BoxInterface.f.P; }
         }
+        /**
+         * Controls stay reachable while CarPlay is connected and the car's own direct route is
+         * not in charge, so a temporarily missing MediaBridge companion cannot dead-key the
+         * vehicle mini window or the steering wheel.
+         */
+        private boolean controllable() {
+            synchronized (wire) {
+                return connected && cn.manstep.phonemirrorBox.BoxInterface.f.P && !"DIRECT".equals(route.route());
+            }
+        }
         private void syncTime() {
             track.durationMs = clock.duration(); track.positionMs = clock.position(); track.positionAtMs = clock.observedAt();
         }
@@ -173,6 +184,44 @@ public final class UsbMediaBridge {
         @Override public void changed() { claimRevision++; publish(); }
         @Override public void ready() { publish(); if (track.playing()) claim(); }
         @Override public void yielded() { claimRevision++; }
+        private String pendingSkip;
+        private long pendingSkipAt;
+        private final Runnable pendingSkipPoll = new Runnable() {
+            @Override public void run() {
+                if (live != Runtime.this || pendingSkip == null) return;
+                if (!controllable()) { pendingSkip = null; return; }
+                boolean playing = track.playing();
+                // The reported flag trails the phone by up to one metadata callback (about
+                // 460 ms here), so cap the wait just past the measured report latency.
+                if (!playing && SystemClock.elapsedRealtime() - pendingSkipAt < 900) {
+                    MAIN.postDelayed(this, 100); return;
+                }
+                dispatchPendingSkip(playing);
+            }
+        };
+        /**
+         * The phone ignores a skip while it is paused, so resume first and dispatch the skip as
+         * soon as the box reports playback again. A newer skip flushes the pending one instead
+         * of losing it.
+         */
+        private void skipAfterResume(String action) {
+            flushPendingSkip();
+            pendingSkip = action; pendingSkipAt = SystemClock.elapsedRealtime();
+            original.onPlay(); claim();
+            lastCommandResult = action + " resumeFirst";
+            publish();
+            MAIN.postDelayed(pendingSkipPoll, 100);
+        }
+        private void flushPendingSkip() {
+            if (pendingSkip != null) dispatchPendingSkip(track.playing());
+        }
+        private void dispatchPendingSkip(boolean playing) {
+            String action = pendingSkip; pendingSkip = null;
+            if (action == null) return;
+            boolean ok = "PREVIOUS".equals(action) ? original.onPrevious() : original.onNext();
+            lastCommandResult = action + " skipped playing=" + playing + " ok=" + ok;
+            publish();
+        }
         private void claim() {
             final long revision = ++claimRevision;
             requestClaim(revision, 0);
@@ -197,13 +246,20 @@ public final class UsbMediaBridge {
                 Log.i("USBMediaBridge", "TitleFormat format=" + track.titleFormat + " reason=" + display.reason);
             }
             boolean visible = isConnected() && "BRIDGE".equals(route.route());
-            String key = visible ? stamp + "|" + track.mediaId() + "|" + display.title + "|" + display.artist
-                    + "|" + track.lyrics + "|" + clock.duration() + "|" + coverRevision : "";
+            // Bridge state and the last control result travel through the session so the
+            // companion's exported log shows them even while this outlet is not active.
+            String diag = "route=" + route.route() + " conn=" + (isConnected() ? "1" : "0")
+                    + " ctrl=" + (controllable() ? "1" : "0")
+                    + " cmd=" + lastCommand + " res=" + lastCommandResult
+                    + " clock=" + clock.diagnostic();
+            String key = (visible ? stamp + "|" + track.mediaId() + "|" + display.title + "|" + display.artist
+                    + "|" + track.lyrics + "|" + clock.duration() + "|" + coverRevision : "") + "|" + diag;
             if (!key.equals(metadataKey) || publishedState == Integer.MIN_VALUE) {
                 MediaMetadata.Builder m = new MediaMetadata.Builder();
+                m.putString("usb.media.build", BridgeSettings.BUILD);
+                m.putString("usb.media.diag", diag);
+                if (isConnected()) m.putString("usb.media.connection", Long.toString(stamp));
                 if (visible) {
-                    m.putString("usb.media.connection", Long.toString(stamp));
-                    m.putString("usb.media.build", BridgeSettings.BUILD);
                     m.putString(MediaMetadata.METADATA_KEY_TITLE, display.title);
                     m.putString(MediaMetadata.METADATA_KEY_DISPLAY_TITLE, display.title);
                     m.putString(MediaMetadata.METADATA_KEY_ARTIST, display.artist);
@@ -230,32 +286,51 @@ public final class UsbMediaBridge {
                                 position >= 0 ? clock.observedAt() : SystemClock.elapsedRealtime()).build());
                 publishedState = state; publishedPosition = position;
             }
-            // Paused tracks remain reachable, so a subsequent PLAY can reach the phone.
-            if (active != visible) { session.setActive(visible); active = visible; }
+            // Paused tracks remain reachable, and the session stays visible to the car while the
+            // MediaBridge companion is briefly away, so a later PLAY/NEXT can still reach the phone.
+            boolean reachable = controllable();
+            if (active != reachable) { session.setActive(reachable); active = reachable; }
         }
         @Override public void command(String action) {
-            if (live != this || !isConnected() || !"BRIDGE".equals(route.route())) return;
+            lastCommand = action;
+            lastCommandResult = "accepted";
+            if (live != this || !controllable()) { lastCommandResult = "rejected"; publish(); return; }
             if ("TOGGLE".equals(action)) action = track.playing() ? "PAUSE" : "PLAY";
             try {
                 switch (action) {
                     // Dispatch immediately and exactly once. A late car-side grant can
                     // never produce a delayed phone PLAY after the user has paused.
-                    case "PLAY": original.onPlay(); claim(); break;
-                    case "PAUSE": case "STOP": claimRevision++; route.suspend(); original.onPause(); break;
-                    case "NEXT":
-                        if (original.onNext() && !track.playing()) { original.onPlay(); claim(); }
+                    case "PLAY": original.onPlay(); lastCommandResult = "onPlay"; claim(); break;
+                    case "PAUSE": case "STOP":
+                        claimRevision++; route.suspend(); original.onPause(); lastCommandResult = "onPause"; break;
+                    case "NEXT": case "PREVIOUS": {
+                        // This box only gets its skip honoured while the phone reports playing
+                        // (measured), so a paused skip resumes first and skips once it is back.
+                        // A track without identity metadata still needs that path: gating on it
+                        // is what made the very first paused skip do nothing.
+                        if (track.playing()) {
+                            boolean ok = "PREVIOUS".equals(action) ? original.onPrevious() : original.onNext();
+                            lastCommandResult = ("PREVIOUS".equals(action) ? "onPrevious=" : "onNext=")
+                                    + ok + " playing=true";
+                        } else {
+                            skipAfterResume(action);
+                        }
                         break;
-                    case "PREVIOUS":
-                        if (original.onPrevious() && !track.playing()) { original.onPlay(); claim(); }
-                        break;
-                    case "FAST_FORWARD": original.onForward(); break;
-                    case "REWIND": original.onRewind(); break;
-                    default: break;
+                    }
+                    case "FAST_FORWARD": original.onForward(); lastCommandResult = "onForward"; break;
+                    case "REWIND": original.onRewind(); lastCommandResult = "onRewind"; break;
+                    default: lastCommandResult = "unknown"; break;
                 }
-            } catch (RuntimeException error) { Log.e("USBMediaBridge", "Original control failed", error); }
+            } catch (RuntimeException error) {
+                lastCommandResult = "error:" + error.getClass().getSimpleName();
+                Log.e("USBMediaBridge", "Original control failed", error);
+            }
+            publish();
         }
         void close() {
-            claimRevision++; MAIN.removeCallbacks(poll); route.close(); pictures.shutdownNow();
+            pendingSkip = null; claimRevision++;
+            MAIN.removeCallbacks(poll); MAIN.removeCallbacks(pendingSkipPoll);
+            route.close(); pictures.shutdownNow();
             session.setActive(false); session.release();
         }
     }

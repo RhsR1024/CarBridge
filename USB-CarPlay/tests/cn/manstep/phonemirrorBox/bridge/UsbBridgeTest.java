@@ -122,6 +122,31 @@ public class UsbBridgeTest {
         jump.update(null,80L,true,3000); jump.update(null,30L,true,5000);
         assertEquals(0,jump.duration()); assertEquals(-1,jump.position());
     }
+    @Test public void fastCallbackCadenceStillConfirmsUnits() {
+        // This box delivers metadata about every 460 ms. The baseline must accumulate across
+        // those samples instead of being re-anchored before the comparison window is reached.
+        BoxClock clock=new BoxClock();
+        long position=1000;
+        clock.update(200000L,position,true,1000);
+        for(int i=1;i<=8;i++) {
+            position+=464;
+            clock.update(null,position,true,1000+i*460);
+        }
+        assertEquals(200000,clock.duration());
+        assertTrue(clock.position()>0);
+    }
+    @Test public void wholeSecondClockConfirmsUnitsAtOneSecondSampling() {
+        // The box reports whole seconds while its callbacks arrive about once a second, so two
+        // consecutive samples repeat the same value. That repeat must not erase the evidence.
+        BoxClock clock=new BoxClock();
+        clock.update(180L,10L,true,1000);
+        clock.update(null,10L,true,2000);
+        clock.update(null,11L,true,3000);
+        clock.update(null,11L,true,4000);
+        clock.update(null,12L,true,5000);
+        assertEquals(180000,clock.duration());
+        assertEquals(12000,clock.position());
+    }
     @Test public void sameTitleRecordingCanBeEstablishedByACompletePair() {
         TrackState t=new TrackState(); t.update("如愿","王菲","如愿",1);
         t.updateLyrics("old line"); long revision=t.revision;
@@ -182,9 +207,11 @@ public class UsbBridgeTest {
         assertFalse(output.metadata.containsKey(MediaMetadata.METADATA_KEY_DURATION));
         assertEquals(0,output.state.getActions() & PlaybackState.ACTION_SEEK_TO);
         command("PLAY"); command("PAUSE"); command("NEXT"); command("PREVIOUS");
-        assertEquals(Arrays.asList(126,127,87,126,88,126),keys);
-        Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(700));
-        assertEquals(Arrays.asList(126,127,87,126,88,126),keys); // only the user's skips add PLAY; no delayed grant does
+        // A paused skip resumes first; the skip itself follows once the box reports playing.
+        assertEquals(Arrays.asList(126,127,126,87,126),keys);
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(2500));
+        // Each user skip contributes exactly one resume and one skip; no late grant does.
+        assertEquals(Arrays.asList(126,127,126,87,126,88),keys);
     }
     @Test public void metadataModeChangeYieldAndHeartbeatFailureNeverSendUsbCommands() throws Exception {
         runtime(); metadata("{\"MediaSongName\":\"Song\",\"MediaPlayStatus\":1}");
@@ -201,9 +228,11 @@ public class UsbBridgeTest {
         Bundle b=envelopeForRoute(); b.putString("id","one"); b.putString("command","NEXT");
         receive(COMMAND,b,12002); assertTrue(keys.isEmpty());
         Bundle stale=new Bundle(b); stale.putLong("epoch",-1); receive(COMMAND,stale,12001); assertTrue(keys.isEmpty());
-        receive(COMMAND,b,12001); receive(COMMAND,b,12001); assertEquals(Arrays.asList(87,126),keys);
+        receive(COMMAND,b,12001); receive(COMMAND,b,12001); assertEquals(Arrays.asList(126),keys);
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(2500));
+        assertEquals(Arrays.asList(126,87),keys);
         Bundle oldConnection=new Bundle(b);oldConnection.putString("connection","old");oldConnection.putString("id","two");
-        receive(COMMAND,oldConnection,12001); assertEquals(Arrays.asList(87,126),keys);
+        receive(COMMAND,oldConnection,12001); assertEquals(Arrays.asList(126,87),keys);
     }
     @Test public void disconnectedMetadataIsDroppedAndReconnectStartsEmpty() throws Exception {
         runtime(); metadata("{\"MediaSongName\":\"Old\",\"MediaPlayStatus\":1}");
@@ -250,8 +279,10 @@ public class UsbBridgeTest {
         assertTrue(session.isActive());assertEquals(PlaybackState.STATE_PAUSED,output.state.getState());
         assertEquals("",output.metadata.getString(MediaMetadata.METADATA_KEY_TITLE));
         assertEquals("1",output.metadata.getString("usb.media.connection"));assertTrue(keys.isEmpty());
-        command("NEXT");assertEquals(Arrays.asList(87,126),keys);
-        cn.manstep.phonemirrorBox.BoxInterface.f.P=false;command("NEXT");assertEquals(Arrays.asList(87,126),keys);
+        command("NEXT");assertEquals(Arrays.asList(126),keys);
+        Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(1200));
+        assertEquals(Arrays.asList(126,87),keys);
+        cn.manstep.phonemirrorBox.BoxInterface.f.P=false;command("NEXT");assertEquals(Arrays.asList(126,87),keys);
     }
     @Test public void titleFormatChangesDisplayImmediatelyWithoutChangingRawIdentityOrSendingKeys() throws Exception {
         runtime();metadata("{\"MediaSongName\":\"雷佳 - 人世间\",\"MediaPlayStatus\":2}");

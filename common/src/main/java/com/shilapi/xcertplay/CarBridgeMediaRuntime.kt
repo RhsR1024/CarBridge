@@ -126,7 +126,7 @@ internal class CarBridgeMediaRuntime(
     }
 
     private fun update(raw: NowPlayingSnapshot) {
-        val value = com.shilapi.xcertplay.nowplaying.CombinedTitleMetadata.resolve(raw, titleFormat)
+        val value = guardLyricTitle(com.shilapi.xcertplay.nowplaying.CombinedTitleMetadata.resolve(raw, titleFormat))
         if (snapshot.connectionId == value.connectionId && value.revision < snapshot.revision) return
         val identity = listOf(raw.trackKey, raw.title, raw.artist, raw.album, raw.durationMs).toString()
         if (identity != diagnosticIdentity) {
@@ -304,6 +304,41 @@ internal class CarBridgeMediaRuntime(
         resources.close()
         artworkWorker.shutdownNow()
         session.isActive = false; session.release()
+    }
+
+    private val creditMarkers = listOf("作词", "作曲", "编曲", "制作人", "未经著作权人许可", "不得翻唱", "翻录")
+    private val titleSeparator = Regex("[ \\t][-–—][ \\t]")
+    private var lastGoodConnection = ""
+    private var lastGoodTitle = ""
+    private var lastGoodArtist = ""
+
+    /**
+     * The phone can overwrite the NowPlaying title with the lyric or credit line on screen and
+     * drop the artist. Keep the last plausible identity for this connection so the vehicle card,
+     * the bridge and the lyric lookup never follow the scrolling text.
+     */
+    private fun guardLyricTitle(value: NowPlayingSnapshot): NowPlayingSnapshot {
+        if (value.connectionId != lastGoodConnection) {
+            lastGoodConnection = value.connectionId
+            lastGoodTitle = ""
+            lastGoodArtist = ""
+        }
+        val title = value.title.orEmpty().trim()
+        val artist = value.artist.orEmpty().trim()
+        if (title.isEmpty()) {
+            return if (lastGoodTitle.isEmpty()) value
+            else value.copy(title = lastGoodTitle, artist = artist.ifEmpty { lastGoodArtist })
+        }
+        val suspect = creditMarkers.any { title.contains(it) } ||
+            (artist.isEmpty() && lastGoodArtist.isNotEmpty() &&
+                title.indexOf(' ') >= 0 && !titleSeparator.containsMatchIn(title))
+        if (suspect && lastGoodTitle.isNotEmpty()) {
+            log("metadata lyric suppressed rejected=\"${title.take(60)}\" kept=\"${lastGoodTitle.take(60)}\"")
+            return value.copy(title = lastGoodTitle, artist = lastGoodArtist.ifEmpty { value.artist })
+        }
+        lastGoodTitle = title
+        if (artist.isNotEmpty()) lastGoodArtist = artist
+        return value
     }
 
     private fun log(message: String) { CarBridgeDiagnostics.record("Media", message) }

@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 /** Separate preferences and a settings-only entry; never changes original USB settings. */
 public final class BridgeSettings {
-    static final String BUILD = "2026.10.03-r2";
+    static final String BUILD = "2026.10.04-r6";
     private static final String[] MODES = {"AUTO", "DIRECT", "BRIDGE"};
     private static final String[] LABELS = {"自动", "F25 直连", "MediaBridge 桥接"};
     private BridgeSettings() {}
