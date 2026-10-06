@@ -173,6 +173,46 @@ public class UsbBridgeTest {
         assertEquals("",output.metadata.getString("android.media.metadata.LYRICS"));
         assertTrue(keys.isEmpty());
     }
+    /** The phone pushes the cover and the song name in separate packets, cover first. */
+    @Test public void coverArrivingBeforeTheSongNameSurvivesTheIdentity() throws Exception {
+        runtime();
+        android.graphics.Bitmap bitmap=android.graphics.Bitmap.createBitmap(64,64,android.graphics.Bitmap.Config.ARGB_8888);
+        java.io.ByteArrayOutputStream bytes=new java.io.ByteArrayOutputStream();
+        bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG,100,bytes);
+        UsbMediaBridge.artwork(bytes.toByteArray()); idle();
+        long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(3);
+        while(field(runtime,"cover")==null && System.nanoTime()<deadline){Thread.sleep(5);idle();}
+        assertNotNull("cover must be accepted before the identity is known",field(runtime,"cover"));
+        metadata("{\"MediaSongName\":\"Singer - Song\",\"MediaPlayStatus\":1}");
+        RecordingSession output=org.robolectric.shadow.api.Shadow.extract(session);
+        assertNotNull(output.metadata.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART));
+        assertEquals("Singer - Song",output.metadata.getString(MediaMetadata.METADATA_KEY_TITLE));
+    }
+    /** Packets seen before the runtime exists must reach the first track, not be discarded. */
+    @Test public void packetsSeenBeforeTheRuntimeStartsAreReplayed() throws Exception {
+        UsbMediaBridge.close(); idle();
+        UsbMediaBridge.metadata("{\"MediaSongName\":\"Singer - Song\",\"MediaPlayStatus\":1}");
+        Method take=UsbMediaBridge.class.getDeclaredMethod("takePending"); take.setAccessible(true);
+        java.util.List<?> held=(java.util.List<?>)take.invoke(null);
+        assertEquals(1,held.size());
+        runtime();
+        for(Object json:held) metadata((String)json);
+        TrackState track=(TrackState)field(runtime,"track");
+        assertEquals("Singer - Song",track.title);
+        assertTrue(track.playing());
+    }
+    /** The box log must say which media fields arrived, so a missing name is provable. */
+    @Test public void diagnosticsReportWhichMediaFieldsTheBoxSent() throws Exception {
+        runtime();
+        metadata("{\"MediaSongName\":\"Singer - Song\",\"MediaArtistName\":\"Singer\",\"MediaLyrics\":\"Line one\",\"MediaPlayStatus\":1}");
+        RecordingSession output=org.robolectric.shadow.api.Shadow.extract(session);
+        String diag=output.metadata.getString("usb.media.diag");
+        assertTrue(diag,diag.contains("meta=1"));
+        assertTrue(diag,diag.contains("keys=SN,AN,LY,ST"));
+        assertTrue(diag,diag.contains("ever=SN,AN,LY,ST"));
+        assertTrue(diag,diag.contains("ly=Line one"));
+        assertTrue(diag,diag.contains("cov=0/0"));
+    }
     @Test public void titleFormatAppliesOnReconnectAndBridgeKeepsTheRawTrackId()throws Exception {
         runtime();assertEquals("ORIGINAL",BridgeSettings.titleFormat(context));assertFalse(BridgeSettings.onlineResources(context));
         context.getSharedPreferences("usb_media_route_v1",0).edit().putString("combined_title_format","ARTIST_TITLE").putString("mode","BRIDGE").commit();

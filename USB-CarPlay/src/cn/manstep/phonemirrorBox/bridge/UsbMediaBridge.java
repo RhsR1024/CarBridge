@@ -25,15 +25,35 @@ public final class UsbMediaBridge {
             if (live != null) return;
             try {
                 Runtime r = new Runtime(context.getApplicationContext(), input);
-                live = r; r.observe(null); r.route.start(); MAIN.post(r.poll);
+                live = r;
+                java.util.List<String> held = takePending();
+                r.replayed = held.size();
+                for (String json : held) r.observe(json);
+                r.observe(null); r.route.start(); MAIN.post(r.poll);
             } catch (RuntimeException | LinkageError error) { Log.e("USBMediaBridge", "Start failed", error); }
         });
     }
     public static void metadata(String json) {
         // The original parser/distribution has already run unchanged before this hook.
+        if (json == null || json.length() > 65536) return;
         Runtime r = live;
-        if (r != null && json != null && json.length() <= 65536) r.observe(json);
+        if (r != null) { r.observe(json); return; }
+        // The phone pushes the full now-playing once, while the box is still starting up. Those
+        // packets carry the song name and artist that later deltas never repeat, so hold them.
+        remember(json);
     }
+    /** Bounded hand-off for packets seen before the runtime exists; replayed on start. */
+    private static final java.util.ArrayDeque<String> PENDING = new java.util.ArrayDeque<>();
+    private static final int PENDING_LIMIT = 8;
+    private static synchronized void remember(String json) {
+        PENDING.addLast(json);
+        while (PENDING.size() > PENDING_LIMIT) PENDING.removeFirst();
+    }
+    private static synchronized java.util.List<String> takePending() {
+        java.util.List<String> held = new java.util.ArrayList<>(PENDING);
+        PENDING.clear(); return held;
+    }
+    private static synchronized void clearPending() { PENDING.clear(); }
     public static void metadataObject(JSONObject value) {
         if (value != null && live != null) metadata(value.toString());
     }
@@ -45,6 +65,7 @@ public final class UsbMediaBridge {
         MAIN.post(() -> { if (live == r) r.artwork(copy); });
     }
     public static void close() {
+        clearPending();
         MAIN.post(() -> { Runtime r = live; live = null; if (r != null) r.close(); });
     }
     public static void refresh() { MAIN.post(() -> { if (live != null) live.route.refresh(); }); }
@@ -72,6 +93,9 @@ public final class UsbMediaBridge {
                 java.util.concurrent.TimeUnit.SECONDS, new java.util.concurrent.ArrayBlockingQueue<>(1),
                 task -> new Thread(task, "USBBox-Cover"), new java.util.concurrent.ThreadPoolExecutor.DiscardOldestPolicy());
         Bitmap cover;
+        String coverOwner = "";
+        int metadataCount, coverSeen, coverAccepted, replayed;
+        String lastKeys = "", everKeys = "", lastLyric = "";
         long coverRevision, publishedPosition = -2;
         final MediaSession session;
         final BridgeRoute route;
@@ -107,7 +131,9 @@ public final class UsbMediaBridge {
                     observed = true; connected = next; final long expected = ++stamp;
                     MAIN.post(() -> {
                         if (!current(expected)) return;
-                        track.reset(); clock.reset(); cover = null; coverRevision++; claimRevision++;
+                        track.reset(); clock.reset(); cover = null; coverOwner = ""; coverRevision++; claimRevision++;
+                        metadataCount = coverSeen = coverAccepted = 0;
+                        lastKeys = everKeys = lastLyric = "";
                         track.titleFormat = BridgeSettings.titleFormat(context);
                         route.update(track, isConnected() ? Long.toString(expected) : ""); publish();
                     });
@@ -118,13 +144,23 @@ public final class UsbMediaBridge {
                     if (!current(expected) || !isConnected()) return;
                     try {
                         JSONObject value = new JSONObject(json);
+                        census(value);
                         Integer state = value.has("MediaPlayStatus") && !value.isNull("MediaPlayStatus")
                                 ? value.optInt("MediaPlayStatus", -1) : null;
                         boolean before = track.playing(), hadTrack = track.hasTrack();
                         long previousRevision = track.revision;
                         track.update(text(value, "MediaSongName"), text(value, "MediaArtistName"),
                                 text(value, "MediaAlbumName"), state);
-                        if (previousRevision != track.revision) { cover = null; coverRevision++; track.artworkUri = ""; clock.newTrack(); }
+                        if (previousRevision != track.revision) {
+                            // The phone sends the cover and the song name in separate packets, so a
+                            // cover accepted while the identity was still unknown belongs to this
+                            // track. Only a known identity that actually changed retires it.
+                            String identity = identity();
+                            if (!coverOwner.isEmpty() && !coverOwner.equals(identity)) {
+                                cover = null; coverRevision++; track.artworkUri = "";
+                            }
+                            clock.newTrack();
+                        }
                         track.updateLyrics(text(value, "MediaLyrics"));
                         clock.update(number(value, "MediaSongDuration"), number(value, "MediaSongPlayTime"), track.playing(), SystemClock.elapsedRealtime());
                         syncTime();
@@ -156,8 +192,34 @@ public final class UsbMediaBridge {
             if (!isConnected()) return;
             syncTime(); route.update(track, Long.toString(stamp)); publish();
         }
+        private String identity() { return (track.title + "\n" + track.artist).trim(); }
+        /** Field presence of one box packet; the difference between "never sent" and "dropped". */
+        private void census(JSONObject value) {
+            metadataCount++;
+            String[][] fields = {{"MediaSongName", "SN"}, {"MediaArtistName", "AN"}, {"MediaAlbumName", "AL"},
+                    {"MediaLyrics", "LY"}, {"MediaSongDuration", "DU"}, {"MediaSongPlayTime", "PO"},
+                    {"MediaPlayStatus", "ST"}};
+            StringBuilder present = new StringBuilder();
+            for (String[] field : fields) {
+                if (!value.has(field[0])) continue;
+                if (present.length() > 0) present.append(',');
+                present.append(field[1]);
+                if (nonEmpty(value, field[0]) && !everKeys.contains(field[1]))
+                    everKeys = everKeys.isEmpty() ? field[1] : everKeys + "," + field[1];
+            }
+            lastKeys = present.toString();
+            String lyric = text(value, "MediaLyrics");
+            if (lyric != null) lastLyric = lyric.length() <= 14 ? lyric : lyric.substring(0, 14);
+        }
+        /** A usable value: text with content, or a number the box did not leave at its -1 sentinel. */
+        private static boolean nonEmpty(JSONObject value, String key) {
+            Object field = value.opt(key);
+            if (field instanceof Number) return ((Number) field).longValue() >= 0;
+            return field instanceof String && !((String) field).trim().isEmpty();
+        }
         private void artwork(byte[] bytes) {
-            if (!isConnected() || track.title.isEmpty()) return;
+            if (!isConnected()) return;
+            coverSeen++;
             final long connection = stamp, song = track.revision;
             final String identity = track.mediaId();
             pictures.execute(() -> {
@@ -177,7 +239,10 @@ public final class UsbMediaBridge {
                 final String uri = stored;
                 MAIN.post(() -> {
                     if (!current(connection) || !isConnected() || song != track.revision || !identity.equals(track.mediaId())) return;
-                    if (picture != null) { cover = picture; coverRevision++; track.artworkUri = uri; refreshDisplay(); }
+                    if (picture != null) {
+                        cover = picture; coverOwner = identity(); coverAccepted++;
+                        coverRevision++; track.artworkUri = uri; refreshDisplay();
+                    }
                 });
             });
         }
@@ -251,7 +316,11 @@ public final class UsbMediaBridge {
             String diag = "route=" + route.route() + " conn=" + (isConnected() ? "1" : "0")
                     + " ctrl=" + (controllable() ? "1" : "0")
                     + " cmd=" + lastCommand + " res=" + lastCommandResult
-                    + " clock=" + clock.diagnostic();
+                    + " clock=" + clock.diagnostic()
+                    + " meta=" + metadataCount + " keys=" + (lastKeys.isEmpty() ? "-" : lastKeys)
+                    + " ever=" + (everKeys.isEmpty() ? "-" : everKeys)
+                    + " ly=" + (lastLyric.isEmpty() ? "-" : lastLyric)
+                    + " cov=" + coverSeen + "/" + coverAccepted + " held=" + replayed;
             String key = (visible ? stamp + "|" + track.mediaId() + "|" + display.title + "|" + display.artist
                     + "|" + track.lyrics + "|" + clock.duration() + "|" + coverRevision : "") + "|" + diag;
             if (!key.equals(metadataKey) || publishedState == Integer.MIN_VALUE) {
