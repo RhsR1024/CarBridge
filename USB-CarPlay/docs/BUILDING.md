@@ -2,7 +2,7 @@
 
 ## 环境
 
-Windows、JDK 17、Android SDK platform 34/build-tools 35.0.0、Gradle 8.9、Python 3。设置 `JAVA_HOME`、`ANDROID_SDK_ROOT`，必要时设置 `GRADLE_BIN` 和 `GRADLE_USER_HOME`。脚本默认兼容本机 `D:\CarSoft\MediaBridgeApp\tooling` 下的已安装工具。
+Windows、JDK 17、Android SDK platform 34/build-tools 35.0.0、Gradle 8.9、Python 3。设置 `JAVA_HOME`、`ANDROID_SDK_ROOT`，必要时设置 `GRADLE_BIN` 和 `GRADLE_USER_HOME`。脚本默认兼容本机 `E:\DevTools\MediaBridgeTooling` 下的已安装工具。
 
 后续 USB 功能修改从本目录的固定精简基线进行，编辑 `src/`，新增接线只在 `scripts/build.py` 中做精确变换。`stubs/` 仅用于编译声明和测试，严禁将其类装入 USB APK。`BridgeDexTool` 和验证脚本会拒绝意外新增/覆盖原类。
 

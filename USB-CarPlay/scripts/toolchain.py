@@ -10,11 +10,11 @@ def checked(path,digest):
     if hashlib.sha256(path.read_bytes()).hexdigest()!=digest: raise SystemExit(f'Unexpected SHA-256: {path}')
     return path
 def java_home():
-    p=Path(os.environ.get('JAVA_HOME','D:/CarSoft/MediaBridgeApp/tooling/jdk/jdk-17.0.16+8'))
+    p=Path(os.environ.get('JAVA_HOME','E:/DevTools/MediaBridgeTooling/jdk/jdk-17.0.16+8'))
     if not (p/'bin/java.exe').is_file():raise SystemExit('Set JAVA_HOME to JDK 17 on Windows.')
     return p
 def android_sdk():
-    p=Path(os.environ.get('ANDROID_SDK_ROOT','D:/CarSoft/MediaBridgeApp/tooling/android-sdk'))
+    p=Path(os.environ.get('ANDROID_SDK_ROOT','E:/DevTools/MediaBridgeTooling/android-sdk'))
     if not (p/'platforms/android-34/android.jar').is_file():raise SystemExit('Set ANDROID_SDK_ROOT; install platform 34 and build-tools 35.0.0.')
     return p
 def jadx_jar():return checked(os.environ.get('JADX_JAR',ROOT/'_tooling/jadx-1.5.6-all.jar'),JADX_SHA)

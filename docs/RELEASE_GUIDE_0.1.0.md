@@ -63,7 +63,7 @@ Geely 默认返回按钮使用用户参考图上方的纯黑车标，无下方�
 使用 [配套构建脚本](../scripts/Build-PairedRelease.ps1)，从仓库根目录执行：
 
 ```powershell
-.\scripts\Build-PairedRelease.ps1 -AuthenticationAssets 'D:\CarSoft\MediaBridgeApp\tooling\carbridge-runtime-assets' -UseLocalTestKey
+.\scripts\Build-PairedRelease.ps1 -AuthenticationAssets 'E:\DevTools\MediaBridgeTooling\carbridge-runtime-assets' -UseLocalTestKey
 ```
 
 脚本使用指定 tooling，校验两端协议一致，运行测试/lint/构建并复制签名包。认证目录和签名不提交 Git。`-UseLocalTestKey` 仅用于本机测试签名；换正式签名时同步双方信任配置。

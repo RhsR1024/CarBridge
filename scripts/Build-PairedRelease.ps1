@@ -1,5 +1,5 @@
 param(
-    [string]$Tooling = 'D:\CarSoft\MediaBridgeApp\tooling',
+    [string]$Tooling = 'E:\DevTools\MediaBridgeTooling',
     [string]$MediaBridgeRoot = 'D:\CarSoft\MediaBridgeApp\MediaBridge-src',
     [string]$AuthenticationAssets = $env:DIPLAY_AUTH_ASSETS_DIR,
     [string]$OutputDirectory = '',
