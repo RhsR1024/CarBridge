@@ -1,5 +1,6 @@
 012676d7ece6cfe76027d6dc78bb7c21376391cea56d8df258ee2cf4134b9717 *CarPlay-USBBox-Slim-Controls-R10.apk
 1e438bb94316ec5db8b1d724f9e6a6866e2256a4a86be2c114d006ec43ba6369 *CarPlay-USBBox-Slim-Controls-R11.apk
+4a677279fb4c16e82adee3ba1cf2ed9d3802a49ba382675f8c473100acbe1e4a *CarPlay-USBBox-Slim-Controls-R12.apk
 8b8234e13295bcfae52adb5d5c22590bf5a5251a5911160df84784bade162b3b *CarPlay-USBBox-Slim-Controls-R2.apk
 d83c1d8853f2ff79d75ff4a2408cb067ad3d9522c05e4fc424d19133a75e12a2 *CarPlay-USBBox-Slim-Controls-R3.apk
 c5cbcc50f5bd389d121db452bf5e4d1ad4a7f96e7fe3ace8113683d8e72d3e82 *CarPlay-USBBox-Slim-Controls-R4.apk
