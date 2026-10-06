@@ -13,6 +13,6 @@ if (-not $gradleBin) { $gradleBin = 'E:\DevTools\MediaBridgeTooling\gradle\gradl
 & $gradleBin --no-daemon -p (Join-Path $projectRoot 'test-project') testDebugUnitTest
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 $mediaBridgeRoot = $env:MEDIABRIDGE_ROOT
-if (-not $mediaBridgeRoot) { $mediaBridgeRoot = 'D:\CarSoft\MediaBridgeApp\MediaBridge-src' }
+if (-not $mediaBridgeRoot) { $mediaBridgeRoot = 'D:\WorkSpace\MediaBridge-src' }
 & $gradleBin --no-daemon -p $mediaBridgeRoot testDebugUnitTest lintDebug assembleRelease
 exit $LASTEXITCODE

@@ -251,14 +251,27 @@ public final class UsbMediaBridge {
         @Override public void yielded() { claimRevision++; }
         private String pendingSkip;
         private long pendingSkipAt;
+        /** When the box first reported playing again; the skip waits for this to settle. */
+        private long pendingSkipPlayingAt;
+        private static final long RESUME_SETTLE_MS = 600L;
+        private static final long SKIP_VERIFY_MS = 1500L;
         private final Runnable pendingSkipPoll = new Runnable() {
             @Override public void run() {
                 if (live != Runtime.this || pendingSkip == null) return;
                 if (!controllable()) { pendingSkip = null; return; }
+                long now = SystemClock.elapsedRealtime();
                 boolean playing = track.playing();
+                if (!playing) pendingSkipPlayingAt = 0;
+                else if (pendingSkipPlayingAt == 0) pendingSkipPlayingAt = now;
                 // The reported flag trails the phone by up to one metadata callback (about
                 // 460 ms here), so cap the wait just past the measured report latency.
-                if (!playing && SystemClock.elapsedRealtime() - pendingSkipAt < 900) {
+                if (!playing && now - pendingSkipAt < 900) {
+                    MAIN.postDelayed(this, 100); return;
+                }
+                // Spending the skip on the first "playing" sample races the resume we just
+                // asked for and the phone drops it, which is the "next does nothing until
+                // pause/play" report. Let the resumed playback settle one more callback.
+                if (playing && now - pendingSkipPlayingAt < RESUME_SETTLE_MS) {
                     MAIN.postDelayed(this, 100); return;
                 }
                 dispatchPendingSkip(playing);
@@ -272,6 +285,7 @@ public final class UsbMediaBridge {
         private void skipAfterResume(String action) {
             flushPendingSkip();
             pendingSkip = action; pendingSkipAt = SystemClock.elapsedRealtime();
+            pendingSkipPlayingAt = 0;
             original.onPlay(); claim();
             lastCommandResult = action + " resumeFirst";
             publish();
@@ -283,9 +297,18 @@ public final class UsbMediaBridge {
         private void dispatchPendingSkip(boolean playing) {
             String action = pendingSkip; pendingSkip = null;
             if (action == null) return;
-            boolean ok = "PREVIOUS".equals(action) ? original.onPrevious() : original.onNext();
+            final long before = track.revision;
+            final boolean ok = "PREVIOUS".equals(action) ? original.onPrevious() : original.onNext();
             lastCommandResult = action + " skipped playing=" + playing + " ok=" + ok;
             publish();
+            // The phone accepts a skip without always acting on it. Record whether the track
+            // really moved, so the companion log can tell a dropped skip from a slow one.
+            if (ok) MAIN.postDelayed(() -> {
+                if (live != Runtime.this || !controllable()) return;
+                lastCommandResult = action + " skipped playing=" + playing + " ok=true"
+                        + " changed=" + (track.revision != before);
+                publish();
+            }, SKIP_VERIFY_MS);
         }
         private void claim() {
             final long revision = ++claimRevision;

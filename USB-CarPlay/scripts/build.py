@@ -12,7 +12,7 @@ JAR = jadx_jar()
 ANDROID = SDK/'platforms/android-34/android.jar'
 CP = str(JAR)+os.pathsep+str(H)
 def run(args): subprocess.run([str(x) for x in args],check=True)
-protocol = Path(os.environ.get('MEDIABRIDGE_ROOT', 'D:/CarSoft/MediaBridgeApp/MediaBridge-src'))/'app/src/main/java/io/github/rhsr1024/interop/BridgeProtocol.java'
+protocol = Path(os.environ.get('MEDIABRIDGE_ROOT', 'D:/WorkSpace/MediaBridge-src'))/'app/src/main/java/io/github/rhsr1024/interop/BridgeProtocol.java'
 dest = R/'src/io/github/rhsr1024/interop/BridgeProtocol.java'
 assert dest.read_bytes() == protocol.read_bytes(), 'Protocol copies differ'
 classes=WORK/'classes'; classes.mkdir(exist_ok=True)
