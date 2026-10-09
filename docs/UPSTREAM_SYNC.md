@@ -11,11 +11,11 @@
 
 保留原始提交历史，不把 fork 变成源码压缩包导入的新仓库。默认 `main` 为 CarBridge 可集成主线，特性用短期分支，upstream 同步使用 `sync/diplay-<已验证标签或短提交>` 分支。远端配置是本地 Git 配置，不会随普通代码提交传播；新克隆按上表设置。
 
-初始化时四个 ref 均为 `f2d06951b4e8114dbb62f551c12a32a845a3042f`（v0.2.8）。2026-10-02 已将上游 main / v0.2.9 的 `18429e737228e8d75d9b6c850af89dcca2f591b6` 合入 CarBridge；本次明细见 [0.2.9 同步报告](UPSTREAM_SYNC_0.2.9.md)。2026-10-03 继续同步 v0.2.10 后的 main `4556313`，见 [0.2.10 同步报告](UPSTREAM_SYNC_0.2.10.md)。2026-10-04 同步 v0.2.11 后的 main `abe750f`，见 [0.2.11 同步报告](UPSTREAM_SYNC_0.2.11.md)。2026-10-05 同步稳定标签 v0.2.12 `22d2aac`，见 [0.2.12 同步报告](UPSTREAM_SYNC_0.2.12.md)。本轮不跟随标签后的移动 main。远端 ref 会变化，后续仍需按实际 fetch 结果核对。
+初始化时四个 ref 均为 `f2d06951b4e8114dbb62f551c12a32a845a3042f`（v0.2.8）。2026-10-02 已将上游 main / v0.2.9 的 `18429e737228e8d75d9b6c850af89dcca2f591b6` 合入 CarBridge；本次明细见 [0.2.9 同步报告](UPSTREAM_SYNC_0.2.9.md)。2026-10-03 继续同步 v0.2.10 后的 main `4556313`，见 [0.2.10 同步报告](UPSTREAM_SYNC_0.2.10.md)。2026-10-04 同步 v0.2.11 后的 main `abe750f`，见 [0.2.11 同步报告](UPSTREAM_SYNC_0.2.11.md)。2026-10-05 同步稳定标签 v0.2.12 `22d2aac`，见 [0.2.12 同步报告](UPSTREAM_SYNC_0.2.12.md)。2026-10-09 同步稳定标签 v0.2.15 `b940efe`，见 [0.2.15 同步报告](UPSTREAM_SYNC_0.2.15.md)。本轮不跟随标签后的移动 main。远端 ref 会变化，后续仍需按实际 fetch 结果核对。
 
 ## 2. 降低冲突的结构规则
 
-1. 保留现有 `shared/common/mobile/automotive` 层次及内部 namespace；外部 applicationId、显示名、签名和分发版本独立。
+1. 保留现有 `shared/common/mobile/automotive` 层次及内部 namespace；外部 applicationId、显示名与签名独立；显示版本按第 5 节对齐已同步上游，内部版本码保持递增。
 2. 新增的 Now Playing、播放仲裁、ECARX、车型配置与跨应用协作优先放在独立包/模块；原有大型 Activity/Controller 只加入清晰的接口调用。
 3. 保留 BYD 实现和测试，通过 VehicleProfile 控制；不对整个仓库批量删 BYD、替换字符串或重新排版。
 4. 新增 Geely 图标，使用默认资源选择器，不直接破坏 BYD 可选资源；OEM 显示名称和认证身份分开。
@@ -82,7 +82,15 @@ git merge --no-ff --no-commit $syncTarget
 
 CarBridge 使用自己的稳定发布签名，不能期待其 APK 覆盖更新 DiPlay 的签名/包名。首次发布固定包名与签名后不随 upstream 版本更改。调试和正式包使用独立身份时，忽略名单、IPC 配对和授权分别设置。
 
-CarBridge 从 `0.1.0 / 100` 起独立递增，不直接套用上游值。当前同步版本为 **0.1.10 / 110**，`upstreamBase=22d2aac (v0.2.12)`，协作协议仍为 1.0；本次未修改 MediaBridge。首次配套交付以及后续车测版本保留在台账和车辆报告中。上游发布状态与 CarBridge 的设备验收状态分别记录。
+自 2026-10-09 起，按用户要求执行以下版本规则：
+
+1. **CarBridge 的 `versionName` 与实际已同步的 DiPlay 上游版本完全一致。** 本轮为 `0.2.15`，mobile／automotive 同步对齐；debug 仅保留现有 `-debug` 后缀。不能只改显示版本号而未完成对应源码合并和验证。
+2. **`versionCode` 保持本项目单调递增，不复制上游较小的整数。** 本轮为 `111`，大于已交付 0.1.10 的 `110`，避免 Android 拒绝覆盖升级。后续每次交付均增加；同一上游基线上的定制修复也增加版本码。
+3. 每次同步记录上游 tag、完整提交和 CarBridge 提交；同一基线上的定制修复保持上游 `versionName`，以内部版本码和提交区分。比较落后程度以已同步的上游 tag 为依据。
+4. 同时更新 mobile／automotive 构建配置、README、开发文档、CHANGELOG 和同步台账，保持“关于”页面、APK 元数据和文档一致。应用包名、签名和用户设置不随版本对齐而改变。
+5. 旧版本记录保留原值，不回改历史。未来同步时以这条规则替代此前独立 `0.1.x` 显示版本的惯例。
+
+当前同步版本为 **0.2.15 / 111**，`upstreamBase=b940efe (v0.2.15)`，协作协议仍为 1.0；本次未修改 MediaBridge。首次配套交付以及后续车测版本保留在台账和车辆报告中。上游发布状态与 CarBridge 的设备验收状态分别记录。
 
 每次发布记录：CarBridge 提交/版本/包名/APK 哈希、上游 tag+提交、协议 major/minor、兼容 MediaBridge 版本、构建依赖、目标车机报告、已知资源/语音限制。SDK/协议 source type 等兼容参数有变化也要记录。
 

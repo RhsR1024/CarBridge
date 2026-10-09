@@ -27,7 +27,7 @@ class DiPlaySessionService : Service() {
         }
         if (intent?.action == ACTION_MEDIA) CarPlayMediaKeys.command(intent.getIntExtra("button", 0))
         val manager = getSystemService(NotificationManager::class.java)
-        manager.createNotificationChannel(NotificationChannel(CHANNEL, "CarPlay connection", NotificationManager.IMPORTANCE_LOW))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) manager.createNotificationChannel(NotificationChannel(CHANNEL, "CarPlay connection", NotificationManager.IMPORTANCE_LOW))
         val notification = mediaNotification()
         if (Build.VERSION.SDK_INT >= 29) {
             var types = ServiceInfo.FOREGROUND_SERVICE_TYPE_CONNECTED_DEVICE
@@ -55,7 +55,8 @@ class DiPlaySessionService : Service() {
         val button = if (playing) com.shilapi.xcertplay.airplay.CarPlayMediaButton.PAUSE else com.shilapi.xcertplay.airplay.CarPlayMediaButton.PLAY
         val media = PendingIntent.getService(this, 10 + button, Intent(this, DiPlaySessionService::class.java)
             .setAction(ACTION_MEDIA).putExtra("button", button), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        val builder = Notification.Builder(this, CHANNEL).setSmallIcon(R.drawable.ic_diplay_notification)
+        val builder = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) Notification.Builder(this, CHANNEL)
+            else { @Suppress("DEPRECATION") Notification.Builder(this).setPriority(Notification.PRIORITY_LOW) }).setSmallIcon(R.drawable.ic_diplay_notification)
             .setContentTitle(title).setContentText(artist).setContentIntent(open).setOngoing(true).setOnlyAlertOnce(true)
             .addAction(Notification.Action.Builder(if (playing) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play,
                 if (playing) "暂停" else "播放", media).build())

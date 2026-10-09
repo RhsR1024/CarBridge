@@ -57,6 +57,30 @@ class CarBridgeUpstreamCompatibilityTest {
         assertFalse(WheelZoomSettings.enabled(context))
         assertFalse(WheelZoomSettings.joystick(context))
         assertTrue(AirPlayPersistence.loadAudioFocusEnabled(context))
+        assertFalse(AirPlayPersistence.loadCarBluetoothAudio(context))
+        assertFalse(AirPlayPersistence.loadCallEchoCancellation(context))
+        assertFalse(AirPlayPersistence.loadCallVoiceFilter(context))
+        assertFalse(AirPlayPersistence.loadMainBufferedAudio(context))
+    }
+
+    @Test fun savedUpstreamCallFeaturesCannotConsumeGeelyControls() {
+        BydOutputSettings.setCarPlayCalls(context, true)
+        BydOutputSettings.setCarPlayCallControls(context, true)
+        for (profile in listOf(VehicleProfile.GEELY, VehicleProfile.GENERIC)) {
+            CarBridgeSettings.prefs(context).edit().putString("vehicle", profile.name).commit()
+            assertFalse(BydOutputSettings.carPlayCalls(context))
+            assertFalse(BydOutputSettings.carPlayCallControls(context))
+        }
+        CarBridgeSettings.prefs(context).edit().putString("vehicle", "BYD").commit()
+        assertTrue(BydOutputSettings.carPlayCalls(context))
+        assertTrue(BydOutputSettings.carPlayCallControls(context))
+    }
+
+    @Test fun customMediaControlsHaveOneVehicleSettingsDestination() {
+        val categories = SettingsInformationArchitecture.sectionsByCategory.filterValues {
+            SettingsSection.CARBRIDGE_MEDIA in it
+        }.keys
+        assertEquals(setOf(SettingsCategory.VEHICLE), categories)
     }
 
     @Test fun upstreamDisplaySettingsDoNotOverwriteAudioChannelsOrTheCustomOemIcon() {
@@ -67,6 +91,8 @@ class CarBridgeUpstreamCompatibilityTest {
         AirPlayPersistence.saveCustomAirPlayIcon(context, custom)
         AirPlayPersistence.saveDisplayScalePercent(context, 137)
         AirPlayPersistence.saveCarPlayNightMode(context, CarPlayNightMode.NIGHT)
+        AirPlayPersistence.saveAppAppearance(context, AppAppearance.LIGHT)
+        AirPlayPersistence.saveSmoothVideo(context, true)
         assertEquals(11, AirPlayPersistence.loadMediaAudioChannel(context))
         assertEquals(15, AirPlayPersistence.loadNavigationAudioChannel(context))
         assertEquals("My Geely", AirPlayPersistence.loadOemLabel(context))

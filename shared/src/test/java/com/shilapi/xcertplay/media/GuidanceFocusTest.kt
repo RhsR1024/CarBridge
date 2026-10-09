@@ -26,7 +26,7 @@ class GuidanceFocusTest {
     @Test fun navigationUsesTransientDuckAndReleasesWithoutRequestingMusic() {
         val log = mutableListOf<String>()
         val volumes = mutableListOf<Int>()
-        val focus = AudioFocusCoordinator(context, true, { log += it }, true, { volumes += it })
+        val focus = AudioFocusCoordinator(context, true, report = { log += it }, guidanceEnabled = true, volumeControl = { volumes += it })
         val attr = attributes(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
         val audio = track(attr)
         focus.acquire(audio, AudioChannel.NAVIGATION, attr)
@@ -44,7 +44,7 @@ class GuidanceFocusTest {
 
     @Test fun phoneRemainsPrimaryAndClosedSinkCannotReacquire() {
         val log = mutableListOf<String>()
-        val focus = AudioFocusCoordinator(context, true, { log += it }, true)
+        val focus = AudioFocusCoordinator(context, true, report = { log += it }, guidanceEnabled = true)
         val phoneAttr = attributes(AudioAttributes.USAGE_VOICE_COMMUNICATION)
         val navAttr = attributes(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
         val phone = track(phoneAttr); val nav = track(navAttr)
@@ -64,8 +64,8 @@ class GuidanceFocusTest {
         val log = mutableListOf<String>()
         val attr = attributes(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
         val audio = track(attr)
-        AudioFocusCoordinator(context, false, { log += it }, true).acquire(audio, AudioChannel.NAVIGATION, attr)
-        AudioFocusCoordinator(context, true, { log += it }, false).acquire(audio, AudioChannel.NAVIGATION, attr)
+        AudioFocusCoordinator(context, false, report = { log += it }, guidanceEnabled = true).acquire(audio, AudioChannel.NAVIGATION, attr)
+        AudioFocusCoordinator(context, true, report = { log += it }, guidanceEnabled = false).acquire(audio, AudioChannel.NAVIGATION, attr)
         assertTrue(log.isEmpty())
         audio.release()
     }
@@ -73,7 +73,7 @@ class GuidanceFocusTest {
     @Test fun rejectedFocusDoesNotRetryUntilNextAudibleBurstOrPinVolume() {
         shadowOf(manager).setNextFocusRequestResponse(AudioManager.AUDIOFOCUS_REQUEST_FAILED)
         val log = mutableListOf<String>(); val volumes = mutableListOf<Int>()
-        val focus = AudioFocusCoordinator(context, true, { log += it }, true, { volumes += it })
+        val focus = AudioFocusCoordinator(context, true, report = { log += it }, guidanceEnabled = true, volumeControl = { volumes += it })
         val attr = attributes(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
         val audio = track(attr)
         focus.acquire(audio, AudioChannel.NAVIGATION, attr)
@@ -88,7 +88,7 @@ class GuidanceFocusTest {
 
     @Test fun overlappingGuidanceTracksReleaseOnlyAfterLastTrackEnds() {
         val log = mutableListOf<String>()
-        val focus = AudioFocusCoordinator(context, true, { log += it }, true)
+        val focus = AudioFocusCoordinator(context, true, report = { log += it }, guidanceEnabled = true)
         val attr = attributes(AudioAttributes.USAGE_ASSISTANCE_NAVIGATION_GUIDANCE)
         val one = track(attr); val two = track(attr)
         focus.acquire(one, AudioChannel.NAVIGATION, attr)

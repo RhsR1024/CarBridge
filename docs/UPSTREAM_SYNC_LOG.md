@@ -145,3 +145,23 @@ APK 包名/版本/签名摘要/哈希（如构建发布）：
 | 状态 | 本机同步验证通过；双亲合并后快进本地 main，原有工作仍未提交 |
 | 完整报告与产物哈希 | [UPSTREAM_SYNC_0.2.12.md](UPSTREAM_SYNC_0.2.12.md) |
 | 回退 | 保留前基线；共享后按 merge 第一父创建 revert，不重写历史 |
+
+
+## 2026-10-09 — 同步 DiPlay v0.2.15，CarBridge 显示版本对齐
+
+| 字段 | 记录 |
+| --- | --- |
+| 同步前 CarBridge | 133f4353ed355849265ff3b7420e0495a0216668；工作区干净 |
+| 原上游基线 | v0.2.12 / 22d2aacedcadc4ec1aef0d74b161b05321f708a7 |
+| 目标标签 | v0.2.15 / b940efe81ebe6fe930caac71e19d9624723e6b7f；不跟随移动 main |
+| 分支 / 双亲合并 | sync/diplay-0.2.15；本记录随 merge，父提交为上述 CarBridge 与上游目标 |
+| 显示版本 / 内部版本码 | mobile／automotive 0.2.15 / 111；debug 保留 -debug |
+| 新维护规则 | 按用户要求 versionName 对齐已同步上游，versionCode 保持本项目递增；写入 AGENTS.md 和 UPSTREAM_SYNC.md §5 |
+| 定制保护 | 吉利方控、直连／MediaBridge、音乐门控、媒体／导航音道和音量目标、自定义图标、歌曲资源和旋转策略保留；新增 BYD 通话功能继续车型隔离 |
+| 核心未变更 | USB-CarPlay、ecarx、车机路由、协作协议、Now Playing、PlaybackPolicy／MusicOutputGate、音道映射与 GuidanceActivity |
+| 兼容性 | ECARX SDK 要求 API 28，mobile 最低 Android 9 保持；共享层吸收旧 Android 兼容实现 |
+| 自动化 | shared 1,037 + common 961 + home 4 = 2,002 项通过，无失败／错误／跳过；四项 lint 0 错误；四模块 debug 构建成功 |
+| 既有检查问题 | public tree 因同步前已跟踪的 21 个 USB 分发 APK／公开证书失败，本轮没有增加 |
+| 协作与设备范围 | MediaBridge 未修改，协议 1.0；未实车测试、未推送或发布 |
+| 回退 | backup/pre-diplay-0.2.15-20261009；共享后按 merge 第一父创建 revert |
+| 完整报告 | [UPSTREAM_SYNC_0.2.15.md](UPSTREAM_SYNC_0.2.15.md) |

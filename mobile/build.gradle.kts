@@ -15,10 +15,11 @@ android {
 
     defaultConfig {
         applicationId = "io.github.rhsr1024.carbridge"
+        // The Geely ECARX SDK still requires Android 9; keep the fork's supported floor.
         minSdk = 28
         targetSdk = 37
-        versionCode = 110
-        versionName = "0.1.10"
+        versionCode = 111
+        versionName = "0.2.15"
 
     }
 

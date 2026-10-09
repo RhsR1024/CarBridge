@@ -4,7 +4,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
-import android.media.AudioFocusRequest
+import com.shilapi.xcertplay.compat.AudioFocusRequestCompat
 import android.media.AudioManager
 import android.media.MediaMetadata
 import android.media.session.MediaSession
@@ -50,7 +50,7 @@ internal class CarBridgeMediaRuntime(
             if (lyrics != null && current.lyrics.isNullOrBlank()) controller.nowPlaying.store.lyrics(value.connectionId, value.trackGeneration, lyrics)?.let(controller.nowPlaying::publish)
         }
     }
-    private var focusRequest: AudioFocusRequest? = null
+    private var focusRequest: AudioFocusRequestCompat? = null
     private var pendingGrant: Long? = null
     private var duck = 1f
     @Volatile private var closed = false
@@ -69,9 +69,11 @@ internal class CarBridgeMediaRuntime(
         session.setSessionActivity(PendingIntent.getActivity(context, 70,
             Intent(context, CarPlayHostActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
         session.setCallback(CarPlayMediaCallback(
-            send = { index, source -> command(index, source, runCatching { session.currentControllerInfo.packageName }.getOrNull()) },
+            send = { index, source -> command(index, source, if (android.os.Build.VERSION.SDK_INT >= 28)
+                runCatching { session.currentControllerInfo.packageName }.getOrNull() else null) },
             mapKey = { key ->
-                if (CarBridgeSettings.isByd(context)) Button.forKeyCode(key) else when (key) {
+                if (CarBridgeSettings.isByd(context)) Button.forKeyCode(key,
+                    com.shilapi.xcertplay.hud.BydOutputSettings.carPlayCallControls(context)) else when (key) {
                     KeyEvent.KEYCODE_MEDIA_PLAY -> Button.PLAY
                     KeyEvent.KEYCODE_MEDIA_PAUSE -> Button.PAUSE
                     KeyEvent.KEYCODE_MEDIA_NEXT -> Button.NEXT
@@ -188,12 +190,11 @@ internal class CarBridgeMediaRuntime(
 
     private fun requestAndroidFocus(token: Long) {
         abandonFocus()
-        lateinit var request: AudioFocusRequest
-        request = AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-            .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA)
-                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build())
-            .setAcceptsDelayedFocusGain(true)
-            .setOnAudioFocusChangeListener({ change ->
+        lateinit var request: AudioFocusRequestCompat
+        request = AudioFocusRequestCompat(AudioManager.AUDIOFOCUS_GAIN,
+            AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build(),
+            { change ->
                 if (!closed && focusRequest === request && policy.current(token)) {
                     log("focus=$change intent=$token")
                     when (change) {
@@ -207,9 +208,9 @@ internal class CarBridgeMediaRuntime(
                         AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> { duck = 0.2f; syncOutput() }
                     }
                 }
-            }, main).build()
+            }, main, acceptsDelayedFocusGain = true)
         focusRequest = request
-        val result = runCatching { audio.requestAudioFocus(request) }.getOrDefault(AudioManager.AUDIOFOCUS_REQUEST_FAILED)
+        val result = runCatching { request.request(audio) }.getOrDefault(AudioManager.AUDIOFOCUS_REQUEST_FAILED)
         log("focusRequest=$result intent=$token")
         when (result) {
             AudioManager.AUDIOFOCUS_REQUEST_GRANTED -> { policy.focusGrant(token); completePlayback(token) }
@@ -241,7 +242,7 @@ internal class CarBridgeMediaRuntime(
     private fun abandonFocus() {
         val old = focusRequest
         focusRequest = null
-        if (old != null) runCatching { audio.abandonAudioFocusRequest(old) }
+        if (old != null) runCatching { old.abandon(audio) }
         duck = 1f
     }
 
