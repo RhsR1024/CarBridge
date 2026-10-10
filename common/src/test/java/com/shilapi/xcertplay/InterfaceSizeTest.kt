@@ -96,6 +96,17 @@ class InterfaceSizeTest {
     }
 
     @Test
+    fun automaticAndFixedDensityOverridesPreserveTheDriversLargeFont() {
+        for (choice in listOf(InterfaceSize.AUTO, 150, 200)) {
+            val base = screen(2560, 1440, 160).apply { fontScale = 1.4f }
+            val scaled = InterfaceSize.override(base, choice)!!
+            val applied = Configuration(base).apply { updateFrom(InterfaceSize.contextOverride(scaled)) }
+            assertEquals(1.4f, applied.fontScale, 0f)
+            assertEquals(scaled.densityDpi, applied.densityDpi)
+        }
+    }
+
+    @Test
     fun automaticScalingReevaluatesASplitWindowFromTheSystemDensity() {
         val scaled = InterfaceSize.override(screen(2666, 1333, 144), InterfaceSize.AUTO)!!
         val split = screen(1333, 1225, 144).apply { updateFrom(InterfaceSize.contextOverride(scaled)) }

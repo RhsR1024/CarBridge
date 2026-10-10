@@ -26,6 +26,8 @@ class CarBridgeUpstreamCompatibilityTest {
     @Before fun reset() {
         CarBridgeSettings.prefs(context).edit().clear().commit()
         context.getSharedPreferences("xcertplay_airplay", Context.MODE_PRIVATE).edit().clear().commit()
+        context.getSharedPreferences("ambient_music", Context.MODE_PRIVATE).edit().clear().commit()
+        context.getSharedPreferences("diplay_navigation_wheel", Context.MODE_PRIVATE).edit().clear().commit()
         AirPlayPersistence.clearCustomAirPlayIcon(context)
     }
 
@@ -61,6 +63,22 @@ class CarBridgeUpstreamCompatibilityTest {
         assertFalse(AirPlayPersistence.loadCallEchoCancellation(context))
         assertFalse(AirPlayPersistence.loadCallVoiceFilter(context))
         assertFalse(AirPlayPersistence.loadMainBufferedAudio(context))
+        assertFalse(AirPlayPersistence.loadLowLatencyDecoder(context))
+        assertFalse(AirPlayPersistence.loadDirectVideoOutput(context))
+        assertFalse(NavigationWheelSettings.enabled(context))
+        assertFalse(com.shilapi.xcertplay.media.AmbientMusicSettings.load(context).enabled)
+    }
+
+    @Test fun savedAmbientOptInCannotStartBydLampIoOnOtherVehicles() {
+        context.getSharedPreferences("ambient_music", Context.MODE_PRIVATE).edit()
+            .putBoolean("enabled", true).commit()
+        for (profile in listOf(VehicleProfile.GEELY, VehicleProfile.GENERIC)) {
+            CarBridgeSettings.prefs(context).edit().putString("vehicle", profile.name).commit()
+            assertEquals(0L, com.shilapi.xcertplay.media.AmbientMusicController.openSink(context))
+            assertFalse(com.shilapi.xcertplay.media.AmbientMusicController.checkSupport(context).get())
+        }
+        // Keep the saved BYD preference intact for a later switch back to that profile.
+        assertTrue(com.shilapi.xcertplay.media.AmbientMusicSettings.load(context).enabled)
     }
 
     @Test fun savedUpstreamCallFeaturesCannotConsumeGeelyControls() {

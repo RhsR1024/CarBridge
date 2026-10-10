@@ -61,6 +61,9 @@ object InterfaceSize {
      * The scaled dimensions are written to the live resources by [enforce] instead.
      */
     internal fun contextOverride(scaled: Configuration): Configuration = Configuration().apply {
+        // Configuration() starts at 1x. Leave the font field unset so a density override
+        // does not silently reset the driver's system large-font choice to 1x.
+        fontScale = 0f
         densityDpi = scaled.densityDpi
         setLocales(scaled.locales)
         setLayoutDirection(scaled.locales[0])

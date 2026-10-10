@@ -66,6 +66,7 @@ internal class CarBridgeMediaRuntime(
     val status: String get() = route.status
 
     init {
+        com.shilapi.xcertplay.media.AmbientMusicController.claimPlaybackOwner(controller)
         session.setSessionActivity(PendingIntent.getActivity(context, 70,
             Intent(context, CarPlayHostActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
         session.setCallback(CarPlayMediaCallback(
@@ -146,6 +147,8 @@ internal class CarBridgeMediaRuntime(
         val previous = snapshot
         if (previous.trackKey != value.trackKey || previous.positionMs != value.positionMs) pausedPosition = null
         snapshot = value
+        com.shilapi.xcertplay.media.AmbientMusicController.phonePlaybackChanged(controller,
+            value.playback == Playback.PLAYING)
         route.update(value)
         if (previous.playback != value.playback || previous.trackGeneration != value.trackGeneration) {
             log("observed playback=${value.playback} track=${value.trackGeneration} revision=${value.revision}")
@@ -296,6 +299,7 @@ internal class CarBridgeMediaRuntime(
     fun close() {
         if (closed) return
         closed = true
+        com.shilapi.xcertplay.media.AmbientMusicController.releasePlaybackOwner(controller)
         controller.nowPlaying.listener = null
         controller.nowPlaying.artworkListener = null
         policy.disconnect(); gate.update(false)

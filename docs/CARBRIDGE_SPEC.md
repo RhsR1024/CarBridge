@@ -1,6 +1,6 @@
 # CarBridge 产品与技术规格
 
-当前实现注记：CarBridge 0.2.15 已同步 DiPlay v0.2.15；下文 0.2.8 是最初需求基线。同步范围及新版本验证边界见 [同步报告](UPSTREAM_SYNC_0.2.15.md)，既有 0.1.3 车测结论见 [车辆记录](VEHICLE_VERIFIED_0.1.3.md)。
+当前实现注记：CarBridge 0.2.16 已同步 DiPlay v0.2.16；下文 0.2.8 是最初需求基线。同步范围及新版本验证边界见 [同步报告](UPSTREAM_SYNC_0.2.16.md)，既有 0.1.3 车测结论见 [车辆记录](VEHICLE_VERIFIED_0.1.3.md)。
 
 0.1.1 补充：iPhone 酷狗的“车载蓝牙歌词”可能把歌词写入媒体标题。应关闭该开关取得歌曲元数据；不能靠固定旧标题掩盖源数据变化。配套 MediaBridge 不得把 CarBridge 连接通知当歌手，缺少歌名/歌手/时长时不启动资源检索。CarPlay 画面里的收藏按钮不等于已有可桥接接口；双向收藏当前范围见 [收藏可行性](CARBRIDGE_FAVORITES_FEASIBILITY.md)。
 

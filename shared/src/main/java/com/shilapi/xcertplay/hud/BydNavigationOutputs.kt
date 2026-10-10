@@ -7,6 +7,7 @@ import com.shilapi.xcertplay.iap2.wire.Iap2Frame
 object BydNavigationOutputs {
     /** Recover a journaled interrupted output when the app opens, even before a phone reconnects. */
     fun onAppOpened(context: Context) {
+        BydBluetoothSuspend.onAppOpened(context)
         com.shilapi.xcertplay.network.WifiScanPause.restoreIfNeeded(context)
         if (!com.shilapi.xcertplay.vehicle.CarBridgeSettings.isByd(context)) return
         BydOemClusterNavi.restoreIfNeeded(context)

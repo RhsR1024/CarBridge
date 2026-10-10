@@ -13,8 +13,8 @@ android {
         applicationId = "io.github.rhsr1024.carbridge.automotive"
         minSdk = 28
         targetSdk = 37
-        versionCode = 111
-        versionName = "0.2.15"
+        versionCode = 112
+        versionName = "0.2.16"
 
     }
 

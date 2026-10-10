@@ -1,3 +1,14 @@
+# CarBridge 0.2.16 — DiPlay 0.2.16 同步 — 2026-10-10
+
+- 同步发布标签 v0.2.16（`bac4196`，上游公开预览版），吸收软件 Opus 麦克风编码、USB／无线连接恢复、视频延迟与设置界面改进。
+- 保留吉利方控、直连／MediaBridge、音乐互斥、媒体／导航音道、导航焦点与音量恢复、默认／自定义图标和旋转策略。
+- 音乐首次播放、补缓冲和尾音仍经过 MusicOutputGate；新增氛围灯播放状态复用 CarBridgeMediaRuntime，不引入第二套媒体会话。
+- BYD 氛围灯和蓝牙暂停限制在 BYD 配置，已保存的开关不影响吉利；导航方控音量等实验功能默认关闭。
+- 修复界面密度缩放重置系统大字体、窄窗口多行按钮裁切和搜索框过窄；增加 2560×1440、大字体及阿拉伯 RTL 的原生渲染核验。
+- mobile／automotive 显示版本 0.2.16，内部版本码 112；包名、最低 Android 9 和既有配置保持兼容。设备验收范围见报告。
+
+详情见 [同步与验证报告](docs/UPSTREAM_SYNC_0.2.16.md)。
+
 # CarBridge 0.2.15 — DiPlay 0.2.15 同步 — 2026-10-09
 
 - 同步稳定标签 v0.2.15（`b940efe`）：吸收 0.2.13–0.2.15 的连接、音频预缓冲恢复、视频解码、界面与设置增强。
@@ -31,6 +42,18 @@
 
 详见 [0.1.7 说明](docs/RELEASE_0.1.7.md) 和 [USB 修复记录](USB-CarPlay/docs/METADATA_HANDOFF_2026-10-03.md)。
 # Unreleased
+# DiPlay 0.2.16 — 2026-10-09
+
+- Send the Siri and call microphone on Android 7.1–9 head units without an Opus encoder through a bundled software Opus encoder, and offer Opus only when it can be encoded; accepted on a BOS Mini A1 (Android 9) with an iPhone 12 on iOS 27 (#468, #483).
+- Fix wired NCM receive framing and Android 8 USB reads, and retry rejected large USB reads at smaller sizes (#478, #495).
+- Refresh hotspot addresses after a first wireless timeout, request Android 17 local-network permission, handle missing VPN authorization screens and add WPA3 car-hotspot security (#474, #465, #517, #501).
+- Add experimental Low-latency decoding and Direct video output, an FPS counter, a hardware low-latency Smooth video decoder and bounded video backlog recovery (#496, #456, #347).
+- Add inline Settings search, confirm before the quick menu discards staged changes, allow turning off the swipe-down gesture, and refine Settings layout and reconnect prompts (#450, #500, #487, #486, #482, #490, #491).
+- Place the dashboard car marker with 1% sliders, give the small-window turn card its own placement, theme the cluster waiting screen, show the full DiLink 3 arrival time, declare initial appearance and add side-panel resizing (#494, #493, #481, #458, #346, #480).
+- Add experimental, off-by-default car Bluetooth pause, music-following ambient lighting, navigation wheel volume and a Platform 21 instrument route; refine call echo alignment, buffered-audio pacing and audio diagnostics (#307, #345, #344, #348, #421, #484, #499).
+
+See [0.2.16 release notes](docs/RELEASE-NOTES-0.2.16.md) for contribution links and limits, and [validation](docs/VALIDATION.md) for checks. Full-release vehicle acceptance is not claimed.
+
 # DiPlay 0.2.15 — 2026-10-08
 
 - Lower the minimum to Android 7.1/API 25 with compatibility fallbacks; Android 7.1–8.1 vehicle validation remains pending (#407).

@@ -10,7 +10,7 @@ mobile 和 automotive 同步更新；debug 保留现有 `-debug` 后缀。
 不得仅修改显示版本而未完成对应源码同步。
 
 `versionCode` 使用 CarBridge 自己的单调递增序列，不能复制上游较小的整数而造成
-安装降级。本次为 `0.2.15 / 111`，下一次交付的版本码必须更大；同一上游版本上的
+安装降级。当前为 `0.2.16 / 112`，下一次交付的版本码必须更大；同一上游版本上的
 定制修复保持上游显示版本，并增加内部版本码。包名、签名和用户设置保持兼容。
 
 每次同时更新两个模块的构建配置、README、开发文档、CHANGELOG 和同步台账，
@@ -82,3 +82,18 @@ Each locale MUST use its existing form: `(تجريبي)`, `(experimental)`, `(э
 
 Overview holds the connection status, links to the categories, quick settings, About and Language.
 Do not add a new setting to Overview. Add it to its category. Then promote it to quick settings only if drivers change it often.
+
+## Settings layout
+
+Spacing, size and shape in the Settings screen MUST come from one place.
+
+1. A gap between blocks MUST use a named dp constant, such as `SETTINGS_BLOCK_GAP_DP`.
+   A new literal gap value MUST NOT be added.
+2. A size MUST NOT be a pixel constant (`*_PX`). Use dp, and clamp to the available window width.
+   Test a menu or panel on a narrow window and on a high-density screen.
+3. Controls in one row MUST have the same height.
+   Corner radius MUST follow the control height. A new button MUST NOT set its own radius.
+4. Every `SettingsCategory` except Overview MUST have a link on Overview.
+   `AdaptiveSettingsUiTest.overviewLinksToEveryOtherCategory` checks this.
+5. A layout change MUST include compact and full screenshots with a large font scale.
+   Add an Arabic (right-to-left) screenshot when the change touches row alignment.

@@ -18,8 +18,8 @@ android {
         // The Geely ECARX SDK still requires Android 9; keep the fork's supported floor.
         minSdk = 28
         targetSdk = 37
-        versionCode = 111
-        versionName = "0.2.15"
+        versionCode = 112
+        versionName = "0.2.16"
 
     }
 

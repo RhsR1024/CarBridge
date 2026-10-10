@@ -165,3 +165,21 @@ APK 包名/版本/签名摘要/哈希（如构建发布）：
 | 协作与设备范围 | MediaBridge 未修改，协议 1.0；未实车测试、未推送或发布 |
 | 回退 | backup/pre-diplay-0.2.15-20261009；共享后按 merge 第一父创建 revert |
 | 完整报告 | [UPSTREAM_SYNC_0.2.15.md](UPSTREAM_SYNC_0.2.15.md) |
+
+## 2026-10-10 — 同步 DiPlay v0.2.16
+
+| 字段 | 记录 |
+| --- | --- |
+| 同步前 CarBridge | 3a25d24773c27573c4600887cf470ff6b9e273f8；工作区干净 |
+| 原上游基线 | v0.2.15 / b940efe81ebe6fe930caac71e19d9624723e6b7f |
+| 目标标签 | v0.2.16 / bac419695ca26b7e67d204a279333ca52132c2cb；公开预览版，不跟随移动 main |
+| 分支 / 双亲合并 | sync/diplay-0.2.16；本记录随 merge，父提交为上述 CarBridge 和上游目标 |
+| 版本 | mobile／automotive 0.2.16 / 112；独立包名与 API 28 最低版本保持 |
+| 定制 | 吉利方控、双模式、音乐互斥、媒体／导航音道与音量恢复、图标、封面代次、旋转策略保留 |
+| 新增隔离 | BYD 氛围灯和蓝牙暂停限制车型；ambient 播放状态复用原 runtime；导航方控为默认关闭的 opt-in |
+| 大字体 | 修复密度覆盖重置系统字号、窄窗口按钮裁切和搜索框过窄；原生渲染核验含 2560×1440 和阿拉伯 RTL |
+| 自动化 | shared 1,249 + common 1,040 + home 4 = 2,293 项通过；四项 lint 0 错误，四模块 debug 构建成功；后续 RTL／大字体 14 项专项通过 |
+| 既有问题 | public-tree 因先前已跟踪的 21 个 USB APK／公开证书失败，本轮未增加 |
+| 协作与设备范围 | MediaBridge、USB-CarPlay、协作协议未变；未进行新版实车验收或正式发布 |
+| 回退 | backup/pre-diplay-0.2.16-20261010；共享后按第一父 revert |
+| 完整报告 | [UPSTREAM_SYNC_0.2.16.md](UPSTREAM_SYNC_0.2.16.md) |

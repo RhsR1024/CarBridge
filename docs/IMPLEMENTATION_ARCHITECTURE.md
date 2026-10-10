@@ -1,5 +1,7 @@
 # CarBridge 0.1 实现与维护边界
 
+0.2.16 修订（2026-10-10）：同步 DiPlay v0.2.16 发布标签 `bac4196`（公开预览版），CarBridge 版本为 0.2.16 / 112。保留单一媒体管理、吉利方控、导航焦点／前台音量与图标；新增氛围灯通过原 runtime 的播放快照接入，灯光和蓝牙暂停严格限制 BYD 配置。吸收软件 Opus、USB／无线恢复、视频延迟与设置改进。导航方控音量为默认关闭的独立 opt-in，不替换吉利既有前台音量行为。详情见 [同步报告](UPSTREAM_SYNC_0.2.16.md)。
+
 0.2.15 修订（2026-10-09）：同步 DiPlay v0.2.15 稳定标签 `b940efe`。设置分类迁移保留车机与媒体接入、屏幕方向和定制图标入口；音乐仍由 CarBridgeMediaRuntime 与 MusicOutputGate 统一管理。吸收预缓冲恢复、视频解码与新连接修复，导航临时焦点、前台音量目标和结束恢复继续保留。新增 BYD 通话输出／按键受车型隔离；DiLink 引导不在吉利首次启动自动打开。音乐焦点通过 AudioFocusRequestCompat，保留延迟焦点支持；mobile 继续保持 ECARX SDK 要求的 API 28 最低版本。自动更新使用 CarBridge 发布源并核对 APK 包名。详情见 [同步报告](UPSTREAM_SYNC_0.2.15.md)。
 
 0.1.10 修订（2026-10-05）：同步 DiPlay v0.2.12 稳定标签 `22d2aac`。保留 CarBridgeMediaRuntime、ECARX／MediaBridge 路由、音乐门控、吉利导航焦点和音量目标、默认图标与自定义图标。新增方控缩放／摇杆保持默认关闭；BYD 新输出仍受车型隔离。上游“下一首封面待传输时沿用上一首封面”不适用于本项目按曲目代次防串图机制，不引入第二套媒体会话。连接、画面、昼夜模式与诊断增强见 [本轮报告](UPSTREAM_SYNC_0.2.12.md)。
@@ -63,7 +65,7 @@ MediaBridge 永久识别两个 CarBridge 包名（正式和 debug），进程重
 
 ## 上游与来源
 
-DiPlay 当前基线：`b940efe81ebe6fe930caac71e19d9624723e6b7f`（v0.2.15 稳定标签，见本轮报告）；原始 fork 基线为 `f2d06951b4e8114dbb62f551c12a32a845a3042f`（v0.2.8）。新增代码集中在独立包及 ecarx 模块，上游大文件只保留必要接线。BYD 功能未删除，入口受车型控制，原固件与接收器校验继续保留。
+DiPlay 当前基线：`bac419695ca26b7e67d204a279333ca52132c2cb`（v0.2.16 发布标签／公开预览版，见本轮报告）；原始 fork 基线为 `f2d06951b4e8114dbb62f551c12a32a845a3042f`（v0.2.8）。新增代码集中在独立包及 ecarx 模块，上游大文件只保留必要接线。BYD 功能未删除，入口受车型控制，原固件与接收器校验继续保留。
 
 文件传输实现参考 `shilapi/xcertplay` 的 `17c92439413638dfd1d7f91d7e1c2e7358398762`：Iap2LinkEngine、Iap2LinkChannel、Iap2CsmChannel、Iap2Session 的 session 12 增量及 FileTransferReceiver。保留 GPL-3.0 来源，并补充资源上限、曲目关联和生命周期约束。
 
